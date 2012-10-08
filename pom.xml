@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PROJECT METADATA -->
+    <parent>
+        <groupId>com.lyndir.lhunath</groupId>
+        <artifactId>lyndir</artifactId>
+        <version>GIT-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.lyndir.lhunath.omnicron</groupId>
+    <artifactId>omnicron</artifactId>
+    <version>GIT-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <name>omnicron</name>
+    <url>http://omnicron.lyndir.com</url>
+    <inceptionYear>2012</inceptionYear>
+    <description>
+        A multiplayer strategy game.
+    </description>
+
+    <organization>
+        <name>Lyndir</name>
+        <url>http://www.lyndir.com</url>
+    </organization>
+
+
+    <!-- CODE MANAGEMENT -->
+    <scm>
+        <url>${scm.github.webbase}/omnicron</url>
+        <connection>${scm.github.pubbase}/omnicron.git</connection>
+        <developerConnection>${scm.github.devbase}/omnicron.git</developerConnection>
+    </scm>
+    <issueManagement>
+        <system>YouTrack</system>
+        <url>https://youtrack.lyndir.com/issues/OC</url>
+    </issueManagement>
+
+
+    <!-- BUILD CONFIGURATION -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- DEPENDENCY MANAGEMENT -->
+    <dependencies>
+
+        <!-- Opal -->
+        <dependency>
+            <groupId>com.lyndir.lhunath.opal</groupId>
+            <artifactId>opal-security</artifactId>
+            <version>GIT-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lyndir.lhunath.opal</groupId>
+            <artifactId>opal-crypto</artifactId>
+            <version>GIT-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <!-- REMOTE ARTIFACT REPOSITORIES -->
+    <repositories>
+        <repository>
+            <id>lyndir</id>
+            <name>Lyndir Repository</name>
+            <url>http://maven.lyndir.com</url>
+
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
+
+</project>
+
