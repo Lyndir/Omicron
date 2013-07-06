@@ -1,11 +1,14 @@
 package com.lyndir.omnicron.api;
 
+import com.lyndir.lhunath.opal.system.util.MetaObject;
+
+
 /**
  * <i>10 07, 2012</i>
  *
  * @author lhunath
  */
-public class Coordinate {
+public class Coordinate extends MetaObject {
 
     public static final Coordinate ORIGIN = new Coordinate( 0, 0 );
 

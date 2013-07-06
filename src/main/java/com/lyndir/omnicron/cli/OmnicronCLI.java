@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.io.LineReader;
 import com.lyndir.omnicron.api.Game;
+import com.lyndir.omnicron.api.Player;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -18,8 +19,11 @@ public class OmnicronCLI {
 
     private static final Splitter commandSplitter = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
 
-    private boolean running = true;
-    private Game game;
+    private final Builders builders = new Builders();
+    private       boolean  running  = true;
+
+    private Game   game;
+    private Player localPlayer;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments)
@@ -30,16 +34,17 @@ public class OmnicronCLI {
             OmnicronCLI omnicron = new OmnicronCLI();
             LineReader inLineReader = new LineReader( inReader );
 
-            System.err.println("Welcome to Omnicron.");
-            System.err.println("Issue your commands.");
-            System.err.println("====================");
+            System.err.println( "Welcome to Omnicron." );
+            System.err.println( "Issue your commands." );
+            System.err.println( "====================" );
             while (omnicron.isRunning()) {
                 System.err.print( "% " );
                 Iterator<String> tokens = commandSplitter.split( inLineReader.readLine() ).iterator();
 
                 try {
-                new RootCommand().evaluate( omnicron, tokens );
-                } catch (RuntimeException e) {
+                    new RootCommand().evaluate( omnicron, tokens );
+                }
+                catch (RuntimeException e) {
                     System.err.format( "Unexpected: %s\n", e.getLocalizedMessage() );
                 }
             }
@@ -67,5 +72,20 @@ public class OmnicronCLI {
     public void setGame(final Game game) {
 
         this.game = game;
+    }
+
+    public Player getLocalPlayer() {
+
+        return localPlayer;
+    }
+
+    public void setLocalPlayer(final Player localPlayer) {
+
+        this.localPlayer = localPlayer;
+    }
+
+    public Builders getBuilders() {
+
+        return builders;
     }
 }

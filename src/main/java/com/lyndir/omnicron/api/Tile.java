@@ -1,12 +1,18 @@
 package com.lyndir.omnicron.api;
 
+import com.lyndir.lhunath.opal.system.util.MetaObject;
+import org.jetbrains.annotations.Nullable;
+
+
 /**
  * <i>10 07, 2012</i>
  *
  * @author lhunath
  */
-public class Tile {
+public class Tile extends MetaObject {
 
+    @Nullable
+    private       GameObject contents;
     private final Coordinate position;
     private final Tile       northWest;
     private final Tile       northEast;
@@ -62,5 +68,14 @@ public class Tile {
     public Tile getSouthEast() {
 
         return southEast;
+    }
+
+    public boolean contains(final GameObserver target) {
+
+        for (GameObserver candidate = contents; candidate != null; candidate = candidate.getParent())
+            if (candidate == target)
+                return true;
+
+        return false;
     }
 }

@@ -1,6 +1,7 @@
 package com.lyndir.omnicron.api;
 
 import com.google.common.collect.Maps;
+import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Map;
 
 
@@ -9,7 +10,7 @@ import java.util.Map;
  *
  * @author lhunath
  */
-public class Level {
+public class Level extends MetaObject {
 
     private final Size levelSize;
     private final Map<Coordinate, Tile> tileMap = Maps.newHashMap();

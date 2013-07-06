@@ -1,11 +1,14 @@
 package com.lyndir.omnicron.api;
 
+import com.lyndir.lhunath.opal.system.util.MetaObject;
+
+
 /**
  * <i>10 07, 2012</i>
  *
  * @author lhunath
  */
-public class Size {
+public class Size extends MetaObject {
 
     private final int width;
     private final int height;
