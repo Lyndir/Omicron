@@ -88,6 +88,16 @@
             <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
 
+        <!-- Web -->
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assisted-inject</artifactId>
+        </dependency>
+
     </dependencies>
 
     <!-- REMOTE ARTIFACT REPOSITORIES -->
