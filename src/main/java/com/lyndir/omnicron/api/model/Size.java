@@ -1,4 +1,4 @@
-package com.lyndir.omnicron.api;
+package com.lyndir.omnicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 
@@ -27,5 +27,10 @@ public class Size extends MetaObject {
     public int getHeight() {
 
         return height;
+    }
+
+    public boolean isInBounds(final Coordinate coordinate) {
+
+        return coordinate.getU() >= 0 && coordinate.getV() >= 0 && coordinate.getU() < width && coordinate.getV() < height;
     }
 }

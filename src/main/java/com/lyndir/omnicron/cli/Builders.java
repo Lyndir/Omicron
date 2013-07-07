@@ -1,6 +1,6 @@
 package com.lyndir.omnicron.cli;
 
-import com.lyndir.omnicron.api.Game;
+import com.lyndir.omnicron.api.model.Game;
 import org.jetbrains.annotations.Nullable;
 
 

@@ -2,9 +2,11 @@ package com.lyndir.omnicron.cli;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.LineReader;
-import com.lyndir.omnicron.api.Game;
-import com.lyndir.omnicron.api.Player;
+import com.lyndir.omnicron.api.controller.GameController;
+import com.lyndir.omnicron.api.model.Game;
+import com.lyndir.omnicron.api.model.Player;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -22,21 +24,23 @@ public class OmnicronCLI {
     private final Builders builders = new Builders();
     private       boolean  running  = true;
 
-    private Game   game;
-    private Player localPlayer;
+    private GameController gameController;
+    private Player         localPlayer;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments)
             throws Exception {
 
-        InputStreamReader inReader = new InputStreamReader( System.in, Charsets.UTF_8 );
-        try {
+        try (InputStreamReader inReader = new InputStreamReader( System.in, Charsets.UTF_8 )) {
             OmnicronCLI omnicron = new OmnicronCLI();
             LineReader inLineReader = new LineReader( inReader );
 
             System.err.println( "Welcome to Omnicron." );
             System.err.println( "Issue your commands." );
             System.err.println( "====================" );
+            new BuildCommand().game( omnicron, ImmutableList.<String>of().iterator() );
+            new AddGameCommand().player( omnicron, ImmutableList.of("Simon,red,red").iterator() );
+            new CreateCommand().game( omnicron, ImmutableList.<String>of().iterator() );
             while (omnicron.isRunning()) {
                 System.err.print( "% " );
                 Iterator<String> tokens = commandSplitter.split( inLineReader.readLine() ).iterator();
@@ -48,9 +52,6 @@ public class OmnicronCLI {
                     System.err.format( "Unexpected: %s\n", e.getLocalizedMessage() );
                 }
             }
-        }
-        finally {
-            inReader.close();
         }
     }
 
@@ -64,14 +65,14 @@ public class OmnicronCLI {
         this.running = running;
     }
 
-    public Game getGame() {
+    public GameController getGameController() {
 
-        return game;
+        return gameController;
     }
 
-    public void setGame(final Game game) {
+    public void setGameController(final GameController gameController) {
 
-        this.game = game;
+        this.gameController = gameController;
     }
 
     public Player getLocalPlayer() {

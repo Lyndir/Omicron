@@ -48,6 +48,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -96,6 +106,13 @@
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-assisted-inject</artifactId>
+        </dependency>
+
+        <!-- Utilities -->
+        <dependency>
+            <groupId>com.lyndir.lhunath.opal</groupId>
+            <artifactId>opal-security</artifactId>
+            <version>GIT-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

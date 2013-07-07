@@ -1,4 +1,4 @@
-package com.lyndir.omnicron.api;
+package com.lyndir.omnicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.io.Serializable;
@@ -15,7 +15,12 @@ public class Color extends MetaObject implements Serializable {
 
     public enum Template {
 
-        RED( new Color( (byte) 255, (byte) 0, (byte) 0 ) );
+        RED( new Color( 0xFF, 0, 0 ) ),
+        GREEN( new Color( 0, 0xFF, 0 ) ),
+        BLUE( new Color( 0, 0, 0xFF ) ),
+        BLACK( new Color( 0, 0, 0 ) ),
+        WHITE( new Color( 0xFF, 0xFF, 0xFF ) ),
+        GRAY( new Color( 0xAA, 0xAA, 0xAA ) );
 
         private static final Random random = new Random();
         private final Color color;
@@ -40,6 +45,11 @@ public class Color extends MetaObject implements Serializable {
     private final byte r;
     private final byte g;
     private final byte b;
+
+    public Color(final int r, final int g, final int b) {
+
+        this( (byte) r, (byte) g, (byte) b );
+    }
 
     public Color(final byte r, final byte g, final byte b) {
 

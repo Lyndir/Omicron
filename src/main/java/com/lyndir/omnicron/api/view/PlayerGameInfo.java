@@ -1,4 +1,7 @@
-package com.lyndir.omnicron.api;
+package com.lyndir.omnicron.api.view;
+
+import com.lyndir.omnicron.api.model.Player;
+
 
 /**
  * <i>10 16, 2012</i>
@@ -7,9 +10,9 @@ package com.lyndir.omnicron.api;
  */
 public class PlayerGameInfo {
 
-    private final Player player;
+    private final Player  player;
     private final boolean discovered;
-    private final int score;
+    private final int     score;
 
     public PlayerGameInfo(final Player player, final boolean discovered, final int score) {
 

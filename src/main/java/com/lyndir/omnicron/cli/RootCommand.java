@@ -62,4 +62,10 @@ public class RootCommand extends Command {
 
         omnicron.setRunning( false );
     }
+
+    @SubCommand(description = "Move game objects around in the level.")
+    public void mv(final OmnicronCLI omnicron, final Iterator<String> tokens) {
+
+        new MoveCommand().evaluate( omnicron, tokens );
+    }
 }

@@ -1,8 +1,8 @@
 package com.lyndir.omnicron.cli;
 
 import com.google.common.collect.Iterators;
-import com.lyndir.omnicron.api.Game;
-import com.lyndir.omnicron.api.Player;
+import com.lyndir.omnicron.api.model.Game;
+import com.lyndir.omnicron.api.model.Player;
 import java.util.Iterator;
 
 

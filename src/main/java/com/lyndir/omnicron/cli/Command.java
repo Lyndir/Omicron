@@ -40,10 +40,7 @@ public abstract class Command {
                     try {
                         method.invoke( this, omnicron, tokens );
                     }
-                    catch (IllegalAccessException e) {
-                        throw logger.bug( e );
-                    }
-                    catch (InvocationTargetException e) {
+                    catch (IllegalAccessException | InvocationTargetException e) {
                         throw logger.bug( e );
                     }
 

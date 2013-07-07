@@ -2,7 +2,7 @@ package com.lyndir.omnicron.cli;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
-import com.lyndir.omnicron.api.*;
+import com.lyndir.omnicron.api.model.*;
 import java.util.Iterator;
 
 

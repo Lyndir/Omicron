@@ -1,4 +1,4 @@
-package com.lyndir.omnicron.api;
+package com.lyndir.omnicron.api.model;
 
 /**
  * <i>10 07, 2012</i>

@@ -1,4 +1,4 @@
-package com.lyndir.omnicron.api;
+package com.lyndir.omnicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 
@@ -34,6 +34,14 @@ public class Coordinate extends MetaObject {
     public Coordinate delta(final int du, final int dv, final Size mapSize) {
 
         return new Coordinate( (mapSize.getWidth() + u + du) % mapSize.getWidth(), (mapSize.getHeight() + v + dv) % mapSize.getHeight() );
+    }
+
+    public int distanceTo(final Coordinate other) {
+
+        int du = u - other.getU();
+        int dv = v - other.getV();
+
+        return (int) Math.ceil( Math.sqrt( du * du + dv * dv ) );
     }
 
     public Coordinate getNW(final Size mapSize) {

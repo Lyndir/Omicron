@@ -1,6 +1,6 @@
-package com.lyndir.omnicron.api;
+package com.lyndir.omnicron.api.model;
 
-import java.util.Set;
+import com.lyndir.omnicron.api.controller.GameObserverController;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,5 +19,5 @@ public interface GameObserver {
     Player getPlayer();
 
     @NotNull
-    Set<Tile> getObservedTiles();
+    GameObserverController getController();
 }

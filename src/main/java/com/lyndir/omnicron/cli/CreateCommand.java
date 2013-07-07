@@ -1,6 +1,6 @@
 package com.lyndir.omnicron.cli;
 
-import com.lyndir.omnicron.api.Game;
+import com.lyndir.omnicron.api.model.Game;
 import java.util.Iterator;
 
 
@@ -25,8 +25,10 @@ public class CreateCommand extends Command {
             return;
         }
 
-        omnicron.setGame( gameBuilder.build() );
+        Game game = gameBuilder.build();
+        omnicron.setGameController( game.getController() );
         omnicron.setLocalPlayer( gameBuilder.getPlayers().iterator().next() );
         omnicron.getBuilders().setGameBuilder( null );
+        inf( "Created game: %s", game );
     }
 }

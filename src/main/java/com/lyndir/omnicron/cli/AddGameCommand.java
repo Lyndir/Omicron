@@ -2,7 +2,7 @@ package com.lyndir.omnicron.cli;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
-import com.lyndir.omnicron.api.*;
+import com.lyndir.omnicron.api.model.*;
 import java.util.Iterator;
 
 
@@ -14,22 +14,14 @@ import java.util.Iterator;
 @CommandGroup(name = "add game")
 public class AddGameCommand extends Command {
 
-    private Game.Builder gameBuilder;
+    @SubCommand(description = "The players that will compete in this game.")
+    public void player(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
-    @Override
-    public void evaluate(final OmnicronCLI omnicron, final Iterator<String> tokens) {
-
-        gameBuilder = omnicron.getBuilders().getGameBuilder();
+        Game.Builder gameBuilder = omnicron.getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game build to add game properties to.  Begin with the 'build' command." );
             return;
         }
-
-        super.evaluate( omnicron, tokens );
-    }
-
-    @SubCommand(description = "The players that will compete in this game.")
-    public void player(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         String value = Iterators.getOnlyElement( tokens, null );
         if (value == null) {
@@ -42,6 +34,8 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        gameBuilder.getPlayers().add( new Player( playerName, Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) ) );
+        Player player = new Player( gameBuilder.nextPlayerID(), playerName, Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
+        gameBuilder.getPlayers().add( player );
+        inf( "Added player to game: %s", player );
     }
 }
