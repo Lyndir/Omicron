@@ -3,10 +3,16 @@ package com.lyndir.omnicron.api.controller;
 import com.lyndir.omnicron.api.model.*;
 
 
-public class EngineerController extends BaseController<Engineer> {
+public class EngineerController extends GameObjectController<Engineer> {
 
-    public EngineerController(final Engineer engineer) {
+    public EngineerController(final Engineer gameObject) {
 
-        super( engineer );
+        super( gameObject );
+    }
+
+    @Override
+    public Player getPlayer() {
+
+        return getGameObject().getPlayer();
     }
 }

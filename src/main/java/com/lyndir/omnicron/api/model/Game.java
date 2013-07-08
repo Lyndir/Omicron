@@ -1,6 +1,7 @@
 package com.lyndir.omnicron.api.model;
 
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import com.lyndir.omnicron.api.controller.GameController;
@@ -20,17 +21,14 @@ public class Game extends MetaObject {
     private final GroundLevel ground;
     private final SkyLevel    sky;
     private final SpaceLevel  space;
+    private final Turn        currentTurn;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final GameController gameController = new GameController( this );
+    private final GameController gameController;
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Collection<Player> players = new LinkedList<>();
+    private final Set<Player> readyPlayers = new HashSet<>();
 
-    public Collection<Player> getPlayers() {
-
-        return players;
-    }
 
     public static class Builder {
 
@@ -104,6 +102,7 @@ public class Game extends MetaObject {
         sky = new SkyLevel( worldSize );
         space = new SpaceLevel( worldSize );
         this.players.addAll( players );
+        currentTurn = new Turn( null );
 
         for (final Player player : players) {
             Tile startTile;
@@ -115,6 +114,8 @@ public class Game extends MetaObject {
             while (startTile.getContents() != null);
             player.getController().addObject( new Engineer( startTile, player ) );
         }
+
+        gameController = new GameController( this );
     }
 
     public GameController getController() {
@@ -135,5 +136,20 @@ public class Game extends MetaObject {
     public SpaceLevel getSpace() {
 
         return space;
+    }
+
+    public Turn getCurrentTurn() {
+
+        return currentTurn;
+    }
+
+    public Collection<Player> getPlayers() {
+
+        return players;
+    }
+
+    public Set<Player> getReadyPlayers() {
+
+        return readyPlayers;
     }
 }

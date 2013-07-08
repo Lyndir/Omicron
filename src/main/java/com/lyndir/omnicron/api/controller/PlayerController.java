@@ -1,14 +1,15 @@
 package com.lyndir.omnicron.api.controller;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
+
+import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
-import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omnicron.api.model.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class PlayerController implements GameObserverController {
+public class PlayerController implements GameObserver {
 
     private final Player player;
 
@@ -18,13 +19,19 @@ public class PlayerController implements GameObserverController {
     }
 
     @Override
-    public boolean canObserve(final Player currentPlayer, final Tile tile) {
+    public Player getPlayer() {
+
+        return player;
+    }
+
+    @Override
+    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
 
         return FluentIterable.from( player.getObjects() ).anyMatch( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
 
-                return input.getController().canObserve( currentPlayer, tile );
+                return input.canObserve( currentPlayer, location );
             }
         } );
     }
@@ -35,19 +42,24 @@ public class PlayerController implements GameObserverController {
             @Override
             public boolean apply(final GameObject input) {
 
-                return observer.getController().canObserve( observer.getPlayer(), input.getLocation() );
+                Player player = observer.getPlayer();
+                if (player == null)
+                    return observer.equals( input );
+
+                return observer.canObserve( player, input.getLocation() );
             }
         } );
     }
 
-    @Nullable
-    public GameObject findObject(final GameObserver observer, final int objectId) {
+    public Optional<GameObject> getObject(final Player currentPlayer, final int objectId) {
 
         GameObject object = player.getObject( objectId );
-        if (object != null && !observer.getController().canObserve( observer.getPlayer(), object.getLocation() ))
-            return null;
 
-        return object;
+        // If the object cannot be observed by the current player, treat it as absent.
+        if (object != null && !currentPlayer.canObserve( currentPlayer, object.getLocation() ))
+            return Optional.absent();
+
+        return Optional.fromNullable( object );
     }
 
     public int newObjectID() {
@@ -55,9 +67,15 @@ public class PlayerController implements GameObserverController {
         return player.nextObjectID();
     }
 
-    public void addObject(final BaseGameObject gameObject) {
+    public void addObject(final GameObject gameObject) {
 
         Preconditions.checkState( gameObject.getPlayer() == player, "Cannot add object to this player: belongs to another player." );
-        player.addObject(gameObject);
+        player.addObject( gameObject );
+    }
+
+    public void newTurn() {
+
+        for (final GameObject gameObject : player.getObjects())
+            gameObject.getController().newTurn();
     }
 }

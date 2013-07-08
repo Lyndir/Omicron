@@ -9,6 +9,6 @@ public class GroundLevel extends Level {
 
     public GroundLevel(final Size levelSize) {
 
-        super( levelSize );
+        super( "Ground", levelSize );
     }
 }

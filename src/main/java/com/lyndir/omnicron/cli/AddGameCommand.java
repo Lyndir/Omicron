@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup(name = "add game")
+@CommandGroup(parent = AddCommand.class, name = "game", abbr = "g", desc = "Add things to an Omnicron game that is being built.")
 public class AddGameCommand extends Command {
 
     @SubCommand(description = "The players that will compete in this game.")
@@ -34,7 +34,8 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        Player player = new Player( gameBuilder.nextPlayerID(), playerName, Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
+        Player player = new Player( gameBuilder.nextPlayerID(), playerName, Color.of( playerPrimaryColor ),
+                                    Color.of( playerSecondaryColor ) );
         gameBuilder.getPlayers().add( player );
         inf( "Added player to game: %s", player );
     }

@@ -8,12 +8,6 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup(name = "set")
+@CommandGroup(name = "set", abbr = "s", desc = "Set properties on a built object.")
 public class SetCommand extends Command {
-
-    @SubCommand(description = "Set properties of an Omnicron game that is being built.")
-    public void game(final OmnicronCLI omnicron, final Iterator<String> tokens) {
-
-        new SetGameCommand().evaluate( omnicron, tokens );
-    }
 }

@@ -1,17 +1,20 @@
 package com.lyndir.omnicron.api.model;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.lyndir.omnicron.api.controller.EngineerController;
+import com.lyndir.omnicron.api.controller.*;
 import org.jetbrains.annotations.NotNull;
 
 
-public class Engineer extends BaseGameObject {
+public class Engineer extends PlayerObject {
 
     private final EngineerController controller = new EngineerController( this );
 
     protected Engineer(final Tile locationTile, final Player owningPlayer) {
 
-        super( locationTile, new BaseModule( 10, 2, 3, ImmutableSet.<Class<? extends Level>>of( GroundLevel.class ), owningPlayer ) );
+        super( "Engineer", owningPlayer, locationTile,
+               new BaseModule( 10, 2, 3, Level.set( GroundLevel.class ) ),
+               new MobilityModule(5, Level.map( GroundLevel.class, 1 ) ) );
     }
 
     @NotNull

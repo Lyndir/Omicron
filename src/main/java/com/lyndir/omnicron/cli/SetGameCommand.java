@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup( name = "set game")
+@CommandGroup( parent = SetCommand.class, name = "game", abbr = "g", desc = "Set properties of an Omnicron game that is being built.")
 public class SetGameCommand extends Command {
 
     private Game.Builder gameBuilder;

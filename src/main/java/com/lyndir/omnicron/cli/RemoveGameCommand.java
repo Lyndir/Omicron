@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup( name = "rm game")
+@CommandGroup(parent = RemoveCommand.class, name = "game", abbr = "g", desc = "Remove things from an Omnicron game that is being built.")
 public class RemoveGameCommand extends Command {
 
     private Game.Builder gameBuilder;
@@ -28,7 +28,7 @@ public class RemoveGameCommand extends Command {
         super.evaluate( omnicron, tokens );
     }
 
-    @SubCommand( description = "The players that will compete in this game.")
+    @SubCommand(description = "The players that will compete in this game.")
     public void player(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         String value = Iterators.getOnlyElement( tokens, null );

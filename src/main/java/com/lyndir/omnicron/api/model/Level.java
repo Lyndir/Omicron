@@ -1,9 +1,10 @@
 package com.lyndir.omnicron.api.model;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import java.util.Map;
+import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -14,14 +15,21 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Level extends MetaObject {
 
-    private final Size levelSize;
+    private final String name;
+    private final Size   levelSize;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Coordinate, Tile> tileMap = Maps.newHashMap();
 
-    public Level(final Size levelSize) {
+    public Level(final String name, final Size levelSize) {
 
+        this.name = name;
         this.levelSize = levelSize;
+    }
+
+    public String getName() {
+
+        return name;
     }
 
     public Size getLevelSize() {
@@ -39,6 +47,13 @@ public class Level extends MetaObject {
         tileMap.put( position, tile );
     }
 
+    /**
+     * Get the tile at the given position in this level.
+     *
+     * @param position The position of the tile to get.
+     *
+     * @return {@code null} if the position is outside of the bounds of this level.
+     */
     @Nullable
     public Tile getTile(final Coordinate position) {
 
@@ -51,5 +66,29 @@ public class Level extends MetaObject {
             tile = new Tile( position, this );
 
         return tile;
+    }
+
+    @SafeVarargs
+    public static Set<Class<? extends Level>> set(final Class<? extends Level>... levelTypes) {
+
+        return ImmutableSet.copyOf( levelTypes );
+    }
+
+    public static <V> Map<Class<? extends Level>, V> map(final Class<? extends Level> levelType1, final V value1) {
+
+        return ImmutableMap.<Class<? extends Level>, V>of( levelType1, value1 );
+    }
+
+    public static <V> Map<Class<? extends Level>, V> map(final Class<? extends Level> levelType1, final V value1,
+                                                         final Class<? extends Level> levelType2, final V value2) {
+
+        return ImmutableMap.of( levelType1, value1, levelType2, value2 );
+    }
+
+    public static <V> Map<Class<? extends Level>, V> map(final Class<? extends Level> levelType1, final V value1,
+                                                         final Class<? extends Level> levelType2, final V value2,
+                                                         final Class<? extends Level> levelType3, final V value3) {
+
+        return ImmutableMap.of( levelType1, value1, levelType2, value2, levelType3, value3 );
     }
 }

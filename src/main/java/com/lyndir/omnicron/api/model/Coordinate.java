@@ -41,7 +41,7 @@ public class Coordinate extends MetaObject {
         int du = u - other.getU();
         int dv = v - other.getV();
 
-        return (int) Math.ceil( Math.sqrt( du * du + dv * dv ) );
+        return (int) Math.ceil( Math.sqrt( du * du + dv * dv - du * dv ) );
     }
 
     public Coordinate getNW(final Size mapSize) {

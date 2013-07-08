@@ -39,7 +39,7 @@ public class OmnicronCLI {
             System.err.println( "Issue your commands." );
             System.err.println( "====================" );
             new BuildCommand().game( omnicron, ImmutableList.<String>of().iterator() );
-            new AddGameCommand().player( omnicron, ImmutableList.of("Simon,red,red").iterator() );
+            new AddGameCommand().player( omnicron, ImmutableList.of( "Simon,red,red" ).iterator() );
             new CreateCommand().game( omnicron, ImmutableList.<String>of().iterator() );
             while (omnicron.isRunning()) {
                 System.err.print( "% " );

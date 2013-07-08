@@ -40,24 +40,22 @@ public class Player extends MetaObject implements GameObserver {
         this.secondaryColor = secondaryColor;
     }
 
-    @Override
-    public GameObserver getParent() {
+    @NotNull
+    public PlayerController getController() {
 
-        return null;
+        return controller;
     }
 
-    @NotNull
+    @Override
+    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
+
+        return getController().canObserve( currentPlayer, location );
+    }
+
     @Override
     public Player getPlayer() {
 
         return this;
-    }
-
-    @NotNull
-    @Override
-    public PlayerController getController() {
-
-        return controller;
     }
 
     public int getPlayerID() {
@@ -111,7 +109,7 @@ public class Player extends MetaObject implements GameObserver {
         return objects.get( objectId );
     }
 
-    public void addObject(final BaseGameObject gameObject) {
+    public void addObject(final GameObject gameObject) {
 
         objects.put( gameObject.getObjectID(), gameObject );
     }

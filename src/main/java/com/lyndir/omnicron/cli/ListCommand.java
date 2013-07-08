@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author lhunath
  */
-@CommandGroup(name = "list")
+@CommandGroup(name = "list", abbr = "ls", desc = "Enumerate certain types of game objects.")
 public class ListCommand extends Command {
 
     @SubCommand(description = "Enumerate all players in the game.")
@@ -33,10 +33,10 @@ public class ListCommand extends Command {
             }
         } );
 
-        for (final PlayerGameInfo playerGameInfo : playerGameInfos) {
+        inf( "%20s | %s", "score", "name" );
+        for (final PlayerGameInfo playerGameInfo : playerGameInfos)
             inf( "%20s | %s%s", playerGameInfo.getScore(), playerGameInfo.getPlayer().getName(),
                  playerGameInfo.isDiscovered()? "": " <undiscovered>" );
-        }
     }
 
     @SubCommand(description = "Enumerate all types of game objects the player can detect.")
@@ -52,9 +52,10 @@ public class ListCommand extends Command {
         for (final Player player : gameController.listPlayers())
             gameObjectBuilder.addAll( player.getController().iterateObservableObjects( omnicron.getLocalPlayer() ) );
 
+        inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
         for (final GameObject gameObject : gameObjectBuilder.build())
-            inf( "%5s | %20s | (%s: %d, %d) | %s", gameObject.getObjectID(), gameObject.getPlayer().getName(),
-                 gameObject.getLocation().getLevel().getClass().getSimpleName(), gameObject.getLocation().getPosition().getU(),
-                 gameObject.getLocation().getPosition().getV(), gameObject.getClass().getSimpleName() );
+            inf( "%5s | %20s | (%7s: %3d, %3d) | %s", gameObject.getObjectID(), gameObject.getPlayer().getName(),
+                 gameObject.getLocation().getLevel().getName(), gameObject.getLocation().getPosition().getU(),
+                 gameObject.getLocation().getPosition().getV(), gameObject.getTypeName() );
     }
 }

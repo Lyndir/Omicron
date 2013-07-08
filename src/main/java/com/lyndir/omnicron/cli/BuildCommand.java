@@ -9,7 +9,7 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup(name = "build")
+@CommandGroup(name = "build", abbr = "b", desc = "Build a new game object.")
 public class BuildCommand extends Command {
 
     @SubCommand(description = "Build a new game of Omnicron")

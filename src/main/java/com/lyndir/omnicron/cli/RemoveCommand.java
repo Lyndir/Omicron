@@ -8,12 +8,7 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup(name = "rm")
+@CommandGroup(name = "remove", abbr = "rm", desc = "Remove objects from properties of a built object.")
 public class RemoveCommand extends Command {
 
-    @SubCommand(description = "Remove things from an Omnicron game that is being built.")
-    public void game(final OmnicronCLI omnicron, final Iterator<String> tokens) {
-
-        new RemoveGameCommand().evaluate( omnicron, tokens );
-    }
 }

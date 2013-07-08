@@ -8,12 +8,7 @@ import java.util.Iterator;
  *
  * @author lhunath
  */
-@CommandGroup(name = "add")
+@CommandGroup(name = "add", abbr = "a", desc = "Add objects to properties of a built object.")
 public class AddCommand extends Command {
 
-    @SubCommand(description = "Add things to an Omnicron game that is being built.")
-    public void game(final OmnicronCLI omnicron, final Iterator<String> tokens) {
-
-        new AddGameCommand().evaluate( omnicron, tokens );
-    }
 }

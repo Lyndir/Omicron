@@ -1,20 +1,39 @@
 package com.lyndir.omnicron.api.model;
 
 import com.google.common.base.Objects;
-import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
 /**
+ * <pre>
+ *                 -v
+ *               .   .   .   .   .   .
+ *                 .   .   .   .   .
+ *               .   .   Nw  Ne  .   .
+ *            -u   .   W   o   E   .   +u
+ *               .   .   Sw  Se  .   .
+ *                 .    .   .   .   .
+ *               .   .   .   .   .   .
+ *                                 +v
+ *
+ *             u   v
+ *        o  = 0 , 0
+ *        Nw = 0 , -1
+ *        Se = 0 , 1
+ *        E  = 1 , 0
+ *        W  = -1, 0
+ *        Nw = 1 , -1
+ *        Sw = -1, 1
+ * </pre>
+ *
  * <i>10 07, 2012</i>
  *
  * @author lhunath
  */
 @ObjectMeta(useFor = { })
 public class Tile extends MetaObject {
-
-    private static final Logger logger = Logger.get( Tile.class );
 
     @Nullable
     private       GameObject contents;
@@ -107,11 +126,17 @@ public class Tile extends MetaObject {
         return southEast;
     }
 
-    public boolean contains(final GameObserver target) {
+    public boolean contains(@NotNull final GameObserver target) {
 
-        for (GameObserver candidate = contents; candidate != null; candidate = candidate.getParent())
-            if (candidate == target)
-                return true;
+        if (contents == null)
+            return false;
+
+        if (ObjectUtils.isEqual( contents, target ))
+            return true;
+
+        Player player = contents.getPlayer();
+        if (player != null)
+            return ObjectUtils.isEqual( player.getController(), target );
 
         return false;
     }

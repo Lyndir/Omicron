@@ -13,4 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface CommandGroup {
 
     String name();
+    String abbr();
+    String desc();
+    Class<? extends Command> parent() default RootCommand.class;
 }
