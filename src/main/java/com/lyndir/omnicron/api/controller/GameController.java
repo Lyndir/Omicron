@@ -75,7 +75,7 @@ public class GameController {
     private void newTurn() {
 
         for (final Player player : game.getPlayers())
-            player.getController().newTurn();
+            player.getController().newTurn( game );
     }
 
     public ImmutableList<Level> listLevels() {

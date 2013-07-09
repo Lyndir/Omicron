@@ -86,9 +86,12 @@ public class PlayerController implements GameObserver {
         player.addObject( gameObject );
     }
 
-    public void newTurn() {
+    public void newTurn(final Game game) {
 
         for (final GameObject gameObject : player.getObjects())
             gameObject.getController().newTurn();
+
+        if (player.isKeyLess())
+            game.getController().setReady( player );
     }
 }

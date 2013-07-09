@@ -1,6 +1,7 @@
 package com.lyndir.omnicron.api.model;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import com.lyndir.omnicron.api.controller.GameController;
@@ -25,7 +26,7 @@ public class Game extends MetaObject {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final GameController gameController;
 
-    private final ImmutableList<Level> levels;
+    private final ImmutableList<Level>  levels;
     private final ImmutableList<Player> players;
     private final Set<Player> readyPlayers = new HashSet<>();
 
@@ -42,7 +43,7 @@ public class Game extends MetaObject {
             // Add random players until totalPlayers count is satisfied.
             int playerID = nextPlayerID;
             while (players.size() < totalPlayers) {
-                Player randomPlayer = new Player( playerID++, Player.randomName(), Color.Template.randomColor(),
+                Player randomPlayer = new Player( playerID++, null, Player.randomName(), Color.Template.randomColor(),
                                                   Color.Template.randomColor() );
                 if (!players.contains( randomPlayer ))
                     players.add( randomPlayer );
@@ -106,14 +107,22 @@ public class Game extends MetaObject {
         currentTurn = new Turn( null );
 
         for (final Player player : players) {
-            Tile startTile;
+            Tile startTile, startTile2;
             do {
                 startTile = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getLevelSize().getWidth() ),
                                                             RANDOM.nextInt( ground.getLevelSize().getHeight() ), ground.getLevelSize() ) );
                 assert startTile != null;
             }
             while (startTile.getContents() != null);
+            do {
+                startTile2 = sky.getTile(
+                        new Coordinate( RANDOM.nextInt( sky.getLevelSize().getWidth() ), RANDOM.nextInt( sky.getLevelSize().getHeight() ),
+                                        sky.getLevelSize() ) );
+                assert startTile2 != null;
+            }
+            while (startTile2.getContents() != null);
             player.getController().addObject( new Engineer( startTile, player ) );
+            player.getController().addObject( new Airship( startTile2, player ) );
         }
 
         gameController = new GameController( this );
@@ -143,6 +152,7 @@ public class Game extends MetaObject {
 
         return currentTurn;
     }
+
     public ImmutableList<Level> listLevels() {
 
         return levels;

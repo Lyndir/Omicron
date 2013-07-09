@@ -14,8 +14,11 @@ import java.util.*;
 @CommandGroup(name = "print", abbr = "p", desc = "Print various information on the current state of the omnicron game.")
 public class PrintCommand extends Command {
 
-    private static final List<Class<? extends Level>> levelIndexes = ImmutableList.of( GroundLevel.class, SkyLevel.class,
-                                                                                       SpaceLevel.class );
+    private static final List<Class<? extends Level>>           levelIndexes    = ImmutableList.of( GroundLevel.class, SkyLevel.class,
+                                                                                                    SpaceLevel.class );
+    private static final Map<Class<? extends Level>, Character> levelCharacters = ImmutableMap.of( GroundLevel.class, '_', //
+                                                                                                   SkyLevel.class, '~', //
+                                                                                                   SpaceLevel.class, '^' );
 
     @SubCommand(abbr = "f", desc = "A view of all observable tiles.")
     public void field(final OmnicronCLI omnicron, final Iterator<String> tokens) {
@@ -35,7 +38,7 @@ public class PrintCommand extends Command {
             GameObject contents = tile.getContents();
             char contentsChar;
             if (contents == null)
-                contentsChar = '_'; //Character.forDigit( tile.getPosition().getU() % 10, 10 );
+                contentsChar = levelCharacters.get( tile.getLevel().getClass() );
             else
                 contentsChar = contents.getTypeName().charAt( 0 );
 
@@ -45,12 +48,10 @@ public class PrintCommand extends Command {
             grid.get( v, u ).setCharAt( levelIndex, contentsChar );
         }
 
-        //StringBuilder indent = new StringBuilder();
         for (int v = 0; v < maxSize.getHeight(); ++v) {
             Map<Integer, StringBuilder> row = new TreeMap<>( Ordering.natural() );
             row.putAll( grid.row( v ) );
             inf( "%s|%s|", v % 2 == 0? "": "  ", Joiner.on( ' ' ).join( row.values() ) );
-            //inf( "%s|%s|", indent.append( "  " ), Joiner.on( ' ' ).join( row.values() ) );
         }
     }
 }

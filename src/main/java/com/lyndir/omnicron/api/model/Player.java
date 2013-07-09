@@ -23,18 +23,20 @@ public class Player extends MetaObject implements GameObserver {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final PlayerController controller = new PlayerController( this );
 
-    private final int    playerID;
-    private final String name;
-    private final Color  primaryColor;
-    private final Color  secondaryColor;
+    private final int       playerID;
+    private final PlayerKey key;
+    private final String    name;
+    private final Color     primaryColor;
+    private final Color     secondaryColor;
     private final Map<Integer, GameObject> objects = new HashMap<>();
 
     private int score;
     private int nextObjectID;
 
-    public Player(final int playerID, final String name, final Color primaryColor, final Color secondaryColor) {
+    public Player(final int playerID, @Nullable final PlayerKey key, final String name, final Color primaryColor, final Color secondaryColor) {
 
         this.playerID = playerID;
+        this.key = key;
         this.name = name;
         this.primaryColor = primaryColor;
         this.secondaryColor = secondaryColor;
@@ -68,6 +70,16 @@ public class Player extends MetaObject implements GameObserver {
     public int getPlayerID() {
 
         return playerID;
+    }
+
+    public boolean hasKey(final PlayerKey playerKey) {
+
+        return key == playerKey;
+    }
+
+    public boolean isKeyLess() {
+
+        return key == null;
     }
 
     public String getName() {

@@ -5,8 +5,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.LineReader;
 import com.lyndir.omnicron.api.controller.GameController;
-import com.lyndir.omnicron.api.model.Game;
 import com.lyndir.omnicron.api.model.Player;
+import com.lyndir.omnicron.api.model.PlayerKey;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -21,10 +21,10 @@ public class OmnicronCLI {
 
     private static final Splitter commandSplitter = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
 
-    private final Builders builders = new Builders();
-    private       boolean  running  = true;
-
-    private GameController gameController;
+    private final Builders  builders = new Builders();
+    private final PlayerKey localKey = new PlayerKey();
+    private       boolean   running  = true;
+     private GameController gameController;
     private Player         localPlayer;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
@@ -83,6 +83,11 @@ public class OmnicronCLI {
     public void setLocalPlayer(final Player localPlayer) {
 
         this.localPlayer = localPlayer;
+    }
+
+    public PlayerKey getLocalKey() {
+
+        return localKey;
     }
 
     public Builders getBuilders() {

@@ -17,6 +17,11 @@ public class AddGameCommand extends Command {
     @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
     public void player(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
+        if (omnicron.getLocalPlayer() != null) {
+            err( "There is already a local player: %s", omnicron.getLocalPlayer().getName() );
+            return;
+        }
+
         Game.Builder gameBuilder = omnicron.getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game build to add game properties to.  Begin with the 'build' command." );
@@ -34,9 +39,9 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        Player player = new Player( gameBuilder.nextPlayerID(), playerName, Color.of( playerPrimaryColor ),
-                                    Color.of( playerSecondaryColor ) );
-        gameBuilder.getPlayers().add( player );
-        inf( "Added player to game: %s", player );
+        omnicron.setLocalPlayer( new Player( gameBuilder.nextPlayerID(), omnicron.getLocalKey(), playerName, Color.of( playerPrimaryColor ),
+                                             Color.of( playerSecondaryColor ) ) );
+        gameBuilder.getPlayers().add( omnicron.getLocalPlayer() );
+        inf( "Added player to game: %s", omnicron.getLocalPlayer() );
     }
 }
