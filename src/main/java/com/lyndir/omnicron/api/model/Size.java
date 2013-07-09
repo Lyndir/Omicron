@@ -1,6 +1,8 @@
 package com.lyndir.omnicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -32,5 +34,13 @@ public class Size extends MetaObject {
     public boolean isInBounds(final Coordinate coordinate) {
 
         return coordinate.getU() >= 0 && coordinate.getV() >= 0 && coordinate.getU() < width && coordinate.getV() < height;
+    }
+
+    public static Size max(@Nullable final Size size1, @NotNull final Size size2) {
+
+        if (size1 == null)
+            return size2;
+
+        return new Size( Math.max( size1.getWidth(), size2.getWidth() ), Math.max( size1.getHeight(), size2.getHeight() ) );
     }
 }

@@ -1,7 +1,7 @@
 package com.lyndir.omnicron.cli;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.*;
 import com.lyndir.omnicron.api.model.*;
 import java.util.*;
 
@@ -14,39 +14,43 @@ import java.util.*;
 @CommandGroup(name = "print", abbr = "p", desc = "Print various information on the current state of the omnicron game.")
 public class PrintCommand extends Command {
 
+    private static final List<Class<? extends Level>> levelIndexes = ImmutableList.of( GroundLevel.class, SkyLevel.class,
+                                                                                       SpaceLevel.class );
+
     @SubCommand(abbr = "f", desc = "A view of all observable tiles.")
     public void field(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
-        ImmutableMap.Builder<Level, ArrayList<ArrayList<Character>>> gridsBuilder = ImmutableMap.builder();
-        for (final Level level : omnicron.getGameController().listLevels()) {
-            ArrayList<ArrayList<Character>> us = new ArrayList<>( level.getLevelSize().getWidth() );
-            for (int u = 0; u < level.getLevelSize().getWidth(); ++u) {
-                ArrayList<Character> vs = new ArrayList<>( level.getLevelSize().getHeight() );
-                for (int v = 0; v < level.getLevelSize().getHeight(); ++v)
-                    vs.add( ' ' );
-                us.add( vs );
-            }
-            gridsBuilder.put( level, us );
-        }
-        ImmutableMap<Level, ArrayList<ArrayList<Character>>> grids = gridsBuilder.build();
+        // Create an empty grid.
+        Size maxSize = null;
+        for (final Level level : omnicron.getGameController().listLevels())
+            maxSize = Size.max( maxSize, level.getLevelSize() );
+        assert maxSize != null;
+        Table<Integer, Integer, StringBuilder> grid = HashBasedTable.create( maxSize.getHeight(), maxSize.getWidth() );
+        for (int u = 0; u < maxSize.getWidth(); ++u)
+            for (int v = 0; v < maxSize.getHeight(); ++v)
+                grid.put( v, u, new StringBuilder( "   " ) );
 
+        // Iterate observable tiles and populate the grid.
         for (final Tile tile : omnicron.getLocalPlayer().listObservableTiles( omnicron.getLocalPlayer() )) {
             GameObject contents = tile.getContents();
-            char contentsChar = '.';
-            if (contents != null)
+            char contentsChar;
+            if (contents == null)
+                contentsChar = '_'; //Character.forDigit( tile.getPosition().getU() % 10, 10 );
+            else
                 contentsChar = contents.getTypeName().charAt( 0 );
 
-            grids.get( tile.getLevel() ).get( tile.getPosition().getU() ).set( tile.getPosition().getV(), contentsChar );
+            int levelIndex = levelIndexes.indexOf( tile.getLevel().getClass() );
+            int v = tile.getPosition().getV();
+            int u = (tile.getPosition().getU() + v / 2) % maxSize.getWidth();
+            grid.get( v, u ).setCharAt( levelIndex, contentsChar );
         }
 
-        for (final Level level : grids.keySet()) {
-            inf( "%s:", level.getName() );
-            Iterable<ArrayList<Character>> us = grids.get( level );
-            StringBuilder indent = new StringBuilder();
-            for (final Iterable<Character> vs : us) {
-                inf( "%s\\%s\\", indent.toString(), Joiner.on(' ').join( vs ) );
-                indent.append( ' ' );
-            }
+        //StringBuilder indent = new StringBuilder();
+        for (int v = 0; v < maxSize.getHeight(); ++v) {
+            Map<Integer, StringBuilder> row = new TreeMap<>( Ordering.natural() );
+            row.putAll( grid.row( v ) );
+            inf( "%s|%s|", v % 2 == 0? "": "  ", Joiner.on( ' ' ).join( row.values() ) );
+            //inf( "%s|%s|", indent.append( "  " ), Joiner.on( ' ' ).join( row.values() ) );
         }
     }
 }

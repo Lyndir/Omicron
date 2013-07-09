@@ -1,12 +1,12 @@
 package com.lyndir.omnicron.api.controller;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.lyndir.omnicron.api.model.*;
 import com.lyndir.omnicron.api.view.PlayerGameInfo;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 
 public class GameController {
@@ -52,14 +52,24 @@ public class GameController {
         return game.getPlayers();
     }
 
-    public void setReady(final Player currentPlayer) {
+    /**
+     * Indicate that the current player is ready with his turn.
+     *
+     * @param currentPlayer The current player.
+     *
+     * @return true if this action has caused a new turn to begin.
+     */
+    public boolean setReady(final Player currentPlayer) {
 
         game.getReadyPlayers().add( currentPlayer );
 
         if (game.getReadyPlayers().containsAll( game.getPlayers() )) {
             newTurn();
             game.getReadyPlayers().clear();
+            return true;
         }
+
+        return false;
     }
 
     private void newTurn() {
@@ -71,5 +81,10 @@ public class GameController {
     public ImmutableList<Level> listLevels() {
 
         return game.listLevels();
+    }
+
+    public Set<Player> listReadyPlayers() {
+
+        return game.getReadyPlayers();
     }
 }
