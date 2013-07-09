@@ -12,7 +12,7 @@ import java.util.Iterator;
 @CommandGroup(name = "create", abbr = "c", desc = "Create a previously built game object.")
 public class CreateCommand extends Command {
 
-    @SubCommand(description = "Create a new game of Omnicron")
+    @SubCommand(abbr = "g", desc = "Create a new game of Omnicron")
     public void game(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         Game.Builder gameBuilder = omnicron.getBuilders().getGameBuilder();

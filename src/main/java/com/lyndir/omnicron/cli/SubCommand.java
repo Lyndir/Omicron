@@ -12,5 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SubCommand {
 
-    String description();
+    String abbr();
+    String desc();
 }

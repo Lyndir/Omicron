@@ -10,15 +10,15 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
  */
 public class Coordinate extends MetaObject {
 
-    public static final Coordinate ORIGIN = new Coordinate( 0, 0 );
+    private final int  u;
+    private final int  v;
+    private final Size wrapSize;
 
-    private final int u;
-    private final int v;
-
-    public Coordinate(final int u, final int v) {
+    public Coordinate(final int u, final int v, final Size wrapSize) {
 
         this.u = u;
         this.v = v;
+        this.wrapSize = wrapSize;
     }
 
     public int getU() {
@@ -31,46 +31,65 @@ public class Coordinate extends MetaObject {
         return v;
     }
 
-    public Coordinate delta(final int du, final int dv, final Size mapSize) {
+    private int getDU(final Coordinate other) {
 
-        return new Coordinate( (mapSize.getWidth() + u + du) % mapSize.getWidth(), (mapSize.getHeight() + v + dv) % mapSize.getHeight() );
+        int du = u - other.getU();
+        if (du > wrapSize.getWidth() / 2)
+            du = wrapSize.getWidth() - du;
+
+        return du;
+    }
+
+    private int getDV(final Coordinate other) {
+
+        int dv = v - other.getV();
+        if (dv > wrapSize.getHeight() / 2)
+            dv = wrapSize.getHeight() - dv;
+
+        return dv;
+    }
+
+    public Coordinate delta(final int du, final int dv) {
+
+        return new Coordinate( (wrapSize.getWidth() + u + du) % wrapSize.getWidth(), (wrapSize.getHeight() + v + dv) % wrapSize.getHeight(),
+                               wrapSize );
     }
 
     public int distanceTo(final Coordinate other) {
 
-        int du = u - other.getU();
-        int dv = v - other.getV();
+        int du = getDU( other );
+        int dv = getDV( other );
 
-        return (int) Math.ceil( Math.sqrt( du * du + dv * dv - du * dv ) );
+        return (Math.abs(du) + Math.abs(dv) + Math.abs(du + dv)) / 2;
     }
 
-    public Coordinate getNW(final Size mapSize) {
+    public Coordinate getNW() {
 
-        return delta( 0, -1, mapSize );
+        return delta( 0, -1 );
     }
 
-    public Coordinate getNE(final Size mapSize) {
+    public Coordinate getNE() {
 
-        return delta( 1, -1, mapSize );
+        return delta( 1, -1 );
     }
 
-    public Coordinate getW(final Size mapSize) {
+    public Coordinate getW() {
 
-        return delta( -1, 0, mapSize );
+        return delta( -1, 0 );
     }
 
-    public Coordinate getE(final Size mapSize) {
+    public Coordinate getE() {
 
-        return delta( 1, 0, mapSize );
+        return delta( 1, 0 );
     }
 
-    public Coordinate getSW(final Size mapSize) {
+    public Coordinate getSW() {
 
-        return delta( -1, 1, mapSize );
+        return delta( -1, 1 );
     }
 
-    public Coordinate getSE(final Size mapSize) {
+    public Coordinate getSE() {
 
-        return delta( 0, 1, mapSize );
+        return delta( 0, 1 );
     }
 }

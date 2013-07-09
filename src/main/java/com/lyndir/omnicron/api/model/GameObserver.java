@@ -1,6 +1,8 @@
 package com.lyndir.omnicron.api.model;
 
+import com.google.common.collect.FluentIterable;
 import com.lyndir.omnicron.api.controller.GameObjectController;
+import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,5 +24,18 @@ public interface GameObserver {
      */
     boolean canObserve(@NotNull Player currentPlayer, @NotNull Tile location);
 
+    /**
+     * Enumerate the tiles this observer can observe.
+     *
+     *
+     *
+     * @param currentPlayer The player that's making the request.
+     *
+     * @return All the tiles observable both by this observer and the current player.
+     */
+    @NotNull
+    Iterable<Tile> listObservableTiles(@NotNull Player currentPlayer);
+
+    @Nullable
     Player getPlayer();
 }

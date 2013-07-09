@@ -28,7 +28,7 @@ public class SetGameCommand extends Command {
         super.evaluate( omnicron, tokens );
     }
 
-    @SubCommand( description = "The tile dimension of each level in the game.")
+    @SubCommand( abbr = "w", desc = "The tile dimension of each level in the game.")
     public void worldSize(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         String gameSettingValue = Iterators.getOnlyElement( tokens, null );
@@ -43,7 +43,7 @@ public class SetGameCommand extends Command {
         gameBuilder.setWorldSize( new Size( Integer.parseInt( worldSizeWidth ), Integer.parseInt( worldSizeHeight ) ) );
     }
 
-    @SubCommand( description = "The players that will compete in this game.")
+    @SubCommand( abbr = "p", desc = "The players that will compete in this game.")
     public void players(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         String gameSettingValue = Iterators.getOnlyElement( tokens, null );

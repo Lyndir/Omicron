@@ -2,11 +2,11 @@ package com.lyndir.omnicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
+import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
-import com.lyndir.omnicron.api.controller.*;
+import com.lyndir.omnicron.api.controller.GameObjectController;
+import com.lyndir.omnicron.api.controller.Module;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,10 +19,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class GameObject extends MetaObject implements GameObserver {
 
-    private final String                     typeName;
-    private final int                        objectID;
-    private       Tile                       location;
-    private final ClassToInstanceMap<Module> modules;
+    private final String                              typeName;
+    private final int                                 objectID;
+    private final ImmutableClassToInstanceMap<Module> modules;
+    private       Tile                                location;
 
     protected GameObject(final String typeName, final int objectID, final Tile location, final Module... modules) {
 
@@ -53,9 +53,17 @@ public abstract class GameObject extends MetaObject implements GameObserver {
     }
 
     @Override
+    @SuppressWarnings("ParameterHidesMemberVariable")
     public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
 
         return getController().canObserve( currentPlayer, location );
+    }
+
+    @NotNull
+    @Override
+    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+
+        return getController().listObservableTiles( currentPlayer );
     }
 
     public int getObjectID() {
@@ -111,8 +119,8 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         return onModuleElse( moduleType, null );
     }
 
-    public Collection<Module> listModules() {
+    public ImmutableCollection<Module> listModules() {
 
-        return modules.values();
+        return ImmutableList.copyOf( modules.values() );
     }
 }

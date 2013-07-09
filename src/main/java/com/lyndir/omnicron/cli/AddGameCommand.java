@@ -14,7 +14,7 @@ import java.util.Iterator;
 @CommandGroup(parent = AddCommand.class, name = "game", abbr = "g", desc = "Add things to an Omnicron game that is being built.")
 public class AddGameCommand extends Command {
 
-    @SubCommand(description = "The players that will compete in this game.")
+    @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
     public void player(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         Game.Builder gameBuilder = omnicron.getBuilders().getGameBuilder();

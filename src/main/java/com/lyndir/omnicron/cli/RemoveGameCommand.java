@@ -28,7 +28,7 @@ public class RemoveGameCommand extends Command {
         super.evaluate( omnicron, tokens );
     }
 
-    @SubCommand(description = "The players that will compete in this game.")
+    @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
     public void player(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         String value = Iterators.getOnlyElement( tokens, null );

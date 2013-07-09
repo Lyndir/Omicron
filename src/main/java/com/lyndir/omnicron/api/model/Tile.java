@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  *               .   .   Nw  Ne  .   .
  *            -u   .   W   o   E   .   +u
  *               .   .   Sw  Se  .   .
- *                 .    .   .   .   .
+ *                 .   .   .   .   .
  *               .   .   .   .   .   .
  *                                 +v
  *
@@ -61,12 +61,12 @@ public class Tile extends MetaObject {
 
         level.putTile( position, this );
 
-        northWest = level.getTile( position.getNW( level.getLevelSize() ) );
-        northEast = level.getTile( position.getNE( level.getLevelSize() ) );
-        west = level.getTile( position.getW( level.getLevelSize() ) );
-        east = level.getTile( position.getE( level.getLevelSize() ) );
-        southWest = level.getTile( position.getSW( level.getLevelSize() ) );
-        southEast = level.getTile( position.getSE( level.getLevelSize() ) );
+        northWest = level.getTile( position.getNW() );
+        northEast = level.getTile( position.getNE() );
+        west = level.getTile( position.getW() );
+        east = level.getTile( position.getE() );
+        southWest = level.getTile( position.getSW() );
+        southEast = level.getTile( position.getSE() );
     }
 
     @Nullable

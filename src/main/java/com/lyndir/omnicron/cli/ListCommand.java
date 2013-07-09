@@ -15,7 +15,7 @@ import java.util.*;
 @CommandGroup(name = "list", abbr = "ls", desc = "Enumerate certain types of game objects.")
 public class ListCommand extends Command {
 
-    @SubCommand(description = "Enumerate all players in the game.")
+    @SubCommand(abbr = "p", desc = "Enumerate all players in the game.")
     public void players(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         final GameController gameController = omnicron.getGameController();
@@ -39,7 +39,7 @@ public class ListCommand extends Command {
                  playerGameInfo.isDiscovered()? "": " <undiscovered>" );
     }
 
-    @SubCommand(description = "Enumerate all types of game objects the player can detect.")
+    @SubCommand(abbr = "o", desc = "Enumerate all types of game objects the player can detect.")
     public void objects(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         final GameController gameController = omnicron.getGameController();

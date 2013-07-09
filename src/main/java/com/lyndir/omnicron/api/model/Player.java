@@ -52,6 +52,13 @@ public class Player extends MetaObject implements GameObserver {
         return getController().canObserve( currentPlayer, location );
     }
 
+    @NotNull
+    @Override
+    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+
+        return getController().listObservableTiles( currentPlayer );
+    }
+
     @Override
     public Player getPlayer() {
 

@@ -24,7 +24,7 @@ public class MobilityModule extends Module {
                                      "Cannot move object that doesn't belong to the current player." );
 
         Tile currentLocation = getGameObject().getLocation();
-        Coordinate newPosition = currentLocation.getPosition().delta( du, dv, currentLocation.getLevel().getLevelSize() );
+        Coordinate newPosition = currentLocation.getPosition().delta( du, dv );
         Tile newTile = currentLocation.getLevel().getTile( newPosition );
         Preconditions.checkArgument( newTile != null, "Cannot move to new position: it is outside the level's bounds." );
         assert newTile != null;
@@ -37,7 +37,9 @@ public class MobilityModule extends Module {
         Preconditions.checkArgument( newRemainingSpeed >= 0, "Cannot move: insufficient speed remaining this turn." );
 
         remainingSpeed = newRemainingSpeed;
+        getGameObject().getLocation().setContents( null );
         getGameObject().setLocation( newTile );
+        newTile.setContents( getGameObject() );
     }
 
     @Override

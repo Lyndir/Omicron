@@ -1,7 +1,6 @@
 package com.lyndir.omnicron.api.model;
 
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import com.lyndir.omnicron.api.controller.GameController;
@@ -26,7 +25,8 @@ public class Game extends MetaObject {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final GameController gameController;
 
-    private final Collection<Player> players = new LinkedList<>();
+    private final ImmutableList<Level> levels;
+    private final ImmutableList<Player> players;
     private final Set<Player> readyPlayers = new HashSet<>();
 
 
@@ -48,7 +48,7 @@ public class Game extends MetaObject {
                     players.add( randomPlayer );
             }
 
-            return new Game( worldSize, players );
+            return new Game( worldSize, ImmutableList.copyOf( players ) );
         }
 
         public Size getWorldSize() {
@@ -96,19 +96,20 @@ public class Game extends MetaObject {
         return new Builder();
     }
 
-    private Game(final Size worldSize, final List<Player> players) {
+    private Game(final Size worldSize, final ImmutableList<Player> players) {
 
         ground = new GroundLevel( worldSize );
         sky = new SkyLevel( worldSize );
         space = new SpaceLevel( worldSize );
-        this.players.addAll( players );
+        levels = ImmutableList.of( ground, sky, space );
+        this.players = players;
         currentTurn = new Turn( null );
 
         for (final Player player : players) {
             Tile startTile;
             do {
                 startTile = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getLevelSize().getWidth() ),
-                                                            RANDOM.nextInt( ground.getLevelSize().getHeight() ) ) );
+                                                            RANDOM.nextInt( ground.getLevelSize().getHeight() ), ground.getLevelSize() ) );
                 assert startTile != null;
             }
             while (startTile.getContents() != null);
@@ -141,6 +142,10 @@ public class Game extends MetaObject {
     public Turn getCurrentTurn() {
 
         return currentTurn;
+    }
+    public ImmutableList<Level> listLevels() {
+
+        return levels;
     }
 
     public Collection<Player> getPlayers() {

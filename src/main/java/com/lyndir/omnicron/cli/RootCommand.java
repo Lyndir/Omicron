@@ -21,8 +21,8 @@ public class RootCommand extends Command {
         super.evaluate( omnicron, tokens );
     }
 
-    @SubCommand(description = "Shut down the omnicron CLI client.")
-    public void exit(final OmnicronCLI omnicron, final Iterator<String> tokens) {
+    @SubCommand(abbr = "q", desc = "Shut down the omnicron CLI client.")
+    public void quit(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         omnicron.setRunning( false );
     }

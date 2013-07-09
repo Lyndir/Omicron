@@ -1,11 +1,12 @@
 package com.lyndir.omnicron.api.controller;
 
-import com.google.common.base.*;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.omnicron.api.model.*;
 import com.lyndir.omnicron.api.view.PlayerGameInfo;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 
 public class GameController {
@@ -19,43 +20,29 @@ public class GameController {
         newTurn();
     }
 
-    public PlayerGameInfo getPlayerGameInfo(final GameObserver observer, final Player player) {
+    /**
+     * Retrieve information on a given player.
+     *
+     * @param currentPlayer The player requesting the information.
+     * @param player        The player whose information is being requested.
+     *
+     * @return Information visible to the current player about the given player.
+     */
+    public PlayerGameInfo getPlayerGameInfo(final Player currentPlayer, final Player player) {
 
-        if (hasDiscovered( observer, player.getController() ))
+        if (player.listObservableTiles( currentPlayer ).iterator().hasNext())
             return PlayerGameInfo.discovered( player, player.getScore() );
 
         return PlayerGameInfo.undiscovered( player );
     }
 
-    private boolean hasDiscovered(final GameObserver observer, final GameObserver target) {
-
-        return FluentIterable.from( getObservedTiles( observer ) ).anyMatch( new Predicate<Tile>() {
-            @Override
-            public boolean apply(final Tile input) {
-
-                return input.contains( target );
-            }
-        } );
-    }
-
-    private Iterable<Tile> getObservedTiles(final GameObserver observer) {
-
-        return FluentIterable.from( game.getGround().getTiles().values() ).filter( new Predicate<Tile>() {
-            @Override
-            public boolean apply(final Tile input) {
-
-                return observer.canObserve( observer.getPlayer(), input );
-            }
-        } );
-    }
-
-    public Collection<PlayerGameInfo> listPlayerGameInfo(final GameObserver observer) {
+    public Collection<PlayerGameInfo> listPlayerGameInfo(final Player currentPlayer) {
 
         return Collections2.transform( game.getPlayers(), new Function<Player, PlayerGameInfo>() {
             @Override
             public PlayerGameInfo apply(final Player input) {
 
-                return getPlayerGameInfo( observer, input );
+                return getPlayerGameInfo( currentPlayer, input );
             }
         } );
     }
@@ -79,5 +66,10 @@ public class GameController {
 
         for (final Player player : game.getPlayers())
             player.getController().newTurn();
+    }
+
+    public ImmutableList<Level> listLevels() {
+
+        return game.listLevels();
     }
 }

@@ -1,10 +1,14 @@
 package com.lyndir.omnicron.api.controller;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.lyndir.omnicron.api.model.*;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
-public class BaseModule extends Module {
+public class BaseModule extends Module implements GameObserver {
 
     private final int                         health;
     private final int                         armor;
@@ -19,16 +23,38 @@ public class BaseModule extends Module {
         this.supportedLayers = supportedLayers;
     }
 
-    public boolean canObserve(final Player currentPlayer, final Tile tile) {
+    @Override
+    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
 
         Player owner = getGameObject().getPlayer();
         if (owner != null && !owner.equals( currentPlayer ))
             return false;
 
-        return getGameObject().getLocation().getPosition().distanceTo( tile.getPosition() ) <= viewRange;
+        return getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) <= viewRange;
+    }
+
+    @NotNull
+    @Override
+    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+
+        return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
+            @Override
+            public boolean apply(final Tile input) {
+
+                return canObserve( currentPlayer, input );
+            }
+        } );
+    }
+
+    @Nullable
+    @Override
+    public Player getPlayer() {
+
+        return getGameObject().getPlayer();
     }
 
     @Override
     public void newTurn() {
+
     }
 }

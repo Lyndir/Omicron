@@ -1,6 +1,5 @@
 package com.lyndir.omnicron.cli;
 
-import com.google.common.base.Joiner;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import java.lang.reflect.InvocationTargetException;
@@ -36,9 +35,10 @@ public abstract class Command {
         String subCommand = tokens.next();
 
         // Find the sub command to invoke by looking at our methods.
-        for (final Method method : getClass().getMethods())
-            if (method.getAnnotation( SubCommand.class ) != null)
-                if (method.getName().equals( subCommand )) {
+        for (final Method method : getClass().getMethods()) {
+            SubCommand annotation = method.getAnnotation( SubCommand.class );
+            if (annotation != null)
+                if (method.getName().equals( subCommand ) || annotation.abbr().equals( subCommand )) {
                     try {
                         method.invoke( this, omnicron, tokens );
                     }
@@ -48,6 +48,7 @@ public abstract class Command {
 
                     return;
                 }
+        }
 
         // Find the sub command to invoke by looking at other Command classes.
         for (final Class<? extends Command> commandGroup : packageReflections.getSubTypesOf( Command.class )) {
@@ -85,7 +86,7 @@ public abstract class Command {
         return commandGroup.name() + (commandGroup.name().isEmpty()? "": ": ");
     }
 
-    @SubCommand(description = "Enumerate all the sub commands of this command.")
+    @SubCommand(abbr = "h", desc = "Enumerate all the sub commands of this command.")
     public void help(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         inf( "Available sub commands are:" );
@@ -105,7 +106,7 @@ public abstract class Command {
                 // Hide special commands.
                 continue;
 
-            commandDescriptions.put( method.getName(), annotation.description() );
+            commandDescriptions.put( method.getName(), annotation.desc() );
         }
 
         for (final Class<? extends Command> commandGroup : packageReflections.getSubTypesOf( Command.class )) {
