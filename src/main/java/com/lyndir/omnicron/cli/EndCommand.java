@@ -21,9 +21,10 @@ public class EndCommand extends Command {
     public void turn(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
         if (omnicron.getGameController().setReady( omnicron.getLocalPlayer() ))
-            inf( "%s ready.  New turn started." );
+            inf( "%s ready.  New turn started.", omnicron.getLocalPlayer().getName() );
         else
-            inf( "%s ready.  Not yet ready: %s", Sets.difference( ImmutableSet.copyOf( omnicron.getGameController().listPlayers() ),
-                                                                  omnicron.getGameController().listReadyPlayers() ) );
+            inf( "%s ready.  Not yet ready: %s", omnicron.getLocalPlayer().getName(),
+                 Sets.difference( ImmutableSet.copyOf( omnicron.getGameController().listPlayers() ),
+                                  omnicron.getGameController().listReadyPlayers() ) );
     }
 }
