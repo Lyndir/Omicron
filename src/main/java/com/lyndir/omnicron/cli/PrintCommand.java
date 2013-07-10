@@ -27,7 +27,7 @@ public class PrintCommand extends Command {
         // Create an empty grid.
         Size maxSize = null;
         for (final Level level : omnicron.getGameController().listLevels())
-            maxSize = Size.max( maxSize, level.getLevelSize() );
+            maxSize = Size.max( maxSize, level.getSize() );
         assert maxSize != null;
         Table<Integer, Integer, StringBuilder> grid = HashBasedTable.create( maxSize.getHeight(), maxSize.getWidth() );
         for (int u = 0; u < maxSize.getWidth(); ++u)

@@ -7,27 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
- * <pre>
- *                 -v
- *               .   .   .   .   .   .
- *                 .   .   .   .   .
- *               .   .   Nw  Ne  .   .
- *            -u   .   W   o   E   .   +u
- *               .   .   Sw  Se  .   .
- *                 .   .   .   .   .
- *               .   .   .   .   .   .
- *                                 +v
- *
- *             u   v
- *        o  = 0 , 0
- *        Nw = 0 , -1
- *        Se = 0 , 1
- *        E  = 1 , 0
- *        W  = -1, 0
- *        Nw = 1 , -1
- *        Sw = -1, 1
- * </pre>
- *
  * <i>10 07, 2012</i>
  *
  * @author lhunath
@@ -39,18 +18,6 @@ public class Tile extends MetaObject {
     private       GameObject contents;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Coordinate position;
-    @Nullable
-    private final Tile       northWest;
-    @Nullable
-    private final Tile       northEast;
-    @Nullable
-    private final Tile       west;
-    @Nullable
-    private final Tile       east;
-    @Nullable
-    private final Tile       southWest;
-    @Nullable
-    private final Tile       southEast;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Level      level;
 
@@ -60,13 +27,12 @@ public class Tile extends MetaObject {
         this.level = level;
 
         level.putTile( position, this );
-
-        northWest = level.getTile( position.neighbour( Coordinate.Side.NW ) ).get();
-        northEast = level.getTile( position.neighbour( Coordinate.Side.NE ) ).get();
-        west = level.getTile( position.neighbour( Coordinate.Side.W ) ).get();
-        east = level.getTile( position.neighbour( Coordinate.Side.E ) ).get();
-        southWest = level.getTile( position.neighbour( Coordinate.Side.SW ) ).get();
-        southEast = level.getTile( position.neighbour( Coordinate.Side.SE ) ).get();
+        level.getTile( position.neighbour( Coordinate.Side.NW ) ).get();
+        level.getTile( position.neighbour( Coordinate.Side.NE ) ).get();
+        level.getTile( position.neighbour( Coordinate.Side.W ) ).get();
+        level.getTile( position.neighbour( Coordinate.Side.E ) ).get();
+        level.getTile( position.neighbour( Coordinate.Side.SW ) ).get();
+        level.getTile( position.neighbour( Coordinate.Side.SE ) ).get();
     }
 
     public Optional<GameObject> getContents() {
@@ -90,42 +56,6 @@ public class Tile extends MetaObject {
     public Level getLevel() {
 
         return level;
-    }
-
-    @Nullable
-    public Tile getNorthWest() {
-
-        return northWest;
-    }
-
-    @Nullable
-    public Tile getNorthEast() {
-
-        return northEast;
-    }
-
-    @Nullable
-    public Tile getWest() {
-
-        return west;
-    }
-
-    @Nullable
-    public Tile getEast() {
-
-        return east;
-    }
-
-    @Nullable
-    public Tile getSouthWest() {
-
-        return southWest;
-    }
-
-    @Nullable
-    public Tile getSouthEast() {
-
-        return southEast;
     }
 
     @NotNull

@@ -2,10 +2,8 @@ package com.lyndir.omnicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import java.util.Map;
-import java.util.Set;
+import com.lyndir.lhunath.opal.system.util.*;
+import java.util.*;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -17,15 +15,15 @@ import org.jetbrains.annotations.Nullable;
 public class Level extends MetaObject {
 
     private final String name;
-    private final Size   levelSize;
+    private final Size   size;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Coordinate, Tile> tileMap = Maps.newHashMap();
 
-    public Level(final String name, final Size levelSize) {
+    public Level(final String name, final Size size) {
 
         this.name = name;
-        this.levelSize = levelSize;
+        this.size = size;
     }
 
     public String getName() {
@@ -33,9 +31,9 @@ public class Level extends MetaObject {
         return name;
     }
 
-    public Size getLevelSize() {
+    public Size getSize() {
 
-        return levelSize;
+        return size;
     }
 
     public Map<Coordinate, Tile> getTiles() {
@@ -57,7 +55,7 @@ public class Level extends MetaObject {
      */
     public Optional<Tile> getTile(final Coordinate position) {
 
-        if (!levelSize.isInBounds( position ))
+        if (!size.isInBounds( position ))
             return Optional.absent();
 
         Tile tile = tileMap.get( position );
@@ -90,5 +88,21 @@ public class Level extends MetaObject {
                                                          final Class<? extends Level> levelType3, final V value3) {
 
         return ImmutableMap.of( levelType1, value1, levelType2, value2, levelType3, value3 );
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash( name, size );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+
+        if (!(obj instanceof Level))
+            return false;
+
+        Level o = (Level) obj;
+        return ObjectUtils.isEqual( name, o.name ) && ObjectUtils.isEqual( size, o.size );
     }
 }

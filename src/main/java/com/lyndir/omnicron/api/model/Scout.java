@@ -13,7 +13,7 @@ public class Scout extends PlayerObject {
         super( "Scout", owningPlayer, locationTile, //
                new BaseModule( 5, 3, 5, Level.set( GroundLevel.class ) ), //
                new MobilityModule( 8, Level.map( GroundLevel.class, 1 ) ), //
-               new WeaponModule( 3, 3, 5, Level.set( GroundLevel.class ) ) );
+               new WeaponModule( 3, 3, 5, 3, 20, Level.set( GroundLevel.class ) ) );
     }
 
     @NotNull

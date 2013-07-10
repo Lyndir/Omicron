@@ -110,9 +110,9 @@ public class Game extends MetaObject {
             // Find tiles for the units.
             Tile startTileEngineer, startTileAirship, startTileScout;
             do {
-                startTileEngineer = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getLevelSize().getWidth() ),
-                                                                    RANDOM.nextInt( ground.getLevelSize().getHeight() ),
-                                                                    ground.getLevelSize() ) ).get();
+                startTileEngineer = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getSize().getWidth() ),
+                                                                    RANDOM.nextInt( ground.getSize().getHeight() ),
+                                                                    ground.getSize() ) ).get();
 
                 Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
                 startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
