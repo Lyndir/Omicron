@@ -53,6 +53,26 @@ public class BaseModule extends Module implements GameObserver {
         return getGameObject().getPlayer();
     }
 
+    public int getHealth() {
+
+        return health;
+    }
+
+    public int getArmor() {
+
+        return armor;
+    }
+
+    public int getViewRange() {
+
+        return viewRange;
+    }
+
+    public Set<Class<? extends Level>> getSupportedLayers() {
+
+        return supportedLayers;
+    }
+
     @Override
     public void newTurn() {
 

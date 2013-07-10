@@ -14,9 +14,6 @@ import java.util.List;
 @CommandGroup(name = "end", abbr = "e", desc = "Finish an operation.")
 public class EndCommand extends Command {
 
-    private static final List<Class<? extends Level>> levelIndexes = ImmutableList.of( GroundLevel.class, SkyLevel.class,
-                                                                                       SpaceLevel.class );
-
     @SubCommand(abbr = "t", desc = "The current turn.")
     public void turn(final OmnicronCLI omnicron, final Iterator<String> tokens) {
 
