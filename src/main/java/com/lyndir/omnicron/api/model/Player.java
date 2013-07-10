@@ -32,7 +32,9 @@ public class Player extends MetaObject implements GameObserver {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Integer, GameObject> objects = new HashMap<>();
 
+    @ObjectMeta(useFor = ObjectMeta.For.toString)
     private int score;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private int nextObjectID;
 
     public Player(final int playerID, @Nullable final PlayerKey key, final String name, final Color primaryColor, final Color secondaryColor) {

@@ -14,7 +14,7 @@
     <groupId>com.lyndir.lhunath.omnicron</groupId>
     <artifactId>omnicron</artifactId>
     <version>GIT-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>omnicron</name>
     <url>http://omnicron.lyndir.com</url>
@@ -112,6 +112,12 @@
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

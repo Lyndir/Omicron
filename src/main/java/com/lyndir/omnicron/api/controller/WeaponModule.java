@@ -2,11 +2,13 @@ package com.lyndir.omnicron.api.controller;
 
 import com.google.common.base.Preconditions;
 import com.lyndir.omnicron.api.model.*;
+import java.util.Random;
 import java.util.Set;
 
 
 public class WeaponModule extends Module {
 
+    private final static Random RANDOM = new Random();
     private final int                         firePower;
     private final int                         variance;
     private final int                         range;
@@ -49,7 +51,7 @@ public class WeaponModule extends Module {
         Preconditions.checkArgument( getGameObject().getLocation().getPosition().distanceTo( target.getLocation().getPosition() ) <= range,
                                      "Cannot fire: target not in range." );
 
-
+        target.onModule( BaseModule.class ).addDamage( firePower + RANDOM.nextInt( variance ) );
     }
 
     @Override

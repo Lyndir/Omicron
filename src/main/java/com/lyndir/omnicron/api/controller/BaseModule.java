@@ -10,14 +10,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class BaseModule extends Module implements GameObserver {
 
-    private final int                         health;
+    private final int                         maxHealth;
     private final int                         armor;
     private final int                         viewRange;
     private final Set<Class<? extends Level>> supportedLayers;
+    private       int                         damage;
 
-    public BaseModule(final int health, final int armor, final int viewRange, final Set<Class<? extends Level>> supportedLayers) {
+    public BaseModule(final int maxHealth, final int armor, final int viewRange, final Set<Class<? extends Level>> supportedLayers) {
 
-        this.health = health;
+        this.maxHealth = maxHealth;
         this.armor = armor;
         this.viewRange = viewRange;
         this.supportedLayers = supportedLayers;
@@ -53,9 +54,14 @@ public class BaseModule extends Module implements GameObserver {
         return getGameObject().getPlayer();
     }
 
-    public int getHealth() {
+    public int getMaxHealth() {
 
-        return health;
+        return maxHealth;
+    }
+
+    public int getRemainingHealth() {
+
+        return Math.max( 0, maxHealth - damage );
     }
 
     public int getArmor() {
@@ -76,5 +82,10 @@ public class BaseModule extends Module implements GameObserver {
     @Override
     public void newTurn() {
 
+    }
+
+    public void addDamage(final int damage) {
+
+        this.damage += Math.max(0, damage - armor);
     }
 }
