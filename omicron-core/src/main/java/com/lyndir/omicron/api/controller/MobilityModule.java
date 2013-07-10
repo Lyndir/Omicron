@@ -4,18 +4,18 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Preconditions;
 import com.lyndir.omicron.api.model.*;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 
 public class MobilityModule extends Module {
 
     private final int movementSpeed;
-    private final Map<Class<? extends Level>, Float> speedMultipliers = new HashMap<>();
+    private final Map<LevelType, Float> speedMultipliers = new EnumMap<>( LevelType.class );
 
     private int remainingSpeed;
 
-    public MobilityModule(final int movementSpeed, final Map<Class<? extends Level>, Float> speedMultipliers) {
+    public MobilityModule(final int movementSpeed, final Map<LevelType, Float> speedMultipliers) {
 
         this.movementSpeed = movementSpeed;
         this.speedMultipliers.putAll( speedMultipliers );
@@ -24,13 +24,13 @@ public class MobilityModule extends Module {
     /**
      * Get the speed multiplier this unit experiences for moving in the given level.
      *
-     * @param level The level to get a multiplier for.
+     * @param levelType The level to get a multiplier for.
      *
      * @return The level-specific speed factor.
      */
-    public float multiplierForLevel(final Class<? extends Level> level) {
+    public float multiplierForLevel(final LevelType levelType) {
 
-        return ifNotNullElse( speedMultipliers.get( level ), 0f );
+        return ifNotNullElse( speedMultipliers.get( levelType ), 0f );
     }
 
     /**
@@ -45,7 +45,7 @@ public class MobilityModule extends Module {
                                      "Cannot move object that doesn't belong to the current player." );
 
         Tile currentLocation = getGameObject().getLocation();
-        Float speedMultiplier = multiplierForLevel( currentLocation.getLevel().getClass() );
+        Float speedMultiplier = multiplierForLevel( currentLocation.getLevel().getType() );
         Preconditions.checkArgument( speedMultiplier != 0, "Cannot move: unit is not mobile in this level." );
 
         Coordinate newPosition = side.delta( currentLocation.getPosition() );

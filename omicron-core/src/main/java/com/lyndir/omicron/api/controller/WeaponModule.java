@@ -10,16 +10,17 @@ import java.util.Set;
 public class WeaponModule extends Module {
 
     private static final Random RANDOM = new Random();
-    private final int                         firePower;
-    private final int                         variance;
-    private final int                         range;
-    private final int                         repeat;
-    private final int                         ammunitionLoad;
-    private final Set<Class<? extends Level>> supportedLayers;
-    private       int                         repeated;
-    private       int                         ammunition;
+    private final int            firePower;
+    private final int            variance;
+    private final int            range;
+    private final int            repeat;
+    private final int            ammunitionLoad;
+    private final Set<LevelType> supportedLayers;
+    private       int            repeated;
+    private       int            ammunition;
 
-    public WeaponModule(final int firePower, final int variance, final int range, final int repeat, final int ammunitionLoad, final Set<Class<? extends Level>> supportedLayers) {
+    public WeaponModule(final int firePower, final int variance, final int range, final int repeat, final int ammunitionLoad,
+                        final Set<LevelType> supportedLayers) {
 
         this.firePower = firePower;
         this.variance = variance;
@@ -56,7 +57,7 @@ public class WeaponModule extends Module {
         return ammunitionLoad;
     }
 
-    public Set<Class<? extends Level>> getSupportedLayers() {
+    public Set<LevelType> getSupportedLayers() {
 
         return supportedLayers;
     }

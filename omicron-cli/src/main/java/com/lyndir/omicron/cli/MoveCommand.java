@@ -23,24 +23,23 @@ public class MoveCommand extends Command {
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
-            err( "Missing objectID.  Syntax: objectID dU dV" );
+            err( "Missing objectID.  Syntax: objectID side" );
             return;
         }
         if ("help".equals( objectIDArgument )) {
-            inf( "Usage: objectID dU dV" );
+            inf( "Usage: objectID side" );
             inf( "    objectID: The ID of the object to move (see list objects)." );
-            inf( "          dU: The delta from the current position's u to the new u." );
-            inf( "          dV: The delta from the current position's v to the new v." );
-            return;
-        }
-
-        String sideArgument = Iterators.getNext( tokens, null );
-        if (sideArgument == null) {
-            err( "Missing dU.  Syntax: objectID side" );
+            inf( "        side: The side of the object's current tile to move to." );
             return;
         }
 
         int objectId = ConversionUtils.toIntegerNN( objectIDArgument );
+        String sideArgument = Iterators.getNext( tokens, null );
+        if (sideArgument == null) {
+            err( "Missing side.  Syntax: objectID side" );
+            return;
+        }
+
         Optional<Coordinate.Side> side = Coordinate.Side.forName( sideArgument );
         if (!side.isPresent()) {
             err( "No such side: %s.  Valid values are: %s", side, //

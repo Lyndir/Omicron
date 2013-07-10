@@ -9,6 +9,6 @@ public class SkyLevel extends Level {
 
     public SkyLevel(final Size levelSize) {
 
-        super( "Sky", levelSize );
+        super( levelSize, LevelType.SKY );
     }
 }

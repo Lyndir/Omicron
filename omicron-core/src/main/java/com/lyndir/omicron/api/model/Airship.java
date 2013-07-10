@@ -1,5 +1,7 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.internal.ImmutableMap;
 import com.lyndir.omicron.api.controller.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,9 +12,9 @@ public class Airship extends PlayerObject {
 
     protected Airship(final Tile locationTile, final Player owningPlayer) {
 
-        super( "Airship", owningPlayer, locationTile,
-               new BaseModule( 5, 1, 5, Level.set( SkyLevel.class ) ),
-               new MobilityModule(2, Level.map( SkyLevel.class, 1f ) ) );
+        super( "Airship", owningPlayer, locationTile, //
+               new BaseModule( 5, 1, 5, ImmutableSet.of( LevelType.SKY ) ), //
+               new MobilityModule( 2, ImmutableMap.of( LevelType.SKY, 1f ) ) );
     }
 
     @NotNull

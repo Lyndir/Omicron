@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.controller;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.omicron.api.model.*;
+import java.util.Collection;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,13 +11,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class BaseModule extends Module implements GameObserver {
 
-    private final int                         maxHealth;
-    private final int                         armor;
-    private final int                         viewRange;
-    private final Set<Class<? extends Level>> supportedLayers;
-    private       int                         damage;
+    private final int            maxHealth;
+    private final int            armor;
+    private final int            viewRange;
+    private final Set<LevelType> supportedLayers;
+    private       int            damage;
 
-    public BaseModule(final int maxHealth, final int armor, final int viewRange, final Set<Class<? extends Level>> supportedLayers) {
+    public BaseModule(final int maxHealth, final int armor, final int viewRange, final Set<LevelType> supportedLayers) {
 
         this.maxHealth = maxHealth;
         this.armor = armor;
@@ -74,7 +75,7 @@ public class BaseModule extends Module implements GameObserver {
         return viewRange;
     }
 
-    public Set<Class<? extends Level>> getSupportedLayers() {
+    public Set<LevelType> getSupportedLayers() {
 
         return supportedLayers;
     }

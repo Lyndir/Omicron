@@ -9,6 +9,6 @@ public class SpaceLevel extends Level {
 
     public SpaceLevel(final Size levelSize) {
 
-        super( "Space", levelSize );
+        super( levelSize, LevelType.SPACE );
     }
 }

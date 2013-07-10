@@ -14,26 +14,26 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Level extends MetaObject {
 
-    private final String name;
-    private final Size   size;
+    private final Size      size;
+    private final LevelType type;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Coordinate, Tile> tileMap = Maps.newHashMap();
 
-    public Level(final String name, final Size size) {
+    public Level(final Size size, final LevelType type) {
 
-        this.name = name;
         this.size = size;
-    }
-
-    public String getName() {
-
-        return name;
+        this.type = type;
     }
 
     public Size getSize() {
 
         return size;
+    }
+
+    public LevelType getType() {
+
+        return type;
     }
 
     public Map<Coordinate, Tile> getTiles() {
@@ -66,34 +66,10 @@ public class Level extends MetaObject {
         return Optional.of( tile );
     }
 
-    @SafeVarargs
-    public static Set<Class<? extends Level>> set(final Class<? extends Level>... levelTypes) {
-
-        return ImmutableSet.copyOf( levelTypes );
-    }
-
-    public static <V> Map<Class<? extends Level>, V> map(final Class<? extends Level> levelType1, final V value1) {
-
-        return ImmutableMap.<Class<? extends Level>, V>of( levelType1, value1 );
-    }
-
-    public static <V> Map<Class<? extends Level>, V> map(final Class<? extends Level> levelType1, final V value1,
-                                                         final Class<? extends Level> levelType2, final V value2) {
-
-        return ImmutableMap.of( levelType1, value1, levelType2, value2 );
-    }
-
-    public static <V> Map<Class<? extends Level>, V> map(final Class<? extends Level> levelType1, final V value1,
-                                                         final Class<? extends Level> levelType2, final V value2,
-                                                         final Class<? extends Level> levelType3, final V value3) {
-
-        return ImmutableMap.of( levelType1, value1, levelType2, value2, levelType3, value3 );
-    }
-
     @Override
     public int hashCode() {
 
-        return Objects.hash( name, size );
+        return Objects.hash( size, type );
     }
 
     @Override
@@ -103,6 +79,6 @@ public class Level extends MetaObject {
             return false;
 
         Level o = (Level) obj;
-        return ObjectUtils.isEqual( name, o.name ) && ObjectUtils.isEqual( size, o.size );
+        return ObjectUtils.isEqual( size, o.size ) && ObjectUtils.isEqual( type, o.type );
     }
 }

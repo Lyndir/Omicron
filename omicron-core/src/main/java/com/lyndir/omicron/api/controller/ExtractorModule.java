@@ -6,8 +6,6 @@ import java.util.Random;
 
 public class ExtractorModule extends Module {
 
-    private static final Random RANDOM = new Random();
-
     private final ResourceType resourceType;
     private final int          speed;
 
@@ -15,6 +13,16 @@ public class ExtractorModule extends Module {
 
         this.resourceType = resourceType;
         this.speed = speed;
+    }
+
+    public ResourceType getResourceType() {
+
+        return resourceType;
+    }
+
+    public int getSpeed() {
+
+        return speed;
     }
 
     @Override
