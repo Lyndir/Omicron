@@ -12,7 +12,7 @@ public class Airship extends PlayerObject {
 
         super( "Airship", owningPlayer, locationTile,
                new BaseModule( 5, 1, 5, Level.set( SkyLevel.class ) ),
-               new MobilityModule(2, Level.map( SkyLevel.class, 1 ) ) );
+               new MobilityModule(2, Level.map( SkyLevel.class, 1f ) ) );
     }
 
     @NotNull

@@ -12,7 +12,7 @@ public class Engineer extends PlayerObject {
 
         super( "Engineer", owningPlayer, locationTile, //
                new BaseModule( 10, 2, 3, Level.set( GroundLevel.class ) ), //
-               new MobilityModule( 5, Level.map( GroundLevel.class, 1 ) ) );
+               new MobilityModule( 5, Level.map( GroundLevel.class, 1f ) ) );
     }
 
     @NotNull

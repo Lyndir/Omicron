@@ -17,5 +17,5 @@ public abstract class Module {
         return gameObject;
     }
 
-    public abstract void newTurn();
+    public abstract void onNewTurn();
 }

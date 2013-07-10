@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Objects;
 
@@ -51,6 +52,15 @@ public class Coordinate extends MetaObject {
         public Coordinate delta(final Coordinate coordinate) {
 
             return coordinate.delta( du, dv );
+        }
+
+        public static Optional<Side> forName(final String name) {
+
+            for (final Side side : values())
+                if (side.name().equalsIgnoreCase( name ))
+                    return Optional.of( side );
+
+            return Optional.absent();
         }
     }
 

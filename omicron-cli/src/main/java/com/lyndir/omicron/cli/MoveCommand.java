@@ -1,9 +1,11 @@
 package com.lyndir.omicron.cli;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.Iterators;
+import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.controller.MobilityModule;
+import com.lyndir.omicron.api.model.Coordinate;
 import com.lyndir.omicron.api.model.GameObject;
 import java.util.Iterator;
 
@@ -32,21 +34,26 @@ public class MoveCommand extends Command {
             return;
         }
 
-        String duArgument = Iterators.getNext( tokens, null );
-        if (duArgument == null) {
-            err( "Missing dU.  Syntax: objectID dU dV" );
+        String sideArgument = Iterators.getNext( tokens, null );
+        if (sideArgument == null) {
+            err( "Missing dU.  Syntax: objectID side" );
             return;
         }
-        String dvArgument = Iterators.getNext( tokens, null );
-        if (dvArgument == null) {
-            err( "Missing dV.  Syntax: objectID dU dV" );
-            return;
-        }
-
 
         int objectId = ConversionUtils.toIntegerNN( objectIDArgument );
-        int du = ConversionUtils.toIntegerNN( duArgument );
-        int dv = ConversionUtils.toIntegerNN( dvArgument );
+        Optional<Coordinate.Side> side = Coordinate.Side.forName( sideArgument );
+        if (!side.isPresent()) {
+            err( "No such side: %s.  Valid values are: %s", side, //
+                 FluentIterable.from( ImmutableList.copyOf( Coordinate.Side.values() ) )
+                               .transform( new Function<Coordinate.Side, String>() {
+                                   @Override
+                                   public String apply(final Coordinate.Side input) {
+
+                                       return input.name();
+                                   }
+                               } ) );
+            return;
+        }
 
         // Find the game object for the given ID.
         Optional<GameObject> optionalObject = omicron.getLocalPlayer().getController().getObject( omicron.getLocalPlayer(), objectId );
@@ -65,7 +72,7 @@ public class MoveCommand extends Command {
         MobilityModule mobilityModule = optionalMobility.get();
 
         // Move the object.
-        mobilityModule.move( omicron.getLocalPlayer(), du, dv );
+        mobilityModule.move( omicron.getLocalPlayer(), side.get() );
         inf( "Object is now at: %s", gameObject.getLocation() );
     }
 }

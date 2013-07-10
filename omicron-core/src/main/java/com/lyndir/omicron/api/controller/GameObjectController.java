@@ -35,7 +35,7 @@ public abstract class GameObjectController<O extends GameObject> implements Game
     public void newTurn() {
 
         for (final Module module : getGameObject().listModules())
-            module.newTurn();
+            module.onNewTurn();
     }
 
     public void die() {

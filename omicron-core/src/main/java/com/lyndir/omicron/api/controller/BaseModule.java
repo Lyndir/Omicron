@@ -80,7 +80,7 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @Override
-    public void newTurn() {
+    public void onNewTurn() {
 
     }
 

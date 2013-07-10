@@ -83,7 +83,7 @@ public class WeaponModule extends Module {
     }
 
     @Override
-    public void newTurn() {
+    public void onNewTurn() {
 
         repeated = 0;
     }
