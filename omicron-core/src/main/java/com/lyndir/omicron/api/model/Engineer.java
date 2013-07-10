@@ -1,5 +1,7 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.lyndir.omicron.api.controller.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,8 +13,8 @@ public class Engineer extends PlayerObject {
     protected Engineer(final Tile locationTile, final Player owningPlayer) {
 
         super( "Engineer", owningPlayer, locationTile, //
-               new BaseModule( 10, 2, 3, Level.set( GroundLevel.class ) ), //
-               new MobilityModule( 5, Level.map( GroundLevel.class, 1f ) ) );
+               new BaseModule( 10, 2, 3, ImmutableSet.of( LevelType.GROUND ) ), //
+               new MobilityModule( 5, ImmutableMap.of( LevelType.GROUND, 1f ), ImmutableMap.<LevelType, Float>of() ) );
     }
 
     @NotNull

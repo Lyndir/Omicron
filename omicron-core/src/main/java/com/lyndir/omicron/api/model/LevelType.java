@@ -24,6 +24,24 @@ public enum LevelType {
         return name;
     }
 
+    public Optional<LevelType> down() {
+
+        int downOrdinal = ordinal() - 1;
+        if (downOrdinal < 0)
+            return Optional.absent();
+
+        return Optional.of( values()[downOrdinal] );
+    }
+
+    public Optional<LevelType> up() {
+
+        int upOrdinal = ordinal() + 1;
+        if (upOrdinal >= values().length)
+            return Optional.absent();
+
+        return Optional.of( values()[upOrdinal] );
+    }
+
     public static Optional<LevelType> forName(final String name) {
 
         for (final LevelType levelType : values())

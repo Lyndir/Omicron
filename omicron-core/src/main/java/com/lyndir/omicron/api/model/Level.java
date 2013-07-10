@@ -1,9 +1,10 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.*;
+import com.google.common.collect.Maps;
 import com.lyndir.lhunath.opal.system.util.*;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -16,14 +17,16 @@ public class Level extends MetaObject {
 
     private final Size      size;
     private final LevelType type;
+    private final Game      game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Coordinate, Tile> tileMap = Maps.newHashMap();
 
-    public Level(final Size size, final LevelType type) {
+    public Level(final Size size, final LevelType type, final Game game) {
 
         this.size = size;
         this.type = type;
+        this.game = game;
     }
 
     public Size getSize() {
@@ -34,6 +37,11 @@ public class Level extends MetaObject {
     public LevelType getType() {
 
         return type;
+    }
+
+    public Game getGame() {
+
+        return game;
     }
 
     public Map<Coordinate, Tile> getTiles() {

@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.base.Predicate;
+import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import com.lyndir.omicron.api.controller.GameController;
@@ -99,9 +99,9 @@ public class Game extends MetaObject {
 
     private Game(final Size worldSize, final ImmutableList<Player> players) {
 
-        ground = new GroundLevel( worldSize );
-        sky = new SkyLevel( worldSize );
-        space = new SpaceLevel( worldSize );
+        ground = new GroundLevel( worldSize, this );
+        sky = new SkyLevel( worldSize, this );
+        space = new SpaceLevel( worldSize, this );
         levels = ImmutableList.of( ground, sky, space );
         this.players = players;
         currentTurn = new Turn( null );
@@ -110,9 +110,9 @@ public class Game extends MetaObject {
             // Find tiles for the units.
             Tile startTileEngineer, startTileAirship, startTileScout;
             do {
-                startTileEngineer = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getSize().getWidth() ),
-                                                                    RANDOM.nextInt( ground.getSize().getHeight() ),
-                                                                    ground.getSize() ) ).get();
+                startTileEngineer = ground.getTile(
+                        new Coordinate( RANDOM.nextInt( ground.getSize().getWidth() ), RANDOM.nextInt( ground.getSize().getHeight() ),
+                                        ground.getSize() ) ).get();
 
                 Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
                 startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
@@ -139,19 +139,15 @@ public class Game extends MetaObject {
         return gameController;
     }
 
-    public GroundLevel getGround() {
+    public Level getLevel(final LevelType levelType) {
 
-        return ground;
-    }
+        return FluentIterable.from( levels ).firstMatch( new Predicate<Level>() {
+            @Override
+            public boolean apply(final Level input) {
 
-    public SkyLevel getSky() {
-
-        return sky;
-    }
-
-    public SpaceLevel getSpace() {
-
-        return space;
+                return input.getType() == levelType;
+            }
+        } ).get();
     }
 
     public Turn getCurrentTurn() {
