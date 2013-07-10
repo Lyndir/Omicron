@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PROJECT METADATA -->
+    <parent>
+        <groupId>com.lyndir.lhunath.omicron</groupId>
+        <artifactId>omicron</artifactId>
+        <version>GIT-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.lyndir.lhunath.omicron</groupId>
+    <artifactId>omicron-cli</artifactId>
+    <version>GIT-SNAPSHOT</version>
+
+    <name>Omicron CLI</name>
+    <description>
+        A command-line interface to the Omicron game.
+    </description>
+
+
+    <!-- BUILD CONFIGURATION -->
+    <build />
+
+    <!-- DEPENDENCY MANAGEMENT -->
+    <dependencies>
+
+        <!-- Opal -->
+        <dependency>
+            <groupId>com.lyndir.lhunath.omicron</groupId>
+            <artifactId>omicron-core</artifactId>
+            <version>GIT-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- Utilities -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+    </dependencies>
+
+</project>
+

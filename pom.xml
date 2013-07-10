@@ -11,13 +11,13 @@
         <version>GIT-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lyndir.lhunath.omnicron</groupId>
-    <artifactId>omnicron</artifactId>
+    <groupId>com.lyndir.lhunath.omicron</groupId>
+    <artifactId>omicron</artifactId>
     <version>GIT-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-    <name>omnicron</name>
-    <url>http://omnicron.lyndir.com</url>
+    <name>Omicron</name>
+    <url>http://omicron.lyndir.com</url>
     <inceptionYear>2012</inceptionYear>
     <description>
         A multiplayer strategy game.
@@ -31,15 +31,21 @@
 
     <!-- CODE MANAGEMENT -->
     <scm>
-        <url>${scm.github.webbase}/omnicron</url>
-        <connection>${scm.github.pubbase}/omnicron.git</connection>
-        <developerConnection>${scm.github.devbase}/omnicron.git</developerConnection>
+        <url>${scm.github.webbase}/omicron</url>
+        <connection>${scm.github.pubbase}/omicron.git</connection>
+        <developerConnection>${scm.github.devbase}/omicron.git</developerConnection>
     </scm>
     <issueManagement>
         <system>YouTrack</system>
         <url>https://youtrack.lyndir.com/issues/OC</url>
     </issueManagement>
 
+
+    <!-- MODULES -->
+    <modules>
+        <module>omicron-core</module>
+        <module>omicron-cli</module>
+    </modules>
 
     <!-- BUILD CONFIGURATION -->
     <build>
@@ -62,67 +68,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <!-- DEPENDENCY MANAGEMENT -->
-    <dependencies>
-
-        <!-- Opal -->
-        <dependency>
-            <groupId>com.lyndir.lhunath.opal</groupId>
-            <artifactId>opal-security</artifactId>
-            <version>GIT-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lyndir.lhunath.opal</groupId>
-            <artifactId>opal-crypto</artifactId>
-            <version>GIT-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-        </dependency>
-
-        <!-- Web -->
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-assisted-inject</artifactId>
-        </dependency>
-
-        <!-- Utilities -->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-    </dependencies>
 
     <!-- REMOTE ARTIFACT REPOSITORIES -->
     <repositories>
