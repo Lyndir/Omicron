@@ -1,6 +1,7 @@
 package com.lyndir.omnicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,5 +43,21 @@ public class Size extends MetaObject {
             return size2;
 
         return new Size( Math.max( size1.getWidth(), size2.getWidth() ), Math.max( size1.getHeight(), size2.getHeight() ) );
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash( width, height );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+
+        if (!(obj instanceof Size))
+            return false;
+
+        Size o = (Size) obj;
+        return width == o.width && height == o.height;
     }
 }
