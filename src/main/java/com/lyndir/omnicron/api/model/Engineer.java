@@ -1,7 +1,5 @@
 package com.lyndir.omnicron.api.model;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.lyndir.omnicron.api.controller.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,9 +10,9 @@ public class Engineer extends PlayerObject {
 
     protected Engineer(final Tile locationTile, final Player owningPlayer) {
 
-        super( "Engineer", owningPlayer, locationTile,
-               new BaseModule( 10, 2, 3, Level.set( GroundLevel.class ) ),
-               new MobilityModule(5, Level.map( GroundLevel.class, 1 ) ) );
+        super( "Engineer", owningPlayer, locationTile, //
+               new BaseModule( 10, 2, 3, Level.set( GroundLevel.class ) ), //
+               new MobilityModule( 5, Level.map( GroundLevel.class, 1 ) ) );
     }
 
     @NotNull

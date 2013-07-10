@@ -84,8 +84,11 @@ public class BaseModule extends Module implements GameObserver {
 
     }
 
-    public void addDamage(final int damage) {
+    public void addDamage(final int incomingDamage) {
 
-        this.damage += Math.max(0, damage - armor);
+        damage += Math.max( 0, incomingDamage - armor );
+
+        if (getRemainingHealth() <= 0)
+            getGameObject().getController().die();
     }
 }

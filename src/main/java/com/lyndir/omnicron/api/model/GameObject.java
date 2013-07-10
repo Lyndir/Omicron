@@ -38,7 +38,6 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         }
         this.modules = modulesBuilder.build();
 
-        Preconditions.checkState( location.getContents() == null, "Cannot create object on tile that is not empty: %s", location );
         location.setContents( this );
     }
 

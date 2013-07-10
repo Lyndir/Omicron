@@ -107,22 +107,27 @@ public class Game extends MetaObject {
         currentTurn = new Turn( null );
 
         for (final Player player : players) {
-            Tile startTile, startTile2;
+            // Find tiles for the units.
+            Tile startTileEngineer, startTileAirship, startTileScout;
             do {
-                startTile = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getLevelSize().getWidth() ),
-                                                            RANDOM.nextInt( ground.getLevelSize().getHeight() ), ground.getLevelSize() ) );
-                assert startTile != null;
+                startTileEngineer = ground.getTile( new Coordinate( RANDOM.nextInt( ground.getLevelSize().getWidth() ),
+                                                                    RANDOM.nextInt( ground.getLevelSize().getHeight() ),
+                                                                    ground.getLevelSize() ) ).get();
+
+                Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
+                startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
+
+                randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
+                startTileScout = startTileEngineer.neighbour( randomSide );
             }
-            while (startTile.getContents() != null);
-            do {
-                startTile2 = sky.getTile(
-                        new Coordinate( RANDOM.nextInt( sky.getLevelSize().getWidth() ), RANDOM.nextInt( sky.getLevelSize().getHeight() ),
-                                        sky.getLevelSize() ) );
-                assert startTile2 != null;
-            }
-            while (startTile2.getContents() != null);
-            player.getController().addObject( new Engineer( startTile, player ) );
-            player.getController().addObject( new Airship( startTile2, player ) );
+            while (startTileEngineer.getContents().isPresent() || //
+                   startTileAirship.getContents().isPresent() || //
+                   startTileScout.getContents().isPresent());
+
+            // Add the units.
+            player.getController().addObject( new Engineer( startTileEngineer, player ) );
+            player.getController().addObject( new Airship( startTileAirship, player ) );
+            player.getController().addObject( new Scout( startTileScout, player ) );
         }
 
         gameController = new GameController( this );

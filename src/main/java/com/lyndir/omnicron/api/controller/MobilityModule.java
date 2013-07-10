@@ -25,9 +25,7 @@ public class MobilityModule extends Module {
 
         Tile currentLocation = getGameObject().getLocation();
         Coordinate newPosition = currentLocation.getPosition().delta( du, dv );
-        Tile newTile = currentLocation.getLevel().getTile( newPosition );
-        Preconditions.checkArgument( newTile != null, "Cannot move to new position: it is outside the level's bounds." );
-        assert newTile != null;
+        Tile newTile = currentLocation.getLevel().getTile( newPosition ).get();
 
         int distance = currentLocation.getPosition().distanceTo( newPosition );
         Preconditions.checkArgument( distance == 1, "Can only move in increments of one tile, tried to move %s tiles.", distance );

@@ -45,12 +45,12 @@ public class OmnicronCLI {
                 System.err.print( "% " );
                 Iterator<String> tokens = commandSplitter.split( inLineReader.readLine() ).iterator();
 
-                try {
+//                try {
                     new RootCommand().evaluate( omnicron, tokens );
-                }
-                catch (RuntimeException e) {
-                    System.err.format( "Unexpected: %s\n", e.getLocalizedMessage() );
-                }
+//                }
+//                catch (RuntimeException e) {
+//                    System.err.format( "Unexpected: %s\n", e.getLocalizedMessage() );
+//                }
             }
         }
     }

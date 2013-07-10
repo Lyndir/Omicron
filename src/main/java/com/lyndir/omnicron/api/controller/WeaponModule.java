@@ -1,5 +1,6 @@
 package com.lyndir.omnicron.api.controller;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.omnicron.api.model.*;
 import java.util.Random;
@@ -42,16 +43,18 @@ public class WeaponModule extends Module {
         return supportedLayers;
     }
 
-    public void fireAt(final Player currentPlayer, final GameObject target) {
+    public void fireAt(final Player currentPlayer, final Tile target) {
 
         Preconditions.checkArgument( currentPlayer.equals( getGameObject().getPlayer() ), //
                                      "Cannot fire: unit is not owned by player." );
-        Preconditions.checkArgument( currentPlayer.canObserve( currentPlayer, target.getLocation() ), //
+        Preconditions.checkArgument( currentPlayer.canObserve( currentPlayer, target ), //
                                      "Cannot fire: target not observed." );
-        Preconditions.checkArgument( getGameObject().getLocation().getPosition().distanceTo( target.getLocation().getPosition() ) <= range,
+        Preconditions.checkArgument( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, //
                                      "Cannot fire: target not in range." );
 
-        target.onModule( BaseModule.class ).addDamage( firePower + RANDOM.nextInt( variance ) );
+        Optional<GameObject> targetGameObject = target.getContents();
+        if (targetGameObject.isPresent())
+            targetGameObject.get().onModule( BaseModule.class ).addDamage( firePower + RANDOM.nextInt( variance ) );
     }
 
     @Override

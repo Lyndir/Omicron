@@ -1,6 +1,7 @@
 package com.lyndir.omnicron.cli;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.omnicron.api.model.*;
 import java.util.*;
@@ -35,12 +36,12 @@ public class PrintCommand extends Command {
 
         // Iterate observable tiles and populate the grid.
         for (final Tile tile : omnicron.getLocalPlayer().listObservableTiles( omnicron.getLocalPlayer() )) {
-            GameObject contents = tile.getContents();
+            Optional<GameObject> contents = tile.getContents();
             char contentsChar;
-            if (contents == null)
-                contentsChar = levelCharacters.get( tile.getLevel().getClass() );
+            if (contents.isPresent())
+                contentsChar = contents.get().getTypeName().charAt( 0 );
             else
-                contentsChar = contents.getTypeName().charAt( 0 );
+                contentsChar = levelCharacters.get( tile.getLevel().getClass() );
 
             int levelIndex = levelIndexes.indexOf( tile.getLevel().getClass() );
             int v = tile.getPosition().getV();

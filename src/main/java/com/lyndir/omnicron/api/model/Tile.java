@@ -1,6 +1,6 @@
 package com.lyndir.omnicron.api.model;
 
-import com.google.common.base.Objects;
+import com.google.common.base.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,21 +61,23 @@ public class Tile extends MetaObject {
 
         level.putTile( position, this );
 
-        northWest = level.getTile( position.getNW() );
-        northEast = level.getTile( position.getNE() );
-        west = level.getTile( position.getW() );
-        east = level.getTile( position.getE() );
-        southWest = level.getTile( position.getSW() );
-        southEast = level.getTile( position.getSE() );
+        northWest = level.getTile( position.neighbour( Coordinate.Side.NW ) ).get();
+        northEast = level.getTile( position.neighbour( Coordinate.Side.NE ) ).get();
+        west = level.getTile( position.neighbour( Coordinate.Side.W ) ).get();
+        east = level.getTile( position.neighbour( Coordinate.Side.E ) ).get();
+        southWest = level.getTile( position.neighbour( Coordinate.Side.SW ) ).get();
+        southEast = level.getTile( position.neighbour( Coordinate.Side.SE ) ).get();
     }
 
-    @Nullable
-    public GameObject getContents() {
+    public Optional<GameObject> getContents() {
 
-        return contents;
+        return Optional.fromNullable( contents );
     }
 
     public void setContents(@Nullable final GameObject contents) {
+
+        if (contents != null)
+            Preconditions.checkState( !getContents().isPresent(), "Cannot put object on tile that is not empty: %s", this );
 
         this.contents = contents;
     }
@@ -124,6 +126,12 @@ public class Tile extends MetaObject {
     public Tile getSouthEast() {
 
         return southEast;
+    }
+
+    @NotNull
+    public Tile neighbour(final Coordinate.Side side) {
+
+        return level.getTile( getPosition().neighbour( side ) ).get();
     }
 
     public boolean contains(@NotNull final GameObserver target) {

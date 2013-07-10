@@ -1,5 +1,6 @@
 package com.lyndir.omnicron.api.model;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
@@ -54,18 +55,17 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    @Nullable
-    public Tile getTile(final Coordinate position) {
+    public Optional<Tile> getTile(final Coordinate position) {
 
         if (!levelSize.isInBounds( position ))
-            return null;
+            return Optional.absent();
 
         Tile tile = tileMap.get( position );
 
         if (tile == null)
             tile = new Tile( position, this );
 
-        return tile;
+        return Optional.of( tile );
     }
 
     @SafeVarargs

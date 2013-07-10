@@ -1,6 +1,7 @@
 package com.lyndir.omnicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import java.util.Objects;
 
 
 /**
@@ -13,6 +14,24 @@ public class Coordinate extends MetaObject {
     private final int  u;
     private final int  v;
     private final Size wrapSize;
+
+
+    public enum Side {
+        NW( 0, -1 ), NE( 1, -1 ), W( -1, 0 ), E( 1, 0 ), SW( -1, 1 ), SE( 0, 1 );
+
+        private final int du, dv;
+
+        Side(final int du, final int dv) {
+
+            this.du = du;
+            this.dv = dv;
+        }
+
+        public Coordinate delta(final Coordinate coordinate) {
+
+            return coordinate.delta( du, dv );
+        }
+    }
 
     public Coordinate(final int u, final int v, final Size wrapSize) {
 
@@ -65,6 +84,11 @@ public class Coordinate extends MetaObject {
                                (wrapSize.getHeight() + v + dv) % wrapSize.getHeight(), wrapSize );
     }
 
+    public Coordinate neighbour(final Side side) {
+
+        return side.delta( this );
+    }
+
     public int distanceTo(final Coordinate other) {
 
         int du = getDU( other );
@@ -73,33 +97,19 @@ public class Coordinate extends MetaObject {
         return (Math.abs( du ) + Math.abs( dv ) + Math.abs( du + dv )) / 2;
     }
 
-    public Coordinate getNW() {
+    @Override
+    public boolean equals(final Object obj) {
 
-        return delta( 0, -1 );
+        if (!(obj instanceof Coordinate))
+            return false;
+
+        Coordinate o = (Coordinate) obj;
+        return u == o.u && v == o.v && wrapSize.equals( o.wrapSize );
     }
 
-    public Coordinate getNE() {
+    @Override
+    public int hashCode() {
 
-        return delta( 1, -1 );
-    }
-
-    public Coordinate getW() {
-
-        return delta( -1, 0 );
-    }
-
-    public Coordinate getE() {
-
-        return delta( 1, 0 );
-    }
-
-    public Coordinate getSW() {
-
-        return delta( -1, 1 );
-    }
-
-    public Coordinate getSE() {
-
-        return delta( 0, 1 );
+        return Objects.hash( u, v, wrapSize );
     }
 }
