@@ -24,10 +24,12 @@ public class Player extends MetaObject implements GameObserver {
     private final PlayerController controller = new PlayerController( this );
 
     private final int       playerID;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final PlayerKey key;
     private final String    name;
     private final Color     primaryColor;
     private final Color     secondaryColor;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Integer, GameObject> objects = new HashMap<>();
 
     private int score;
