@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.controller;
 
+import com.google.common.base.Preconditions;
 import com.lyndir.omicron.api.model.GameObject;
 
 
@@ -14,7 +15,7 @@ public abstract class Module {
 
     public GameObject getGameObject() {
 
-        return gameObject;
+        return Preconditions.checkNotNull( gameObject, "This module has not yet been initialized by its game object." );
     }
 
     public abstract void onNewTurn();

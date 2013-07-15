@@ -3,10 +3,8 @@ package com.lyndir.omicron.api.controller;
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.lyndir.omicron.api.model.*;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class MobilityModule extends Module {
@@ -56,9 +54,10 @@ public class MobilityModule extends Module {
             if (!newLevel.isPresent())
                 break;
 
-            cost += levelingCost.get( newLevel.get() );
+            currentLevel = newLevel.get();
+            cost += levelingCost.get( currentLevel );
 
-            if (newLevel.get() == levelType)
+            if (currentLevel == levelType)
                 return cost;
         }
         while (true);
@@ -70,9 +69,10 @@ public class MobilityModule extends Module {
             if (!newLevel.isPresent())
                 break;
 
-            cost += levelingCost.get( newLevel.get() );
+            currentLevel = newLevel.get();
+            cost += levelingCost.get( currentLevel );
 
-            if (newLevel.get() == levelType)
+            if (currentLevel == levelType)
                 return cost;
         }
         while (true);
@@ -113,6 +113,67 @@ public class MobilityModule extends Module {
         newLocation.setContents( getGameObject() );
 
         return true;
+    }
+
+    /**
+     * Move the unit to an adjacent tile.
+     *
+     * @param currentPlayer The player ordering the action.
+     * @param target        The side of the adjacent tile relative to the current.
+     */
+    public boolean move(final Player currentPlayer, final Tile target) {
+
+        if (!currentPlayer.equals( getGameObject().getPlayer() ))
+            // Cannot move object that doesn't belong to the current player.
+            return false;
+
+        if (!level( currentPlayer, target.getLevel().getType() ))
+            return false;
+
+        // Initialize cost calculation.
+        Tile currentLocation = getGameObject().getLocation();
+        float stepCost = costForMovingInLevel( currentLocation.getLevel().getType() );
+        float currentCost = 0;
+
+        // Initialize breath-first.
+        Set<Tile> tested = new HashSet<>();
+        Deque<Tile> toTest = new LinkedList<>();
+        toTest.addLast( currentLocation );
+        tested.add( currentLocation );
+
+        // Search breath-first.
+        while (!toTest.isEmpty()) {
+            // Check cost for moving to a neighbour tile.
+            currentCost += stepCost;
+            float currentRemainingSpeed = remainingSpeed - currentCost;
+            if (currentRemainingSpeed < 0)
+                // Cannot move: insufficient speed remaining this turn.
+                return false;
+
+            // Check each neighbour tile.
+            Tile testTile = toTest.removeFirst();
+            for (final Coordinate.Side side : Coordinate.Side.values()) {
+                Tile neighbour = testTile.neighbour( side );
+                if (tested.contains( neighbour ))
+                    continue;
+
+                // Did we reach the target?
+                if (neighbour.equals( target )) {
+                    remainingSpeed = currentRemainingSpeed;
+                    getGameObject().getLocation().setContents( null );
+                    getGameObject().setLocation( neighbour );
+                    neighbour.setContents( getGameObject() );
+
+                    return true;
+                }
+
+                // Neighbour is not the target, add it for testing its neighbours later.
+                toTest.add( neighbour );
+                tested.add( neighbour );
+            }
+        }
+
+        return false;
     }
 
     /**
