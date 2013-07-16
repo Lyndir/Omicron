@@ -131,7 +131,7 @@ public class Game extends MetaObject {
         }
 
         gameController = new GameController( this );
-        gameController.newTurn();
+        gameController.onNewTurn();
     }
 
     public GameController getController() {

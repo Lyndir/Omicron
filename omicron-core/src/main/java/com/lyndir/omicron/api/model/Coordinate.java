@@ -54,6 +54,16 @@ public class Coordinate extends MetaObject {
             return coordinate.delta( du, dv );
         }
 
+        public int getDu() {
+
+            return du;
+        }
+
+        public int getDv() {
+
+            return dv;
+        }
+
         public static Optional<Side> forName(final String name) {
 
             for (final Side side : values())

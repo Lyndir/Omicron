@@ -63,17 +63,17 @@ public class GameController {
 
         if (game.getReadyPlayers().containsAll( game.getPlayers() )) {
             game.getReadyPlayers().clear();
-            newTurn();
+            onNewTurn();
             return true;
         }
 
         return false;
     }
 
-    public void newTurn() {
+    public void onNewTurn() {
 
         for (final Player player : game.getPlayers())
-            player.getController().newTurn( this );
+            player.getController().onNewTurn( this );
     }
 
     public ImmutableList<Level> listLevels() {

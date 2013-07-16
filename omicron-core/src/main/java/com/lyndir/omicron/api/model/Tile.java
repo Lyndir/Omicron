@@ -35,6 +35,7 @@ public class Tile extends MetaObject {
         level.getTile( position.neighbour( Coordinate.Side.SE ) ).get();
     }
 
+    @NotNull
     public Optional<GameObject> getContents() {
 
         return Optional.fromNullable( contents );
@@ -93,5 +94,10 @@ public class Tile extends MetaObject {
 
         Tile o = (Tile) obj;
         return ObjectUtils.isEqual( position, o.position ) && ObjectUtils.isEqual( level, o.level );
+    }
+
+    public boolean isAccessible() {
+
+        return !getContents().isPresent();
     }
 }

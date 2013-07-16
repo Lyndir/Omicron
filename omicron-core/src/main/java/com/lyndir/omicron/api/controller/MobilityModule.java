@@ -102,6 +102,10 @@ public class MobilityModule extends Module {
             // Already in the destination location.
             return true;
 
+        if (!newLocation.isAccessible())
+            // Cannot move: new location is not accessible.
+            return false;
+
         float newRemainingSpeed = remainingSpeed - cost;
         if (newRemainingSpeed < 0)
             // Cannot move: insufficient speed remaining this turn.
@@ -156,9 +160,13 @@ public class MobilityModule extends Module {
                 Tile neighbour = testTile.neighbour( side );
                 if (tested.contains( neighbour ))
                     continue;
+                boolean accessible = neighbour.isAccessible();
 
                 // Did we reach the target?
                 if (neighbour.equals( target )) {
+                    if (!accessible)
+                        return false;
+
                     remainingSpeed = currentRemainingSpeed;
                     getGameObject().getLocation().setContents( null );
                     getGameObject().setLocation( neighbour );
@@ -168,7 +176,8 @@ public class MobilityModule extends Module {
                 }
 
                 // Neighbour is not the target, add it for testing its neighbours later.
-                toTest.add( neighbour );
+                if (accessible)
+                    toTest.add( neighbour );
                 tested.add( neighbour );
             }
         }

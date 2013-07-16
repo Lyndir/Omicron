@@ -85,7 +85,7 @@ public class PlayerController implements GameObserver {
         player.addObject( gameObject );
     }
 
-    public void newTurn(final GameController gameController) {
+    public void onNewTurn(final GameController gameController) {
 
         for (final GameObject gameObject : player.getObjects())
             gameObject.getController().newTurn();
