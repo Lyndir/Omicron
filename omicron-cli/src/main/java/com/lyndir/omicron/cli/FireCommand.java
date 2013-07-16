@@ -58,12 +58,12 @@ public class FireCommand extends Command {
         }
         GameObject gameObject = optionalObject.get();
 
-        final String levelArgument = Iterators.getNext( tokens, gameObject.getLocation().getLevel().getName() );
+        final String levelArgument = Iterators.getNext( tokens, gameObject.getLocation().getLevel().getType().getName() );
         Optional<Level> level = FluentIterable.from( omicron.getGameController().listLevels() ).firstMatch( new Predicate<Level>() {
             @Override
             public boolean apply(final Level input) {
 
-                return input.getName().equalsIgnoreCase( levelArgument );
+                return input.getType().getName().equalsIgnoreCase( levelArgument );
             }
         } );
         if (!level.isPresent()) {
@@ -83,7 +83,7 @@ public class FireCommand extends Command {
         Coordinate targetCoordinate = gameObject.getLocation().getPosition().delta( du, dv );
         Optional<Tile> target = level.get().getTile( targetCoordinate );
         if (!(target.isPresent())) {
-            err( "No tile in level: %s, at position: %s", level.get().getName(), targetCoordinate );
+            err( "No tile in level: %s, at position: %s", level.get().getType().getName(), targetCoordinate );
             return;
         }
 

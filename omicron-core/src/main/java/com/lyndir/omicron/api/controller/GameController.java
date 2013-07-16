@@ -18,6 +18,11 @@ public class GameController {
         this.game = game;
     }
 
+    public Game getGame() {
+
+        return game;
+    }
+
     /**
      * Retrieve information on a given player.
      *
@@ -71,6 +76,8 @@ public class GameController {
     }
 
     public void onNewTurn() {
+
+        game.setCurrentTurn( new Turn( game.getCurrentTurn() ) );
 
         for (final Player player : game.getPlayers())
             player.getController().onNewTurn( this );

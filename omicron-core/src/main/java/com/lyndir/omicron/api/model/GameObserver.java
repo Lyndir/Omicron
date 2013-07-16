@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

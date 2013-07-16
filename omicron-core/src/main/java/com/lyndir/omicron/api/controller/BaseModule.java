@@ -3,7 +3,6 @@ package com.lyndir.omicron.api.controller;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.omicron.api.model.*;
-import java.util.Collection;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

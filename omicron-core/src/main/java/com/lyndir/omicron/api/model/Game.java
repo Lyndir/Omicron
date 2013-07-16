@@ -21,7 +21,7 @@ public class Game extends MetaObject {
     private final GroundLevel ground;
     private final SkyLevel    sky;
     private final SpaceLevel  space;
-    private final Turn        currentTurn;
+    private   Turn        currentTurn;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final GameController gameController;
@@ -104,7 +104,7 @@ public class Game extends MetaObject {
         space = new SpaceLevel( worldSize, this );
         levels = ImmutableList.of( ground, sky, space );
         this.players = players;
-        currentTurn = new Turn( null );
+        currentTurn = new Turn();
 
         for (final Player player : players) {
             // Find tiles for the units.
@@ -153,6 +153,11 @@ public class Game extends MetaObject {
     public Turn getCurrentTurn() {
 
         return currentTurn;
+    }
+
+    public void setCurrentTurn(final Turn currentTurn) {
+
+        this.currentTurn = currentTurn;
     }
 
     public ImmutableList<Level> listLevels() {

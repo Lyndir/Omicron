@@ -1,7 +1,11 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+
 import com.google.common.base.*;
 import com.lyndir.lhunath.opal.system.util.*;
+import java.util.EnumMap;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +24,7 @@ public class Tile extends MetaObject {
     private final Coordinate position;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Level      level;
+    private final Map<ResourceType, Integer> resourceQuantities = new EnumMap<>( ResourceType.class );
 
     public Tile(final Coordinate position, final Level level) {
 
@@ -57,6 +62,17 @@ public class Tile extends MetaObject {
     public Level getLevel() {
 
         return level;
+    }
+
+    public void setResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
+
+        Preconditions.checkArgument( resourceQuantity >= 0, "Resource quantity cannot be less than zero: %s", resourceQuantity );
+        resourceQuantities.put( resourceType, resourceQuantity );
+    }
+
+    public int getResourceQuantity(final ResourceType resourceType) {
+
+        return ifNotNullElse( resourceQuantities.get( resourceType ), 0 );
     }
 
     @NotNull

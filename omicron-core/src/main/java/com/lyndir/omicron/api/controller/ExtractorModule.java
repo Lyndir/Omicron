@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.controller;
 
 import com.lyndir.omicron.api.model.ResourceType;
+import com.lyndir.omicron.api.model.Tile;
 import java.util.Random;
 
 
@@ -28,5 +29,14 @@ public class ExtractorModule extends Module {
     @Override
     public void onNewTurn() {
 
+        Tile location = getGameObject().getLocation();
+        int availableResources = location.getResourceQuantity( resourceType );
+        int newAvailableResources = Math.max(0, availableResources - speed);
+        int minedResources = availableResources - newAvailableResources;
+        if (minedResources == 0)
+            return;
+
+        // TODO: Send minedResources somewhere.
+        location.setResourceQuantity( resourceType, newAvailableResources );
     }
 }
