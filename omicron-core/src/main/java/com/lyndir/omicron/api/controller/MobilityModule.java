@@ -1,21 +1,29 @@
 package com.lyndir.omicron.api.controller;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.omicron.api.util.PathUtils.*;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.model.*;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 
 public class MobilityModule extends Module {
 
     private final int movementSpeed;
-    private final Map<LevelType, Float> movementCost = new EnumMap<>( LevelType.class );
-    private final Map<LevelType, Float> levelingCost = new EnumMap<>( LevelType.class );
+    private final Map<LevelType, Double> movementCost = new EnumMap<>( LevelType.class );
+    private final Map<LevelType, Double> levelingCost = new EnumMap<>( LevelType.class );
 
-    private float remainingSpeed;
+    private double remainingSpeed;
 
-    public MobilityModule(final int movementSpeed, final Map<LevelType, Float> movementCost, final Map<LevelType, Float> levelingCost) {
+    public MobilityModule(final int movementSpeed, final Map<LevelType, Double> movementCost, final Map<LevelType, Double> levelingCost) {
 
         this.movementSpeed = movementSpeed;
         this.movementCost.putAll( movementCost );
@@ -29,9 +37,9 @@ public class MobilityModule extends Module {
      *
      * @return The speed cost.
      */
-    public float costForMovingInLevel(final LevelType levelType) {
+    public double costForMovingInLevel(final LevelType levelType) {
 
-        return ifNotNullElse( movementCost.get( levelType ), Float.MAX_VALUE );
+        return ifNotNullElse( movementCost.get( levelType ), Double.MAX_VALUE );
     }
 
     /**
@@ -94,7 +102,7 @@ public class MobilityModule extends Module {
             return false;
 
         Tile currentLocation = getGameObject().getLocation();
-        float cost = costForMovingInLevel( currentLocation.getLevel().getType() );
+        double cost = costForMovingInLevel( currentLocation.getLevel().getType() );
 
         Coordinate newPosition = side.delta( currentLocation.getPosition() );
         Tile newLocation = currentLocation.getLevel().getTile( newPosition ).get();
@@ -106,7 +114,7 @@ public class MobilityModule extends Module {
             // Cannot move: new location is not accessible.
             return false;
 
-        float newRemainingSpeed = remainingSpeed - cost;
+        double newRemainingSpeed = remainingSpeed - cost;
         if (newRemainingSpeed < 0)
             // Cannot move: insufficient speed remaining this turn.
             return false;
@@ -136,53 +144,47 @@ public class MobilityModule extends Module {
 
         // Initialize cost calculation.
         Tile currentLocation = getGameObject().getLocation();
-        float stepCost = costForMovingInLevel( currentLocation.getLevel().getType() );
-        float currentCost = 0;
+        final double stepCost = costForMovingInLevel( currentLocation.getLevel().getType() );
 
-        // Initialize breath-first.
-        Set<Tile> tested = new HashSet<>();
-        Deque<Tile> toTest = new LinkedList<>();
-        toTest.addLast( currentLocation );
-        tested.add( currentLocation );
+        // Initialize path finding data functions.
+        PredicateNN<Tile> foundFunction = new PredicateNN<Tile>() {
+            @Override
+            public boolean apply(@Nonnull final Tile input) {
 
-        // Search breath-first.
-        while (!toTest.isEmpty()) {
-            // Check cost for moving to a neighbour tile.
-            currentCost += stepCost;
-            float currentRemainingSpeed = remainingSpeed - currentCost;
-            if (currentRemainingSpeed < 0)
-                // Cannot move: insufficient speed remaining this turn.
-                return false;
-
-            // Check each neighbour tile.
-            Tile testTile = toTest.removeFirst();
-            for (final Coordinate.Side side : Coordinate.Side.values()) {
-                Tile neighbour = testTile.neighbour( side );
-                if (tested.contains( neighbour ))
-                    continue;
-                boolean accessible = neighbour.isAccessible();
-
-                // Did we reach the target?
-                if (neighbour.equals( target )) {
-                    if (!accessible)
-                        return false;
-
-                    remainingSpeed = currentRemainingSpeed;
-                    getGameObject().getLocation().setContents( null );
-                    getGameObject().setLocation( neighbour );
-                    neighbour.setContents( getGameObject() );
-
-                    return true;
-                }
-
-                // Neighbour is not the target, add it for testing its neighbours later.
-                if (accessible)
-                    toTest.add( neighbour );
-                tested.add( neighbour );
+                return ObjectUtils.isEqual( input, target );
             }
-        }
+        };
+        NNFunctionNN<Step<Tile>, Double> costFunction = new NNFunctionNN<Step<Tile>, Double>() {
+            @NotNull
+            @Override
+            public Double apply(@NotNull final Step<Tile> input) {
 
-        return false;
+                if (!input.getTo().isAccessible())
+                    return Double.MAX_VALUE;
+
+                return stepCost;
+            }
+        };
+        NNFunctionNN<Tile, Iterable<Tile>> neighboursFunction = new NNFunctionNN<Tile, Iterable<Tile>>() {
+            @NotNull
+            @Override
+            public Iterable<Tile> apply(@NotNull final Tile input) {
+
+                return input.neighbours();
+            }
+        };
+
+        // Find the path!
+        Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction );
+        if (!path.isPresent())
+            return false;
+
+        remainingSpeed -= path.get().getCost();
+        getGameObject().getLocation().setContents( null );
+        getGameObject().setLocation( path.get().getTarget() );
+        path.get().getTarget().setContents( getGameObject() );
+
+        return true;
     }
 
     /**
@@ -205,7 +207,7 @@ public class MobilityModule extends Module {
         float cost = costForLevelingToLevel( levelType );
 
         Tile newLocation = currentLocation.getLevel().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get();
-        float newRemainingSpeed = remainingSpeed - cost;
+        double newRemainingSpeed = remainingSpeed - cost;
         if (newRemainingSpeed < 0)
             // Cannot move: insufficient speed remaining this turn.
             return false;

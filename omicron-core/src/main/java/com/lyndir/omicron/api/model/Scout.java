@@ -14,7 +14,7 @@ public class Scout extends PlayerObject {
 
         super( "Scout", owningPlayer, locationTile, //
                new BaseModule( 5, 3, 5, ImmutableSet.of( LevelType.GROUND ) ), //
-               new MobilityModule( 8, ImmutableMap.of( LevelType.GROUND, 1f ), ImmutableMap.<LevelType, Float>of() ), //
+               new MobilityModule( 8, ImmutableMap.of( LevelType.GROUND, 1d ), ImmutableMap.<LevelType, Double>of() ), //
                new WeaponModule( 3, 3, 5, 3, 20, ImmutableSet.of( LevelType.GROUND ) ) );
     }
 

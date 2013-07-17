@@ -14,7 +14,7 @@ public class Airship extends PlayerObject {
 
         super( "Airship", owningPlayer, locationTile, //
                new BaseModule( 5, 1, 5, ImmutableSet.of( LevelType.SKY ) ), //
-               new MobilityModule( 2, ImmutableMap.of( LevelType.SKY, 1f ), ImmutableMap.<LevelType, Float>of() ) );
+               new MobilityModule( 2, ImmutableMap.of( LevelType.SKY, 1d ), ImmutableMap.<LevelType, Double>of() ) );
     }
 
     @NotNull

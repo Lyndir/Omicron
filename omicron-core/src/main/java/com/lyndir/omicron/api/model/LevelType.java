@@ -1,6 +1,8 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -10,13 +12,17 @@ import com.google.common.base.Optional;
  */
 public enum LevelType {
 
-    GROUND( "Ground" ), SKY( "Sky" ), SPACE( "Space" );
+    GROUND( "Ground", ResourceType.FUEL, ResourceType.SILICON, ResourceType.METALS ),
+    SKY( "Sky" ),
+    SPACE( "Space", ResourceType.FUEL, ResourceType.SILICON, ResourceType.METALS, ResourceType.RARE_ELEMENTS );
 
-    private final String name;
+    private final String                            name;
+    private final ImmutableCollection<ResourceType> supportedResources;
 
-    LevelType(final String name) {
+    LevelType(final String name, final ResourceType... supportedResources) {
 
         this.name = name;
+        this.supportedResources = ImmutableSet.copyOf( supportedResources );
     }
 
     public String getName() {
@@ -49,5 +55,10 @@ public enum LevelType {
                 return Optional.of( levelType );
 
         return Optional.absent();
+    }
+
+    public Iterable<ResourceType> getSupportedResources() {
+
+        return supportedResources;
     }
 }

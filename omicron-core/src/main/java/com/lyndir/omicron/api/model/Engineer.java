@@ -14,7 +14,7 @@ public class Engineer extends PlayerObject {
 
         super( "Engineer", owningPlayer, locationTile, //
                new BaseModule( 10, 2, 3, ImmutableSet.of( LevelType.GROUND ) ), //
-               new MobilityModule( 5, ImmutableMap.of( LevelType.GROUND, 1f ), ImmutableMap.<LevelType, Float>of() ) );
+               new MobilityModule( 5, ImmutableMap.of( LevelType.GROUND, 1d ), ImmutableMap.<LevelType, Double>of() ) );
     }
 
     @NotNull

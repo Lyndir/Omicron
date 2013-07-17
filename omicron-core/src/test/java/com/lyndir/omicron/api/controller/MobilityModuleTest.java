@@ -3,7 +3,8 @@ package com.lyndir.omicron.api.controller;
 import static org.testng.AssertJUnit.*;
 
 import com.google.common.collect.ImmutableMap;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.model.LevelType;
+import com.lyndir.omicron.api.util.TestUtils;
 import org.testng.annotations.Test;
 
 
@@ -13,49 +14,33 @@ public class MobilityModuleTest {
     public void testCostForMovingInLevel()
             throws Exception {
 
-        MobilityModule mobilityModule = new MobilityModule( 0, ImmutableMap.of( LevelType.GROUND, 1f ),
-                                                            ImmutableMap.<LevelType, Float>of() );
-        initModule( mobilityModule );
+        MobilityModule module = new MobilityModule( 0, ImmutableMap.of( LevelType.GROUND, 1d ), ImmutableMap.<LevelType, Double>of() );
+        TestUtils.createObjectForModules( module );
 
-        assertEquals( mobilityModule.costForMovingInLevel( LevelType.GROUND ), 1f );
-        assertEquals( mobilityModule.costForMovingInLevel( LevelType.SKY ), Float.MAX_VALUE );
-        assertEquals( mobilityModule.costForMovingInLevel( LevelType.SPACE ), Float.MAX_VALUE );
+        assertEquals( module.costForMovingInLevel( LevelType.GROUND ), 1d );
+        assertEquals( module.costForMovingInLevel( LevelType.SKY ), Double.MAX_VALUE );
+        assertEquals( module.costForMovingInLevel( LevelType.SPACE ), Double.MAX_VALUE );
 
-        ImmutableMap.Builder<LevelType, Float> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<LevelType, Double> builder = ImmutableMap.builder();
         for (final LevelType levelType : LevelType.values())
-            builder.put( levelType, (float) levelType.ordinal() );
-        mobilityModule = new MobilityModule( 0, builder.build(), ImmutableMap.<LevelType, Float>of() );
+            builder.put( levelType, (double) levelType.ordinal() );
+        module = new MobilityModule( 0, builder.build(), ImmutableMap.<LevelType, Double>of() );
 
         for (final LevelType levelType : LevelType.values())
-            assertEquals( mobilityModule.costForMovingInLevel( levelType ), (float) levelType.ordinal() );
+            assertEquals( module.costForMovingInLevel( levelType ), (double) levelType.ordinal() );
     }
 
     @Test
     public void testCostForLevelingToLevel()
             throws Exception {
 
-        MobilityModule mobilityModule = new MobilityModule( 0, ImmutableMap.<LevelType, Float>of(),
-                                                            ImmutableMap.of( LevelType.GROUND, 1f, //
-                                                                             LevelType.SKY, 2f, //
-                                                                             LevelType.SPACE, 3f ) );
-        initModule( mobilityModule );
+        MobilityModule module = new MobilityModule( 0, ImmutableMap.<LevelType, Double>of(), //
+                                                    ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY, 2d, LevelType.SPACE, 3d ) );
+        TestUtils.createObjectForModules( module );
 
-        assertEquals( mobilityModule.costForLevelingToLevel( LevelType.GROUND ), 0f );
-        assertEquals( mobilityModule.costForLevelingToLevel( LevelType.SKY ), 2f );
-        assertEquals( mobilityModule.costForLevelingToLevel( LevelType.SPACE ), 5f );
-    }
-
-    private static void initModule(final MobilityModule mobilityModule) {
-
-        Game.Builder builder = Game.builder();
-        Player player = new Player( builder.nextPlayerID(), new PlayerKey(), "testPlayer", Color.Template.randomColor(),
-                                    Color.Template.randomColor() );
-        builder.getPlayers().add( player );
-        Game game = builder.build();
-
-        mobilityModule.setGameObject(
-                new Scout( new Tile( new Coordinate( 0, 0, new Size( 10, 10 ) ), new Level( new Size( 10, 10 ), LevelType.GROUND, game ) ),
-                           player ) );
+        assertEquals( module.costForLevelingToLevel( LevelType.GROUND ), 0f );
+        assertEquals( module.costForLevelingToLevel( LevelType.SKY ), 2f );
+        assertEquals( module.costForLevelingToLevel( LevelType.SPACE ), 5f );
     }
 
     @Test

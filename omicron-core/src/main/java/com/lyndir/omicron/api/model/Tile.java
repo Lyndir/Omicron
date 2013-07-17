@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.*;
+import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.EnumMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class Tile extends MetaObject {
     private final Coordinate position;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Level      level;
+    @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Map<ResourceType, Integer> resourceQuantities = new EnumMap<>( ResourceType.class );
 
     public Tile(final Coordinate position, final Level level) {
@@ -40,6 +42,11 @@ public class Tile extends MetaObject {
         level.getTile( position.neighbour( Coordinate.Side.SE ) ).get();
     }
 
+    public Tile(final int u, final int v, final Level level) {
+
+        this( new Coordinate( u, v, level.getSize() ), level );
+    }
+
     @NotNull
     public Optional<GameObject> getContents() {
 
@@ -49,7 +56,8 @@ public class Tile extends MetaObject {
     public void setContents(@Nullable final GameObject contents) {
 
         if (contents != null)
-            Preconditions.checkState( !getContents().isPresent(), "Cannot put object on tile that is not empty: %s", this );
+            Preconditions.checkState( !getContents().isPresent(), "Cannot put object on tile that is not empty: %s, holds: %s", //
+                                      this, getContents().orNull() );
 
         this.contents = contents;
     }
@@ -70,6 +78,11 @@ public class Tile extends MetaObject {
         resourceQuantities.put( resourceType, resourceQuantity );
     }
 
+    public void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
+
+        setResourceQuantity( resourceType, resourceQuantities.get( resourceType ) + resourceQuantity );
+    }
+
     public int getResourceQuantity(final ResourceType resourceType) {
 
         return ifNotNullElse( resourceQuantities.get( resourceType ), 0 );
@@ -79,6 +92,15 @@ public class Tile extends MetaObject {
     public Tile neighbour(final Coordinate.Side side) {
 
         return level.getTile( getPosition().neighbour( side ) ).get();
+    }
+
+    public Iterable<Tile> neighbours() {
+
+        ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
+        for (final Coordinate.Side side : Coordinate.Side.values())
+            neighbours.add( neighbour( side ) );
+
+        return neighbours.build();
     }
 
     public boolean contains(@NotNull final GameObserver target) {

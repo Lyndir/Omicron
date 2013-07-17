@@ -17,6 +17,7 @@ public class Level extends MetaObject {
 
     private final Size      size;
     private final LevelType type;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Game      game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
@@ -72,6 +73,19 @@ public class Level extends MetaObject {
             tile = new Tile( position, this );
 
         return Optional.of( tile );
+    }
+
+    /**
+     * Get the tile at the given position in this level.
+     *
+     * @param u The u coordinate of the position of the tile to get.
+     * @param v The v coordinate of the position of the tile to get.
+     *
+     * @return {@code null} if the position is outside of the bounds of this level.
+     */
+    public Optional<Tile> getTile(final int u, final int v) {
+
+        return getTile( new Coordinate( u, v, getSize() ) );
     }
 
     @Override
