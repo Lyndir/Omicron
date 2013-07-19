@@ -1,14 +1,15 @@
 package com.lyndir.omicron.cli;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.LineReader;
+import com.googlecode.lanterna.TerminalFacade;
+import com.googlecode.lanterna.input.Key;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.TerminalSize;
+import com.lyndir.lhunath.opal.system.util.StringUtils;
 import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.api.model.PlayerKey;
-import java.io.InputStreamReader;
-import java.util.Iterator;
 import java.util.regex.Pattern;
 
 
@@ -19,39 +20,59 @@ import java.util.regex.Pattern;
  */
 public class OmicronCLI {
 
-    private static final Splitter commandSplitter = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
+    private static final Splitter commandSplitter    = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
+    private static final int      COMMAND_LOG_HEIGHT = 5;
 
     private final Builders  builders = new Builders();
     private final PlayerKey localKey = new PlayerKey();
+    private final Screen    screen   = new Screen( TerminalFacade.createTextTerminal() );
     private       boolean   running  = true;
-     private GameController gameController;
+    private GameController gameController;
     private Player         localPlayer;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments)
             throws Exception {
 
-        try (InputStreamReader inReader = new InputStreamReader( System.in, Charsets.UTF_8 )) {
-            OmicronCLI omicron = new OmicronCLI();
-            LineReader inLineReader = new LineReader( inReader );
+        OmicronCLI omicron = new OmicronCLI();
+        Screen screen = omicron.getScreen();
 
-            System.err.println( "Welcome to Omicron." );
-            System.err.println( "Issue your commands." );
-            System.err.println( "====================" );
-            new BuildCommand().game( omicron, ImmutableList.<String>of().iterator() );
-            new AddGameCommand().player( omicron, ImmutableList.of( "Simon,red,red" ).iterator() );
-            new CreateCommand().game( omicron, ImmutableList.<String>of().iterator() );
+        screen.startScreen();
+        screen.getTerminal().setCursorVisible( false );
+        try {
             while (omicron.isRunning()) {
-                System.err.print( "% " );
-                Iterator<String> tokens = commandSplitter.split( inLineReader.readLine() ).iterator();
+                TerminalSize terminalSize = screen.getTerminalSize();
+                String rowString = StringUtils.repeat( " ", terminalSize.getColumns() );
 
-//                try {
-                    new RootCommand().evaluate( omicron, tokens );
-//                }
-//                catch (RuntimeException e) {
-//                    System.err.format( "Unexpected: %s\n", e.getLocalizedMessage() );
-//                }
+                // Draw the UI.
+                // - Background
+                for (int y = 0; y < terminalSize.getRows(); ++y)
+                    screen.putString( 0, y, rowString, Terminal.Color.BLACK, Terminal.Color.DEFAULT );
+                // - Title
+                String title = omicron.getGameController() == null? "No game.": omicron.getGameController().getGame().toString();
+                screen.putString( 0, 0, rowString, //
+                                  Terminal.Color.DEFAULT, Terminal.Color.BLACK );
+                screen.putString( 2, 0, String.format( "Omicron - %s", title ), //
+                                  Terminal.Color.DEFAULT, Terminal.Color.BLACK );
+                // - Command Log
+                screen.putString( 0, terminalSize.getRows() - COMMAND_LOG_HEIGHT - 1, rowString, //
+                                  Terminal.Color.DEFAULT, Terminal.Color.BLACK );
+                screen.putString( 2, terminalSize.getRows() - COMMAND_LOG_HEIGHT - 1, "Command Log", //
+                                  Terminal.Color.DEFAULT, Terminal.Color.BLACK );
+                // - Flush.
+                screen.refresh();
+
+                // Check for input.
+                Key key = screen.readInput();
+                if (key != null) {
+                    if (key.getCharacter() == 'q')
+                        omicron.setRunning( false );
+                }
             }
+        }
+        finally {
+            screen.getTerminal().setCursorVisible( true );
+            screen.stopScreen();
         }
     }
 
@@ -88,6 +109,10 @@ public class OmicronCLI {
     public PlayerKey getLocalKey() {
 
         return localKey;
+    }
+
+    public Screen getScreen() {
+        return screen;
     }
 
     public Builders getBuilders() {
