@@ -1,8 +1,8 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
+import com.google.common.base.*;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.util.PathUtils;
@@ -17,6 +17,8 @@ import javax.annotation.Nonnull;
  */
 @SuppressWarnings("ParameterHidesMemberVariable") // IDEA doesn't understand setters that return this.
 public class Game extends MetaObject {
+
+    static final Logger logger = Logger.get( Game.class );
 
     private static final Random RANDOM = new Random();
 
@@ -67,21 +69,20 @@ public class Game extends MetaObject {
 
         // Add resources to the tiles.
         // Figure out how many resources we're distributing for each of the resource types supported by our levels.
-        Map<ResourceType, Integer> remainingResources = FluentIterable.from( levels )
-                                                                      .transformAndConcat( new Function<Level, Iterable<ResourceType>>() {
-                                                                          @Override
-                                                                          public Iterable<ResourceType> apply(final Level input) {
+        Map<ResourceType, Integer> remainingResources = new EnumMap<>( ResourceType.class );
+        remainingResources.putAll( FluentIterable.from( levels ).transformAndConcat( new Function<Level, Iterable<ResourceType>>() {
+            @Override
+            public Iterable<ResourceType> apply(final Level input) {
 
-                                                                              return input.getType().getSupportedResources();
-                                                                          }
-                                                                      } )
-                                                                      .toMap( new Function<ResourceType, Integer>() {
-                                                                          @Override
-                                                                          public Integer apply(final ResourceType input) {
+                return input.getType().getSupportedResources();
+            }
+        } ).toMap( new Function<ResourceType, Integer>() {
+            @Override
+            public Integer apply(final ResourceType input) {
 
-                                                                              return resourceConfig.quantity( input );
-                                                                          }
-                                                                      } );
+                return resourceConfig.quantity( input );
+            }
+        } ) );
         while (true) {
             // Do we have remaining undistributed resources left?
             while (remainingResources.values().remove( 0 ))
@@ -92,8 +93,8 @@ public class Game extends MetaObject {
             // Go over our levels and distribute a puddle of remaining resources supported by them.
             for (final Level level : levels) {
                 for (final ResourceType resourceType : level.getType().getSupportedResources()) {
-                    int remaining = remainingResources.get( resourceType );
-                    if (remaining == 0)
+                    Integer remaining = remainingResources.get( resourceType );
+                    if (remaining == null || remaining == 0)
                         // No resources left to distribute for this type.
                         continue;
 
@@ -111,9 +112,10 @@ public class Game extends MetaObject {
 
                     // Fill the puddle tiles with resource.
                     for (final Tile tile : puddle) {
-                        int tileResources = Math.max( remaining, RANDOM.nextInt( resourceConfig.quantityPerTile( resourceType ) ) );
+                        int tileResources = Math.min( remaining, RANDOM.nextInt( resourceConfig.quantityPerTile( resourceType ) ) );
                         tile.addResourceQuantity( resourceType, tileResources );
                         remaining -= tileResources;
+                        logger.trc( "Deposited %d %s at %s (%d left to deposit)", tileResources, resourceType, tile.getPosition(), remaining );
                     }
 
                     // Remember how much undistributed resource is left.

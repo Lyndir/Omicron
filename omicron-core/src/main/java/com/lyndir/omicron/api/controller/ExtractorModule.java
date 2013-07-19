@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 public class ExtractorModule extends Module {
 
     private static final double MAX_DISTANCE_TO_CONTAINER = 10;
+
     private final ResourceType resourceType;
     private final int          speed;
 

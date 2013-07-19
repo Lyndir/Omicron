@@ -80,7 +80,7 @@ public class Tile extends MetaObject {
 
     public void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
 
-        setResourceQuantity( resourceType, resourceQuantities.get( resourceType ) + resourceQuantity );
+        setResourceQuantity( resourceType, getResourceQuantity( resourceType ) + resourceQuantity );
     }
 
     public int getResourceQuantity(final ResourceType resourceType) {
