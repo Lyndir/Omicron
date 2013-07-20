@@ -1,7 +1,5 @@
 package com.lyndir.omicron.api.controller;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
-
 import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.omicron.api.model.*;
@@ -10,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerController implements GameObserver {
 
-    private final Player player;
+    private final Player         player;
+    private       GameController gameController;
 
     public PlayerController(final Player player) {
 
@@ -21,6 +20,15 @@ public class PlayerController implements GameObserver {
     public Player getPlayer() {
 
         return player;
+    }
+
+    public void setGameController(final GameController gameController) {
+        Preconditions.checkState( this.gameController == null, "This player has already been added to a game!" );
+        this.gameController = gameController;
+    }
+
+    public GameController getGameController() {
+        return Preconditions.checkNotNull( gameController, "This player has not yet been added to a game!" );
     }
 
     @Override
@@ -39,13 +47,14 @@ public class PlayerController implements GameObserver {
     @Override
     public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
 
-        return FluentIterable.from( iterateObservableObjects( currentPlayer ) ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
-            @Override
-            public Iterable<? extends Tile> apply(final GameObject input) {
+        return FluentIterable.from( iterateObservableObjects( currentPlayer ) )
+                             .transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
+                                 @Override
+                                 public Iterable<? extends Tile> apply(final GameObject input) {
 
-                return input.listObservableTiles( currentPlayer );
-            }
-        } );
+                                     return input.listObservableTiles( currentPlayer );
+                                 }
+                             } );
     }
 
     public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {

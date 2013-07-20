@@ -16,6 +16,9 @@ public class GameController {
     public GameController(final Game game) {
 
         this.game = game;
+
+        for (final Player player : game.getPlayers())
+            player.getController().setGameController( this );
     }
 
     public Game getGame() {
