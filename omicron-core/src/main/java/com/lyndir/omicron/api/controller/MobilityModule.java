@@ -63,7 +63,13 @@ public class MobilityModule extends Module {
                 break;
 
             currentLevel = newLevel.get();
-            cost += levelingCost.get( currentLevel );
+
+            Double currentLevelCost = levelingCost.get( currentLevel );
+            if (currentLevelCost == null)
+                // Cannot level to this level.
+                return Float.MAX_VALUE;
+
+            cost += currentLevelCost;
 
             if (currentLevel == levelType)
                 return cost;
@@ -78,7 +84,13 @@ public class MobilityModule extends Module {
                 break;
 
             currentLevel = newLevel.get();
-            cost += levelingCost.get( currentLevel );
+
+            Double currentLevelCost = levelingCost.get( currentLevel );
+            if (currentLevelCost == null)
+                // Cannot level to this level.
+                return Float.MAX_VALUE;
+
+            cost += currentLevelCost;
 
             if (currentLevel == levelType)
                 return cost;
