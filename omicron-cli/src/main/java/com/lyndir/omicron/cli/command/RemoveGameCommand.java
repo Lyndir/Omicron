@@ -1,8 +1,9 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.google.common.collect.Iterators;
 import com.lyndir.omicron.api.model.Game;
 import com.lyndir.omicron.api.model.Player;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -16,20 +17,24 @@ public class RemoveGameCommand extends Command {
 
     private Game.Builder gameBuilder;
 
-    @Override
-    public void evaluate(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public RemoveGameCommand(final OmicronCLI omicron, final Game.Builder gameBuilder) {
+        super( omicron );
+    }
 
-        gameBuilder = omicron.getBuilders().getGameBuilder();
+    @Override
+    public void evaluate(final Iterator<String> tokens) {
+
+        gameBuilder = getOmicron().getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game build to add game properties to.  Begin with the 'build' command." );
             return;
         }
 
-        super.evaluate( omicron, tokens );
+        super.evaluate( tokens );
     }
 
     @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
-    public void player(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void player(final Iterator<String> tokens) {
 
         String value = Iterators.getOnlyElement( tokens, null );
         if (value == null) {

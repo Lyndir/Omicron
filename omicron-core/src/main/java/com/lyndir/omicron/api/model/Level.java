@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.Map;
 import java.util.Objects;
@@ -21,13 +21,21 @@ public class Level extends MetaObject {
     private final Game      game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final Map<Coordinate, Tile> tileMap = Maps.newHashMap();
+    private final ImmutableMap<Coordinate, Tile> tileMap;
 
     public Level(final Size size, final LevelType type, final Game game) {
 
         this.size = size;
         this.type = type;
         this.game = game;
+
+        ImmutableMap.Builder<Coordinate, Tile> tileMapBuilder = ImmutableMap.builder();
+        for (int u = 0; u < size.getWidth(); ++u)
+            for (int v = 0; v < size.getHeight(); ++v) {
+                Coordinate coordinate = new Coordinate( u, v, size );
+                tileMapBuilder.put( coordinate, new Tile( coordinate, this ) );
+            }
+        tileMap = tileMapBuilder.build();
     }
 
     public Size getSize() {
@@ -50,11 +58,6 @@ public class Level extends MetaObject {
         return tileMap;
     }
 
-    public void putTile(final Coordinate position, final Tile tile) {
-
-        tileMap.put( position, tile );
-    }
-
     /**
      * Get the tile at the given position in this level.
      *
@@ -67,12 +70,7 @@ public class Level extends MetaObject {
         if (!size.isInBounds( position ))
             return Optional.absent();
 
-        Tile tile = tileMap.get( position );
-
-        if (tile == null)
-            tile = new Tile( position, this );
-
-        return Optional.of( tile );
+        return Optional.of( tileMap.get( position ) );
     }
 
     /**

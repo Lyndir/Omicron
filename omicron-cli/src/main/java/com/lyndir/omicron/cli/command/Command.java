@@ -1,7 +1,9 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
+import com.google.common.base.Throwables;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.TypeUtils;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -18,17 +20,22 @@ public abstract class Command {
     static final Logger      logger             = Logger.get( Command.class );
     static final Reflections packageReflections = new Reflections( Command.class.getPackage().getName() );
 
+    private final OmicronCLI omicron;
+
+    protected Command(final OmicronCLI omicron) {
+        this.omicron = omicron;
+    }
+
     /**
      * Evaluate the given tokens in the context of this command.
      *
-     * @param omicron The omicron client that this command should control.
-     * @param tokens   The tokens given to this command in order to define how it should operate.
+     * @param tokens The tokens given to this command in order to define how it should operate.
      */
-    public void evaluate(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void evaluate(final Iterator<String> tokens) {
 
         if (!tokens.hasNext()) {
             err( "Missing sub command." );
-            help( omicron, tokens );
+            help( tokens );
             return;
         }
 
@@ -40,7 +47,7 @@ public abstract class Command {
             if (annotation != null)
                 if (method.getName().equals( subCommand ) || annotation.abbr().equals( subCommand )) {
                     try {
-                        method.invoke( this, omicron, tokens );
+                        method.invoke( this, tokens );
                     }
                     catch (IllegalAccessException | InvocationTargetException e) {
                         throw logger.bug( e );
@@ -53,31 +60,36 @@ public abstract class Command {
         // Find the sub command to invoke by looking at other Command classes.
         for (final Class<? extends Command> commandGroup : packageReflections.getSubTypesOf( Command.class )) {
             CommandGroup annotation = commandGroup.getAnnotation( CommandGroup.class );
-            if (annotation.parent() == getClass() && annotation.name().equals( subCommand ) || annotation.abbr().equals( subCommand )) {
-                TypeUtils.newInstance( commandGroup ).evaluate( omicron, tokens );
-                return;
-            }
+            if (annotation.parent() == getClass() && annotation.name().equals( subCommand ) || annotation.abbr().equals( subCommand ))
+                try {
+                    commandGroup.getConstructor( OmicronCLI.class ).newInstance( omicron ).evaluate( tokens );
+                    return;
+                }
+                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw Throwables.propagate( e );
+                }
         }
 
         err( "Don't know how to handle: %s", subCommand );
     }
 
+    public OmicronCLI getOmicron() {
+        return omicron;
+    }
+
     protected void dbg(final String format, final Object... args) {
 
-        System.err.format( "%sdbg: ", commandPrefix() );
-        System.err.format( format + '\n', args );
+        omicron.getLog().add( String.format( "[DBG] %s", commandPrefix() ) + String.format( format, args ) );
     }
 
     protected void inf(final String format, final Object... args) {
 
-        System.err.format( "%s", commandPrefix() );
-        System.err.format( format + '\n', args );
+        omicron.getLog().add( commandPrefix() + String.format( format, args ) );
     }
 
     protected void err(final String format, final Object... args) {
 
-        System.err.format( "%serr: ", commandPrefix() );
-        System.err.format( format + '\n', args );
+        omicron.getLog().add( String.format( "[ERR] %s", commandPrefix() ) + String.format( format, args ) );
     }
 
     private String commandPrefix() {
@@ -87,7 +99,7 @@ public abstract class Command {
     }
 
     @SubCommand(abbr = "h", desc = "Enumerate all the sub commands of this command.")
-    public void help(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void help(final Iterator<String> tokens) {
 
         inf( "Available sub commands are:" );
         enumerateSubCommands();

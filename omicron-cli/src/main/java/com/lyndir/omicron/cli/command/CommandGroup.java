@@ -1,4 +1,4 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

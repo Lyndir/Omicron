@@ -1,6 +1,7 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.lyndir.omicron.api.model.Game;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -12,10 +13,14 @@ import java.util.Iterator;
 @CommandGroup(name = "create", abbr = "c", desc = "Create a previously built game object.")
 public class CreateCommand extends Command {
 
-    @SubCommand(abbr = "g", desc = "Create a new game of Omicron")
-    public void game(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public CreateCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
 
-        Game.Builder gameBuilder = omicron.getBuilders().getGameBuilder();
+    @SubCommand(abbr = "g", desc = "Create a new game of Omicron")
+    public void game(final Iterator<String> tokens) {
+
+        Game.Builder gameBuilder = getOmicron().getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game has been built yet.  Begin with the 'build' command." );
             return;
@@ -26,9 +31,9 @@ public class CreateCommand extends Command {
         }
 
         Game game = gameBuilder.build();
-        omicron.setGameController( game.getController() );
-        omicron.setLocalPlayer( gameBuilder.getPlayers().iterator().next() );
-        omicron.getBuilders().setGameBuilder( null );
+        getOmicron().setGameController( game.getController() );
+        getOmicron().setLocalPlayer( gameBuilder.getPlayers().iterator().next() );
+        getOmicron().getBuilders().setGameBuilder( null );
         inf( "Created game: %s", game );
     }
 }

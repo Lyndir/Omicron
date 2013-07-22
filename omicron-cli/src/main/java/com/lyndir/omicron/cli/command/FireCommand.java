@@ -1,12 +1,14 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
+import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.controller.WeaponModule;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -18,8 +20,18 @@ import java.util.Iterator;
 @CommandGroup(name = "fire", abbr = "f", desc = "Fire weapons at a target.")
 public class FireCommand extends Command {
 
+    public FireCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
+
     @Override
-    public void evaluate(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void evaluate(final Iterator<String> tokens) {
+
+        final Optional<GameController> gameController = getOmicron().getGameController();
+        if (!gameController.isPresent()) {
+            err( "No game is running.  Create one with the 'create' command." );
+            return;
+        }
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
@@ -51,7 +63,7 @@ public class FireCommand extends Command {
         int dv = ConversionUtils.toIntegerNN( dvArgument );
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = omicron.getLocalPlayer().getController().getObject( omicron.getLocalPlayer(), objectId );
+        Optional<GameObject> optionalObject = getOmicron().getLocalPlayer().getController().getObject( getOmicron().getLocalPlayer(), objectId );
         if (!optionalObject.isPresent()) {
             err( "No observable object with ID: %s", objectId );
             return;
@@ -59,7 +71,7 @@ public class FireCommand extends Command {
         GameObject gameObject = optionalObject.get();
 
         final String levelArgument = Iterators.getNext( tokens, gameObject.getLocation().getLevel().getType().getName() );
-        Optional<Level> level = FluentIterable.from( omicron.getGameController().listLevels() ).firstMatch( new Predicate<Level>() {
+        Optional<Level> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<Level>() {
             @Override
             public boolean apply(final Level input) {
 
@@ -88,7 +100,7 @@ public class FireCommand extends Command {
         }
 
         // Fire at the target.
-        weaponModule.fireAt( omicron.getLocalPlayer(), target.get() );
+        weaponModule.fireAt( getOmicron().getLocalPlayer(), target.get() );
         Optional<GameObject> targetContents = target.get().getContents();
         inf( "Fired at: %s", targetContents.isPresent()? targetContents.get(): target );
     }

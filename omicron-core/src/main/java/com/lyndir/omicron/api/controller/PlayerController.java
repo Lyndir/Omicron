@@ -47,16 +47,22 @@ public class PlayerController implements GameObserver {
     @Override
     public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
 
-        return FluentIterable.from( iterateObservableObjects( currentPlayer ) )
-                             .transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
-                                 @Override
-                                 public Iterable<? extends Tile> apply(final GameObject input) {
+        return FluentIterable.from( player.getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
+            @Override
+            public Iterable<? extends Tile> apply(final GameObject input) {
 
-                                     return input.listObservableTiles( currentPlayer );
-                                 }
-                             } );
+                return input.listObservableTiles( currentPlayer );
+            }
+        } );
     }
 
+    /**
+     * Iterate the objects of this player that the given observer can observe.
+     *
+     * @param observer The observer that we want to observe the player's objects with.
+     *
+     * @return An iterable of game objects owned by this controller's player.
+     */
     public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {
 
         return FluentIterable.from( player.getObjects() ).filter( new Predicate<GameObject>() {

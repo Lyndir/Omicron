@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,8 +23,6 @@ public interface GameObserver {
 
     /**
      * Enumerate the tiles this observer can observe.
-     *
-     *
      *
      * @param currentPlayer The player that's making the request.
      *

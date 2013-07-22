@@ -1,6 +1,7 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.lyndir.omicron.api.model.Game;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -12,10 +13,14 @@ import java.util.Iterator;
 @CommandGroup(name = "build", abbr = "b", desc = "Build a new game object.")
 public class BuildCommand extends Command {
 
-    @SubCommand(abbr = "g", desc = "Build a new game of Omicron")
-    public void game(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public BuildCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
 
-        omicron.getBuilders().setGameBuilder( Game.builder() );
+    @SubCommand(abbr = "g", desc = "Build a new game of Omicron")
+    public void game(final Iterator<String> tokens) {
+
+        getOmicron().getBuilders().setGameBuilder( Game.builder() );
         inf( "Building a new game of Omicron.  Configure properties with 'set'/'add'/'rm' commands, use 'create' when done." );
     }
 }

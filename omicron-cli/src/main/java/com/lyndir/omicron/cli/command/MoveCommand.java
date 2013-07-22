@@ -1,4 +1,4 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -6,6 +6,7 @@ import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.controller.MobilityModule;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -17,8 +18,12 @@ import java.util.Iterator;
 @CommandGroup(name = "move", abbr = "mv", desc = "Move game objects around in the level.")
 public class MoveCommand extends Command {
 
+    public MoveCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
+
     @Override
-    public void evaluate(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void evaluate(final Iterator<String> tokens) {
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
@@ -61,7 +66,7 @@ public class MoveCommand extends Command {
         }
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = omicron.getLocalPlayer().getController().getObject( omicron.getLocalPlayer(), objectId );
+        Optional<GameObject> optionalObject = getOmicron().getLocalPlayer().getController().getObject( getOmicron().getLocalPlayer(), objectId );
         if (!optionalObject.isPresent()) {
             err( "No observable object with ID: %s", objectId );
             return;
@@ -77,7 +82,7 @@ public class MoveCommand extends Command {
         MobilityModule mobilityModule = optionalMobility.get();
 
         // Move the object.
-        mobilityModule.move( omicron.getLocalPlayer(), side.get() );
+        mobilityModule.move( getOmicron().getLocalPlayer(), side.get() );
         inf( "Object is now at: %s", gameObject.getLocation() );
     }
 }

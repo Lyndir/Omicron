@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.*;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
@@ -22,10 +23,7 @@ public class Game extends MetaObject {
 
     private static final Random RANDOM = new Random();
 
-    private final GroundLevel ground;
-    private final SkyLevel    sky;
-    private final SpaceLevel  space;
-    private       Turn        currentTurn;
+    private Turn currentTurn;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final GameController gameController;
@@ -36,10 +34,7 @@ public class Game extends MetaObject {
 
     private Game(final Size worldSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig) {
 
-        ground = new GroundLevel( worldSize, this );
-        sky = new SkyLevel( worldSize, this );
-        space = new SpaceLevel( worldSize, this );
-        levels = ImmutableList.of( ground, sky, space );
+        levels = ImmutableList.of( new GroundLevel( worldSize, this ), new SkyLevel( worldSize, this ), new SpaceLevel( worldSize, this ) );
         this.players = players;
         currentTurn = new Turn();
 
@@ -48,9 +43,11 @@ public class Game extends MetaObject {
             // Find tiles for the units.
             Tile startTileEngineer, startTileAirship, startTileScout;
             do {
+                Level ground = getLevel( LevelType.GROUND );
                 startTileEngineer = ground.getTile( RANDOM.nextInt( ground.getSize().getWidth() ),
                                                     RANDOM.nextInt( ground.getSize().getHeight() ) ).get();
 
+                Level sky = getLevel( LevelType.SKY );
                 Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
                 startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
 
@@ -115,7 +112,8 @@ public class Game extends MetaObject {
                         int tileResources = Math.min( remaining, RANDOM.nextInt( resourceConfig.quantityPerTile( resourceType ) ) );
                         tile.addResourceQuantity( resourceType, tileResources );
                         remaining -= tileResources;
-                        logger.trc( "Deposited %d %s at %s (%d left to deposit)", tileResources, resourceType, tile.getPosition(), remaining );
+                        logger.trc( "Deposited %d %s at %s (%d left to deposit)", tileResources, resourceType, tile.getPosition(),
+                                    remaining );
                     }
 
                     // Remember how much undistributed resource is left.
@@ -177,7 +175,7 @@ public class Game extends MetaObject {
 
     public static class Builder {
 
-        private Size               worldSize      = new Size( 20, 20 );
+        private Size               worldSize      = new Size( 50, 50 );
         private List<Player>       players        = Lists.newLinkedList();
         private int                nextPlayerID   = 1;
         private int                totalPlayers   = 4;

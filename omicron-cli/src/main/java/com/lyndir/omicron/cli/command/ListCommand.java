@@ -1,12 +1,14 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.model.GameObject;
 import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
 
 
@@ -18,16 +20,20 @@ import java.util.*;
 @CommandGroup(name = "list", abbr = "ls", desc = "Enumerate certain types of game objects.")
 public class ListCommand extends Command {
 
-    @SubCommand(abbr = "p", desc = "Enumerate all players in the game.")
-    public void players(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public ListCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
 
-        final GameController gameController = omicron.getGameController();
-        if (gameController == null) {
+    @SubCommand(abbr = "p", desc = "Enumerate all players in the game.")
+    public void players(final Iterator<String> tokens) {
+
+        final Optional<GameController> gameController = getOmicron().getGameController();
+        if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.listPlayerGameInfo( omicron.getLocalPlayer() ) );
+        List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.get().listPlayerGameInfo( getOmicron().getLocalPlayer() ) );
         Collections.sort( playerGameInfos, new Comparator<PlayerGameInfo>() {
             @Override
             public int compare(final PlayerGameInfo o1, final PlayerGameInfo o2) {
@@ -43,17 +49,17 @@ public class ListCommand extends Command {
     }
 
     @SubCommand(abbr = "o", desc = "Enumerate all types of game objects the player can detect.")
-    public void objects(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void objects(final Iterator<String> tokens) {
 
-        final GameController gameController = omicron.getGameController();
-        if (gameController == null) {
+        final Optional<GameController> gameController = getOmicron().getGameController();
+        if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
         ImmutableList.Builder<GameObject> gameObjectBuilder = ImmutableList.builder();
-        for (final Player player : gameController.listPlayers())
-            gameObjectBuilder.addAll( player.getController().iterateObservableObjects( omicron.getLocalPlayer() ) );
+        for (final Player player : gameController.get().listPlayers())
+            gameObjectBuilder.addAll( player.getController().iterateObservableObjects( getOmicron().getLocalPlayer() ) );
 
         inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
         for (final GameObject gameObject : gameObjectBuilder.build())

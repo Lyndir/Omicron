@@ -32,14 +32,6 @@ public class Tile extends MetaObject {
 
         this.position = position;
         this.level = level;
-
-        level.putTile( position, this );
-        level.getTile( position.neighbour( Coordinate.Side.NW ) ).get();
-        level.getTile( position.neighbour( Coordinate.Side.NE ) ).get();
-        level.getTile( position.neighbour( Coordinate.Side.W ) ).get();
-        level.getTile( position.neighbour( Coordinate.Side.E ) ).get();
-        level.getTile( position.neighbour( Coordinate.Side.SW ) ).get();
-        level.getTile( position.neighbour( Coordinate.Side.SE ) ).get();
     }
 
     public Tile(final int u, final int v, final Level level) {

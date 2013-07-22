@@ -1,0 +1,18 @@
+# Maven build tools
+# -----------------
+#
+# Configuration script
+#
+#   distribution=[artifactPath] -- Specify the name/path of the distribution artifact that should be deployed remotely.
+#                                   Default: "", Don't deploy a distribution.
+#   syncTo=[user@]host[:port]   -- Defines how and where to access the remote to perform sync operations with.
+#                                   Default: "", Can't synchronize.
+#   syncToPath=[path]           -- Defines the location on the remote's filesystem where the local repository should be synced to.
+#                                   Default: "", Can't synchronize.
+#   deployTo=[user@]host[:port] -- Defines how and where to access the remote to perform deploy operations with.
+#                                   Default: "", Can't deploy.
+#   deployToPath=[path]         -- Defines the location on the remote's filesystem where the distribution should be deployed to.
+#                                   Default: "", Will deploy in remote user's home directory.
+#   releasePom=[01]             -- Specify whether a trimmed down release POM should be generated instead of using the project's POM for releases.
+#                                   Default: 0, Use the project's POM for releases.
+

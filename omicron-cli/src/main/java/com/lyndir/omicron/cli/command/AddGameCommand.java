@@ -1,8 +1,9 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -14,15 +15,19 @@ import java.util.Iterator;
 @CommandGroup(parent = AddCommand.class, name = "game", abbr = "g", desc = "Add things to an Omicron game that is being built.")
 public class AddGameCommand extends Command {
 
-    @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
-    public void player(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public AddGameCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
 
-        if (omicron.getLocalPlayer() != null) {
-            err( "There is already a local player: %s", omicron.getLocalPlayer().getName() );
+    @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
+    public void player(final Iterator<String> tokens) {
+
+        if (getOmicron().getLocalPlayer() != null) {
+            err( "There is already a local player: %s", getOmicron().getLocalPlayer().getName() );
             return;
         }
 
-        Game.Builder gameBuilder = omicron.getBuilders().getGameBuilder();
+        Game.Builder gameBuilder = getOmicron().getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game build to add game properties to.  Begin with the 'build' command." );
             return;
@@ -39,9 +44,9 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        omicron.setLocalPlayer( new Player( gameBuilder.nextPlayerID(), omicron.getLocalKey(), playerName, Color.of( playerPrimaryColor ),
+        getOmicron().setLocalPlayer( new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, Color.of( playerPrimaryColor ),
                                              Color.of( playerSecondaryColor ) ) );
-        gameBuilder.getPlayers().add( omicron.getLocalPlayer() );
-        inf( "Added player to game: %s", omicron.getLocalPlayer() );
+        gameBuilder.getPlayers().add( getOmicron().getLocalPlayer() );
+        inf( "Added player to game: %s", getOmicron().getLocalPlayer() );
     }
 }

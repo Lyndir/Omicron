@@ -1,9 +1,11 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
+import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
 
 
@@ -21,12 +23,22 @@ public class PrintCommand extends Command {
                                                                                                    SkyLevel.class, '~', //
                                                                                                    SpaceLevel.class, '^' );
 
+    public PrintCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
+
     @SubCommand(abbr = "f", desc = "A view of all observable tiles.")
-    public void field(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void field(final Iterator<String> tokens) {
+
+        final Optional<GameController> gameController = getOmicron().getGameController();
+        if (!gameController.isPresent()) {
+            err( "No game is running.  Create one with the 'create' command." );
+            return;
+        }
 
         // Create an empty grid.
         Size maxSize = null;
-        for (final Level level : omicron.getGameController().listLevels())
+        for (final Level level : gameController.get().listLevels())
             maxSize = Size.max( maxSize, level.getSize() );
         assert maxSize != null;
         Table<Integer, Integer, StringBuilder> grid = HashBasedTable.create( maxSize.getHeight(), maxSize.getWidth() );
@@ -35,7 +47,7 @@ public class PrintCommand extends Command {
                 grid.put( v, u, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
-        for (final Tile tile : omicron.getLocalPlayer().listObservableTiles( omicron.getLocalPlayer() )) {
+        for (final Tile tile : getOmicron().getLocalPlayer().listObservableTiles( getOmicron().getLocalPlayer() )) {
             Optional<GameObject> contents = tile.getContents();
             char contentsChar;
             if (contents.isPresent())

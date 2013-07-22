@@ -1,8 +1,9 @@
-package com.lyndir.omicron.cli;
+package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
 
@@ -16,20 +17,24 @@ public class SetGameCommand extends Command {
 
     private Game.Builder gameBuilder;
 
-    @Override
-    public void evaluate(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public SetGameCommand(final OmicronCLI omicron) {
+        super( omicron );
+    }
 
-        gameBuilder = omicron.getBuilders().getGameBuilder();
+    @Override
+    public void evaluate(final Iterator<String> tokens) {
+
+        gameBuilder = getOmicron().getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game build to set game properties on.  Begin with the 'build' command." );
             return;
         }
 
-        super.evaluate( omicron, tokens );
+        super.evaluate( tokens );
     }
 
     @SubCommand( abbr = "w", desc = "The tile dimension of each level in the game.")
-    public void worldSize(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void worldSize(final Iterator<String> tokens) {
 
         String gameSettingValue = Iterators.getOnlyElement( tokens, null );
         if (gameSettingValue == null) {
@@ -44,7 +49,7 @@ public class SetGameCommand extends Command {
     }
 
     @SubCommand( abbr = "p", desc = "The players that will compete in this game.")
-    public void players(final OmicronCLI omicron, final Iterator<String> tokens) {
+    public void players(final Iterator<String> tokens) {
 
         String gameSettingValue = Iterators.getOnlyElement( tokens, null );
         if (gameSettingValue != null) {
