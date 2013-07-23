@@ -36,5 +36,11 @@ public interface CLITheme {
 
     Color textFg();
 
+    Color promptFg();
+
     Color mapFg();
+
+    Color infoFg();
+
+    Color infoBg();
 }

@@ -18,6 +18,7 @@ package com.lyndir.omicron.cli.view;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
@@ -30,34 +31,47 @@ import java.util.Iterator;
 public class TextView extends View {
 
     public enum Crop {
-        TOP, BOTTOM
+        SHOW_FIRST, SHOW_LAST
     }
 
 
     private String text     = "";
-    private Crop   textCrop = Crop.BOTTOM;
+    private Crop   textCrop = Crop.SHOW_LAST;
+    private int            textOffset;
     private Terminal.Color textColor;
+    private Terminal.Color infoTextColor;
+    private Terminal.Color infoBackgroundColor;
 
     @Override
     protected void drawForeground(final Screen screen) {
         super.drawForeground( screen );
 
-        FluentIterable<String> lines = FluentIterable.from( Splitter.on( '\n' ).split( getText() ) );
+        FluentIterable<String> lines = FluentIterable.from( getTextLines() );
 
         Rectangle contentBox = getContentBoxOnScreen();
-        int from = 0;
+        int from = getTextOffset();
         switch (getTextCrop()) {
 
-            case TOP:
+            case SHOW_FIRST:
                 break;
-            case BOTTOM:
-                from = Math.max( 0, lines.size() - 1 - contentBox.getSize().getHeight() );
+            case SHOW_LAST:
+                from = Math.max( 0, lines.size() - 1 - contentBox.getSize().getHeight() - getTextOffset() );
                 break;
         }
 
         Iterator<String> linesIt = lines.skip( from ).iterator();
         for (int row = contentBox.getTop(); linesIt.hasNext() && row <= contentBox.getBottom(); ++row)
             screen.putString( contentBox.getLeft(), row, linesIt.next(), getTextColor(), getBackgroundColor() );
+
+        if (getTextOffset() > 0) {
+            String offsetText = String.format( "%+d", getTextOffset() );
+            screen.putString( contentBox.getRight() - offsetText.length(), contentBox.getTop(), offsetText, //
+                              getInfoTextColor(), getInfoBackgroundColor() );
+        }
+    }
+
+    private Iterable<String> getTextLines() {
+        return Splitter.on( '\n' ).split( getText() );
     }
 
     public Terminal.Color getTextColor() {
@@ -82,5 +96,33 @@ public class TextView extends View {
 
     public void setText(final String text) {
         this.text = text;
+
+        // Update offset in case text lines shrank beyond the current offset.
+        textOffset = Math.min( textOffset, Iterables.size( getTextLines() ) );
+    }
+
+    public Terminal.Color getInfoTextColor() {
+        return ObjectUtils.ifNotNullElse( infoTextColor, getTheme().infoFg() );
+    }
+
+    public void setInfoTextColor(final Terminal.Color infoTextColor) {
+        this.infoTextColor = infoTextColor;
+    }
+
+    public Terminal.Color getInfoBackgroundColor() {
+        return ObjectUtils.ifNotNullElse( infoBackgroundColor, getTheme().infoBg() );
+    }
+
+    public void setInfoBackgroundColor(final Terminal.Color infoBackgroundColor) {
+        this.infoBackgroundColor = infoBackgroundColor;
+    }
+
+    public void updateTextOffset(final int offsetDelta) {
+        textOffset = Math.min( Math.max( 0, textOffset + offsetDelta ),
+                               Iterables.size( getTextLines() ) - 1 - getContentBoxOnScreen().getSize().getHeight() );
+    }
+
+    public int getTextOffset() {
+        return textOffset;
     }
 }

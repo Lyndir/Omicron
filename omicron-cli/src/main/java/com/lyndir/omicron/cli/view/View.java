@@ -44,7 +44,6 @@ public class View {
     private Rectangle  measuredBoxInParent = new Rectangle();
     private Rectangle  padding             = new Rectangle();
     private Rectangle  margin              = new Rectangle();
-    private Coordinate offset              = new Coordinate();
     private Terminal.Color backgroundColor;
     private Terminal.Color backgroundPatternColor;
     private String         backgroundPattern;
@@ -87,7 +86,7 @@ public class View {
         drawChildren( screen );
     }
 
-    @SuppressWarnings({ "ForLoopThatDoesntUseLoopVariable", "AssignmentToForLoopParameter" })
+    @SuppressWarnings({ "ForLoopThatDoesntUseLoopVariable", "AssignmentToForLoopParameter", "UnusedDeclaration" })
     private void drawLayoutDebug(final Screen screen) {
         int parents = 0;
         for (View v = this; v.getParent().isPresent(); ++parents)
@@ -193,14 +192,6 @@ public class View {
 
     public void setMargin(final Rectangle margin) {
         this.margin = margin;
-    }
-
-    public Coordinate getOffset() {
-        return offset;
-    }
-
-    public void setOffset(final Coordinate offset) {
-        this.offset = offset;
     }
 
     public Terminal.Color getBackgroundColor() {

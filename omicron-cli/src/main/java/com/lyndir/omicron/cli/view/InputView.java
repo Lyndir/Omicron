@@ -25,6 +25,8 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.lyndir.omicron.cli.OmicronCLI;
 import com.lyndir.omicron.cli.command.RootCommand;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
@@ -36,10 +38,15 @@ public class InputView extends View {
 
     private static final Splitter commandSplitter = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
 
-    private final StringBuilder inputText = new StringBuilder();
-    private Rectangle textPadding = new Rectangle( 0, 2, 0, 2 );
+    private final Deque<String> inputHistory = new LinkedList<>();
+    private final Deque<String> inputFuture  = new LinkedList<>();
+    private final StringBuilder inputText    = new StringBuilder();
+    private       Rectangle     textPadding  = new Rectangle( 0, 2, 0, 2 );
+    private       String        promptText   = "> ";
     private Terminal.Color textColor;
+    private Terminal.Color promptTextColor;
     private Terminal.Color backgroundColor;
+    private TextView       controlTextView;
 
     @Override
     protected void drawForeground(final Screen screen) {
@@ -47,10 +54,12 @@ public class InputView extends View {
 
         Rectangle contentBox = getContentBoxOnScreen().shrink( getTextPadding() );
         //        logger.dbg( "contentBox: %s, screen: %sx%s", contentBox, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows() );
-        int inputOnScreenLength = Math.min( getInputText().length(), contentBox.getSize().getWidth() );
+        int inputOnScreenLength = Math.min( getInputText().length(), contentBox.getSize().getWidth() - getPromptText().length() );
         String inputOnScreen = getInputText().substring( getInputText().length() - inputOnScreenLength, getInputText().length() );
-        screen.putString( contentBox.getLeft(), contentBox.getTop(), inputOnScreen, getTextColor(), getBackgroundColor() );
-        screen.setCursorPosition( contentBox.getLeft() + inputOnScreenLength, contentBox.getTop() );
+        screen.putString( contentBox.getLeft(), contentBox.getTop(), getPromptText(), getPromptTextColor(), getBackgroundColor() );
+        screen.putString( contentBox.getLeft() + getPromptText().length(), contentBox.getTop(), inputOnScreen, getTextColor(),
+                          getBackgroundColor() );
+        screen.setCursorPosition( contentBox.getLeft() + getPromptText().length() + inputOnScreenLength, contentBox.getTop() );
     }
 
     @Nonnull
@@ -64,18 +73,75 @@ public class InputView extends View {
 
     @Override
     protected boolean onKey(final Key key) {
-        if (key.getKind() == Key.Kind.Backspace)
-            inputText.deleteCharAt( inputText.length() - 1 );
-        else if (key.getKind() == Key.Kind.Escape)
-            inputText.delete( 0, inputText.length() );
-        else if (key.getKind() == Key.Kind.Enter) {
-            new RootCommand(OmicronCLI.get()).evaluate( commandSplitter.split( inputText ).iterator() );
-            inputText.delete( 0, inputText.length() );
+        // BACKSPACE: Delete last character
+        if (key.getKind() == Key.Kind.Backspace) {
+            if (inputText.length() > 0)
+                inputText.deleteCharAt( inputText.length() - 1 );
         }
+
+        // ESC: Erase input.
+        else if (key.getKind() == Key.Kind.Escape)
+            clearInputText();
+
+        // ENTER: Execute input.
+        else if (key.getKind() == Key.Kind.Enter) {
+            OmicronCLI.get().getLog().add( getPromptText() + inputText );
+            new RootCommand( OmicronCLI.get() ).evaluate( commandSplitter.split( inputText ).iterator() );
+
+            inputHistory.push( inputText.toString() );
+            clearInputText();
+        }
+
+        // ARROWS: ALT = Scroll Control View, NONE = History navigation.
+        else if (key.getKind() == Key.Kind.ArrowUp) {
+            if (key.isAltPressed() && getControlTextView() != null)
+                getControlTextView().updateTextOffset( -1 );
+            else {
+                if (!inputHistory.isEmpty()) {
+                    if (inputText.length() > 0)
+                        inputFuture.push( inputText.toString() );
+                    clearInputText();
+                    inputText.append( inputHistory.pop() );
+                }
+            }
+        } else if (key.getKind() == Key.Kind.ArrowDown) {
+            if (key.isAltPressed() && getControlTextView() != null)
+                getControlTextView().updateTextOffset( 1 );
+            else {
+                if (!inputFuture.isEmpty()) {
+                    if (inputText.length() > 0)
+                        inputHistory.push( inputText.toString() );
+                    clearInputText();
+                    inputText.append( inputFuture.pop() );
+                }
+            }
+        }
+
+        // OTHERS: Add character to input.
         else
             inputText.append( key.getCharacter() );
 
         return true;
+    }
+
+    private StringBuilder clearInputText() {
+        return inputText.delete( 0, inputText.length() );
+    }
+
+    public String getPromptText() {
+        return promptText;
+    }
+
+    public void setPromptText(final String promptText) {
+        this.promptText = promptText;
+    }
+
+    public Terminal.Color getPromptTextColor() {
+        return ifNotNullElse( promptTextColor, getTheme().promptFg() );
+    }
+
+    public void setPromptTextColor(final Terminal.Color promptTextColor) {
+        this.promptTextColor = promptTextColor;
     }
 
     public Rectangle getTextPadding() {
@@ -102,6 +168,14 @@ public class InputView extends View {
 
     public void setTextColor(final Terminal.Color textColor) {
         this.textColor = textColor;
+    }
+
+    public TextView getControlTextView() {
+        return controlTextView;
+    }
+
+    public void setControlTextView(final TextView controlTextView) {
+        this.controlTextView = controlTextView;
     }
 
     @Nonnull

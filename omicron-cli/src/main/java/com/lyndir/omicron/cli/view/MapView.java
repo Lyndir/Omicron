@@ -20,6 +20,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
+import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -75,7 +76,7 @@ public class MapView extends View {
         Rectangle contentBox = getContentBoxOnScreen();
         for (int x = contentBox.getLeft(); x <= contentBox.getRight(); ++x)
             for (int y = contentBox.getTop(); y <= contentBox.getBottom(); ++y) {
-                Tile tile = grid.get( y + offset.getY(), x + offset.getX() );
+                Tile tile = grid.get( y + getOffset().getY(), x + getOffset().getX() );
                 if (tile == null)
                     continue;
 
@@ -89,6 +90,28 @@ public class MapView extends View {
                 screen.putString( x + (y % 2 == 0? 0: 1), y, contents.isPresent()? contents.get().getTypeName().substring( 0, 1 ): " ",
                                   getMapColor(), bgColor, ScreenCharacterStyle.Bold );
             }
+    }
+
+    @Override
+    protected boolean onKey(final Key key) {
+        if (key.getKind() == Key.Kind.ArrowUp && !key.isAltPressed()) {
+            setOffset( getOffset().translate( 0, -1 ) );
+            return true;
+        }
+        if (key.getKind() == Key.Kind.ArrowDown && !key.isAltPressed()) {
+            setOffset( getOffset().translate( 0, 1 ) );
+            return true;
+        }
+        if (key.getKind() == Key.Kind.ArrowLeft && !key.isAltPressed()) {
+            setOffset( getOffset().translate( -1, 0 ) );
+            return true;
+        }
+        if (key.getKind() == Key.Kind.ArrowRight && !key.isAltPressed()) {
+            setOffset( getOffset().translate( 1, 0 ) );
+            return true;
+        }
+
+        return false;
     }
 
     public Terminal.Color getMapColor() {
@@ -105,5 +128,14 @@ public class MapView extends View {
 
     public void setLevelType(final LevelType levelType) {
         this.levelType = levelType;
+    }
+
+    @Nonnull
+    public Coordinate getOffset() {
+        return offset;
+    }
+
+    public void setOffset(@Nonnull final Coordinate offset) {
+        this.offset = offset;
     }
 }

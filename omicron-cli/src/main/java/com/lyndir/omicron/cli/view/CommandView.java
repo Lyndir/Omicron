@@ -41,6 +41,7 @@ public class CommandView extends TitledView {
             }
         } );
         content.addChild( commandInputView = new InputView() );
+        commandInputView.setControlTextView( logView );
         addChild( content );
     }
 
@@ -48,7 +49,7 @@ public class CommandView extends TitledView {
     @Override
     public Optional<?> layoutValue(final LayoutParameter layoutParameter) {
         if (layoutParameter == LinearView.Parameters.DESIRED_SPACE)
-            return Optional.of( 5 );
+            return Optional.of( 10 );
 
         return super.layoutValue( layoutParameter );
     }

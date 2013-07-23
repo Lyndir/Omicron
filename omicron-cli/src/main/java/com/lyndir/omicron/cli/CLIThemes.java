@@ -56,7 +56,23 @@ public enum CLIThemes implements CLITheme {
     }
 
     @Override
+    public Terminal.Color promptFg() {
+        return Terminal.Color.GREEN;
+    }
+
+    @Override
     public Terminal.Color mapFg() {
         return Terminal.Color.BLACK;
     }
+
+    @Override
+    public Terminal.Color infoFg() {
+        return Terminal.Color.RED;
+    }
+
+    @Override
+    public Terminal.Color infoBg() {
+        return Terminal.Color.DEFAULT;
+    }
+
 }
