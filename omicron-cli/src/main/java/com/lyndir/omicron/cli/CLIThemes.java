@@ -41,6 +41,11 @@ public enum CLIThemes implements CLITheme {
     }
 
     @Override
+    public Terminal.Color bgPatternFg() {
+        return Terminal.Color.DEFAULT;
+    }
+
+    @Override
     public Terminal.Color barFg() {
         return Terminal.Color.WHITE;
     }
@@ -63,6 +68,11 @@ public enum CLIThemes implements CLITheme {
     @Override
     public Terminal.Color mapFg() {
         return Terminal.Color.BLACK;
+    }
+
+    @Override
+    public String mapBgPattern() {
+        return "/ ";
     }
 
     @Override

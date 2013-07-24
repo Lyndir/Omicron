@@ -41,12 +41,14 @@ public class View {
 
     private final List<View> children = new LinkedList<>();
     private View parent;
-    private Rectangle  measuredBoxInParent = new Rectangle();
-    private Rectangle  padding             = new Rectangle();
-    private Rectangle  margin              = new Rectangle();
+    private Box   measuredBoxInParent = new Box();
+    private Inset padding             = new Inset();
+    private Inset margin              = new Inset();
     private Terminal.Color backgroundColor;
     private Terminal.Color backgroundPatternColor;
     private String         backgroundPattern;
+    private Terminal.Color infoTextColor;
+    private Terminal.Color infoBackgroundColor;
     private CLITheme       theme;
 
     public final void measure(final Screen screen) {
@@ -62,14 +64,14 @@ public class View {
         if (getParent().isPresent())
             measuredBoxInParent = getParent().get().getMeasuredBoxForChild( this );
         else
-            measuredBoxInParent = new Rectangle( 0, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows(), 0 );
+            measuredBoxInParent = new Box( 0, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows(), 0 );
     }
 
     protected void measureChildren(final Screen screen) {
     }
 
-    protected Rectangle getMeasuredBoxForChild(final View child) {
-        return new Rectangle( 0, getMeasuredBoxInParent().getSize().getWidth(), getMeasuredBoxInParent().getSize().getHeight(), 0 );
+    protected Box getMeasuredBoxForChild(final View child) {
+        return new Box( 0, getMeasuredBoxInParent().getSize().getWidth(), getMeasuredBoxInParent().getSize().getHeight(), 0 );
     }
 
     public void addChild(final View child) {
@@ -92,7 +94,7 @@ public class View {
         for (View v = this; v.getParent().isPresent(); ++parents)
             v = v.getParent().get();
         int p = 0;
-        Rectangle drawBox = getDrawBoxOnScreen();
+        Box drawBox = getDrawBoxOnScreen();
         for (int y = drawBox.getTop(); y <= drawBox.getBottom(); ++y)
             screen.putString( drawBox.getLeft(), y, StringUtils.repeat( "+", parents ) + p++, //
                               Terminal.Color.WHITE, Terminal.Color.RED );
@@ -100,13 +102,13 @@ public class View {
 
     protected void drawBackground(final Screen screen) {
         int p = 0;
-        Rectangle drawBox = getDrawBoxOnScreen();
+        Box drawBox = getDrawBoxOnScreen();
         for (int y = drawBox.getTop(); y <= drawBox.getBottom(); ++y)
             for (int x = drawBox.getLeft(); x <= drawBox.getRight(); ++x) {
-                int backgroundPatternOffset = p++ % getBackgroundPattern().length();
+                int backgroundPatternOffset = ((y % 2) + p++) % getBackgroundPattern().length();
 
                 screen.putString( x, y, getBackgroundPattern().substring( backgroundPatternOffset, backgroundPatternOffset + 1 ), //
-                                  getBackgroundColor(), getBackgroundColor() );
+                                  getBackgroundPatternColor(), getBackgroundColor() );
             }
     }
 
@@ -158,39 +160,39 @@ public class View {
         return children;
     }
 
-    public Rectangle getMeasuredBoxInParent() {
+    public Box getMeasuredBoxInParent() {
         return measuredBoxInParent;
     }
 
-    public final Rectangle getMeasuredBoxOnScreen() {
+    public final Box getMeasuredBoxOnScreen() {
         if (!getParent().isPresent())
             return measuredBoxInParent;
 
-        Rectangle parentContentBox = getParent().get().getContentBoxOnScreen();
+        Box parentContentBox = getParent().get().getContentBoxOnScreen();
         return measuredBoxInParent.translate( parentContentBox.getOrigin() );
     }
 
-    protected final Rectangle getDrawBoxOnScreen() {
+    protected final Box getDrawBoxOnScreen() {
         return getMeasuredBoxOnScreen().shrink( getMargin() );
     }
 
-    protected final Rectangle getContentBoxOnScreen() {
+    protected final Box getContentBoxOnScreen() {
         return getDrawBoxOnScreen().shrink( getPadding() );
     }
 
-    public Rectangle getPadding() {
+    public Inset getPadding() {
         return padding;
     }
 
-    public void setPadding(final Rectangle padding) {
+    public void setPadding(final Inset padding) {
         this.padding = padding;
     }
 
-    public Rectangle getMargin() {
+    public Inset getMargin() {
         return margin;
     }
 
-    public void setMargin(final Rectangle margin) {
+    public void setMargin(final Inset margin) {
         this.margin = margin;
     }
 
@@ -203,7 +205,7 @@ public class View {
     }
 
     public Terminal.Color getBackgroundPatternColor() {
-        return ifNotNullElse( backgroundPatternColor, getTheme().fg() );
+        return ifNotNullElse( backgroundPatternColor, getTheme().bgPatternFg() );
     }
 
     public void setBackgroundPatternColor(final Terminal.Color backgroundPatternColor) {
@@ -216,6 +218,22 @@ public class View {
 
     public void setBackgroundPattern(final String backgroundPattern) {
         this.backgroundPattern = backgroundPattern;
+    }
+
+    public Terminal.Color getInfoTextColor() {
+        return ifNotNullElse( infoTextColor, getTheme().infoFg() );
+    }
+
+    public void setInfoTextColor(final Terminal.Color infoTextColor) {
+        this.infoTextColor = infoTextColor;
+    }
+
+    public Terminal.Color getInfoBackgroundColor() {
+        return ifNotNullElse( infoBackgroundColor, getTheme().infoBg() );
+    }
+
+    public void setInfoBackgroundColor(final Terminal.Color infoBackgroundColor) {
+        this.infoBackgroundColor = infoBackgroundColor;
     }
 
     public CLITheme getTheme() {

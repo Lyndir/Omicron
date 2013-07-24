@@ -175,7 +175,7 @@ public class Game extends MetaObject {
 
     public static class Builder {
 
-        private Size               worldSize      = new Size( 50, 50 );
+        private Size               worldSize      = new Size( 200, 200 );
         private List<Player>       players        = Lists.newLinkedList();
         private int                nextPlayerID   = 1;
         private int                totalPlayers   = 4;

@@ -34,7 +34,7 @@ public class TitledView extends View {
     private String         title;
     private Terminal.Color backgroundColor;
     private Terminal.Color textColor;
-    private Rectangle textPadding = new Rectangle( 0, 2, 0, 2 );
+    private Inset textPadding = new Inset( 0, 2, 0, 2 );
 
     public TitledView(final String title) {
         this.title = title;
@@ -48,15 +48,15 @@ public class TitledView extends View {
     }
 
     @Override
-    protected Rectangle getMeasuredBoxForChild(final View child) {
-        return super.getMeasuredBoxForChild( child ).shrink( new Rectangle( 1, 0, 0, 0 ) );
+    protected Box getMeasuredBoxForChild(final View child) {
+        return super.getMeasuredBoxForChild( child ).shrink( new Inset( 1, 0, 0, 0 ) );
     }
 
     @Override
     protected void drawForeground(final Screen screen) {
         super.drawForeground( screen );
 
-        Rectangle contentBox = getContentBoxOnScreen().shrink( getTextPadding() );
+        Box contentBox = getContentBoxOnScreen().shrink( getTextPadding() );
         String titleOnScreen = getTitle().substring( 0, Math.min( getTitle().length(), contentBox.getSize().getWidth() ) );
         screen.putString( contentBox.getLeft(), contentBox.getTop(), titleOnScreen, getTextColor(), getBackgroundColor() );
     }
@@ -70,11 +70,11 @@ public class TitledView extends View {
         this.title = title;
     }
 
-    public Rectangle getTextPadding() {
+    public Inset getTextPadding() {
         return textPadding;
     }
 
-    public void setTextPadding(final Rectangle textPadding) {
+    public void setTextPadding(final Inset textPadding) {
         this.textPadding = textPadding;
     }
 

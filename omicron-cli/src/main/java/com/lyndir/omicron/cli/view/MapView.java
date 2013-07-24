@@ -48,6 +48,7 @@ public class MapView extends View {
     private Coordinate offset = new Coordinate( 0, 0 );
     private LevelType      levelType;
     private Terminal.Color mapColor;
+    private String         backgroundPattern;
 
     public MapView(@Nonnull final LevelType levelType) {
         this.levelType = levelType;
@@ -62,56 +63,102 @@ public class MapView extends View {
             return;
 
         // Create an empty grid.
-        Size size = gameController.get().getGame().getLevel( getLevelType() ).getSize();
-        Table<Integer, Integer, Tile> grid = HashBasedTable.create( size.getHeight(), size.getWidth() );
+        Size levelSize = gameController.get().getGame().getLevel( getLevelType() ).getSize();
+        Table<Integer, Integer, Tile> grid = HashBasedTable.create( levelSize.getHeight(), levelSize.getWidth() );
 
         // Iterate observable tiles and populate the grid.
         for (final Tile tile : OmicronCLI.get().getLocalPlayer().listObservableTiles( OmicronCLI.get().getLocalPlayer() )) {
             int v = tile.getPosition().getV();
-            int u = (tile.getPosition().getU() + v / 2) % size.getWidth();
+            int u = (tile.getPosition().getU() + v / 2) % levelSize.getWidth();
             grid.put( v, u, tile );
         }
 
         // Draw grid in view.
-        Rectangle contentBox = getContentBoxOnScreen();
+        Box contentBox = getContentBoxOnScreen();
+        com.lyndir.omicron.cli.view.Size contentSize = contentBox.getSize();
         for (int x = contentBox.getLeft(); x <= contentBox.getRight(); ++x)
             for (int y = contentBox.getTop(); y <= contentBox.getBottom(); ++y) {
-                Tile tile = grid.get( y + getOffset().getY(), x + getOffset().getX() );
-                if (tile == null)
+                int v = y - contentBox.getTop() + getOffset().getY();
+                int u = x - contentBox.getLeft() + getOffset().getX();
+                if (!levelSize.isInBounds( new com.lyndir.omicron.api.model.Coordinate( u, v, levelSize ) ))
                     continue;
 
-                Optional<GameObject> contents = tile.getContents();
+                Optional<GameObject> contents = Optional.absent();
+                Terminal.Color bgColor = getBackgroundColor();
 
-                Terminal.Color bgColor = levelTypeColors.get( tile.getLevel().getType() );
-                for (final ResourceType resourceType : ResourceType.values())
-                    if (tile.getResourceQuantity( resourceType ) > 0)
-                        bgColor = resourceTypeColors.get( resourceType );
+                Tile tile = grid.get( v, u );
+                if (tile != null) {
+                    contents = tile.getContents();
+                    bgColor = levelTypeColors.get( tile.getLevel().getType() );
+
+                    for (final ResourceType resourceType : ResourceType.values())
+                        if (tile.getResourceQuantity( resourceType ) > 0)
+                            bgColor = resourceTypeColors.get( resourceType );
+                }
 
                 screen.putString( x + (y % 2 == 0? 0: 1), y, contents.isPresent()? contents.get().getTypeName().substring( 0, 1 ): " ",
                                   getMapColor(), bgColor, ScreenCharacterStyle.Bold );
             }
+
+        // Draw off-screen warning labels.
+        Inset offScreen = new Inset( Math.max( 0, getOffset().getY() ),
+                                     Math.max( 0, levelSize.getWidth() - contentSize.getWidth() - getOffset().getX() + 1 ),
+                                     Math.max( 0, levelSize.getHeight() - contentSize.getHeight() - getOffset().getY() - 1 ),
+                                     Math.max( 0, getOffset().getX() ) );
+        int centerX = contentBox.getLeft() + (levelSize.getWidth() - offScreen.getHorizontal()) / 2 - getOffset().getX() + offScreen.getLeft();
+        int centerY = contentBox.getTop() + (levelSize.getHeight() - offScreen.getVertical()) / 2 - getOffset().getY() + offScreen.getTop();
+        centerX = Math.min( contentBox.getRight() - 3, Math.max( contentBox.getLeft(), centerX ) );
+        centerY = Math.min( contentBox.getBottom() - 1, Math.max( contentBox.getTop() + 1, centerY ) );
+        if (offScreen.getTop() > 0)
+            screen.putString( centerX, contentBox.getTop(), //
+                              String.format( "%+d", offScreen.getTop() ), getInfoTextColor(), getInfoBackgroundColor() );
+        if (offScreen.getRight() > 0) {
+            String label = String.format( "%+d", offScreen.getRight() );
+            screen.putString( contentBox.getRight() - label.length(), centerY, //
+                              label, getInfoTextColor(), getInfoBackgroundColor() );
+        }
+        if (offScreen.getBottom() > 0)
+            screen.putString( centerX, contentBox.getBottom(), //
+                              String.format( "%+d", offScreen.getBottom() ), getInfoTextColor(), getInfoBackgroundColor() );
+        if (offScreen.getLeft() > 0)
+            screen.putString( contentBox.getLeft(), centerY, //
+                              String.format( "%+d", offScreen.getLeft() ), getInfoTextColor(), getInfoBackgroundColor() );
     }
 
     @Override
     protected boolean onKey(final Key key) {
-        if (key.getKind() == Key.Kind.ArrowUp && !key.isAltPressed()) {
+        if (key.getKind() == Key.Kind.ArrowUp && key.isCtrlPressed()) {
             setOffset( getOffset().translate( 0, -1 ) );
             return true;
         }
-        if (key.getKind() == Key.Kind.ArrowDown && !key.isAltPressed()) {
+        if (key.getKind() == Key.Kind.ArrowDown && key.isCtrlPressed()) {
             setOffset( getOffset().translate( 0, 1 ) );
             return true;
         }
-        if (key.getKind() == Key.Kind.ArrowLeft && !key.isAltPressed()) {
+        if (key.getKind() == Key.Kind.ArrowLeft && key.isCtrlPressed()) {
             setOffset( getOffset().translate( -1, 0 ) );
             return true;
         }
-        if (key.getKind() == Key.Kind.ArrowRight && !key.isAltPressed()) {
+        if (key.getKind() == Key.Kind.ArrowRight && key.isCtrlPressed()) {
             setOffset( getOffset().translate( 1, 0 ) );
+            return true;
+        }
+        if (key.getKind() == Key.Kind.Home && key.isCtrlPressed()) {
+            setOffset( new Coordinate() );
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public String getBackgroundPattern() {
+        return ifNotNullElse( backgroundPattern, getTheme().mapBgPattern() );
+    }
+
+    @Override
+    public void setBackgroundPattern(final String backgroundPattern) {
+        this.backgroundPattern = backgroundPattern;
     }
 
     public Terminal.Color getMapColor() {

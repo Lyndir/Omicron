@@ -39,8 +39,6 @@ public class TextView extends View {
     private Crop   textCrop = Crop.SHOW_LAST;
     private int            textOffset;
     private Terminal.Color textColor;
-    private Terminal.Color infoTextColor;
-    private Terminal.Color infoBackgroundColor;
 
     @Override
     protected void drawForeground(final Screen screen) {
@@ -48,7 +46,7 @@ public class TextView extends View {
 
         FluentIterable<String> lines = FluentIterable.from( getTextLines() );
 
-        Rectangle contentBox = getContentBoxOnScreen();
+        Box contentBox = getContentBoxOnScreen();
         int from = getTextOffset();
         switch (getTextCrop()) {
 
@@ -99,22 +97,6 @@ public class TextView extends View {
 
         // Update offset in case text lines shrank beyond the current offset.
         textOffset = Math.min( textOffset, Iterables.size( getTextLines() ) );
-    }
-
-    public Terminal.Color getInfoTextColor() {
-        return ObjectUtils.ifNotNullElse( infoTextColor, getTheme().infoFg() );
-    }
-
-    public void setInfoTextColor(final Terminal.Color infoTextColor) {
-        this.infoTextColor = infoTextColor;
-    }
-
-    public Terminal.Color getInfoBackgroundColor() {
-        return ObjectUtils.ifNotNullElse( infoBackgroundColor, getTheme().infoBg() );
-    }
-
-    public void setInfoBackgroundColor(final Terminal.Color infoBackgroundColor) {
-        this.infoBackgroundColor = infoBackgroundColor;
     }
 
     public void updateTextOffset(final int offsetDelta) {

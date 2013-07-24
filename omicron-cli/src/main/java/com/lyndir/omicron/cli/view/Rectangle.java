@@ -22,30 +22,22 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 /**
  * @author lhunath, 2013-07-20
  */
-public class Rectangle extends MetaObject {
+public abstract class Rectangle extends MetaObject {
 
     private final int top;
     private final int right;
     private final int bottom;
     private final int left;
 
-    public Rectangle() {
+    protected Rectangle() {
         this( 0, 0, 0, 0 );
     }
 
-    public Rectangle(final int top, final int right, final int bottom, final int left) {
+    protected Rectangle(final int top, final int right, final int bottom, final int left) {
         this.top = top;
         this.right = right;
         this.bottom = bottom;
         this.left = left;
-    }
-
-    public Coordinate getOrigin() {
-        return new Coordinate( getLeft(), getTop() );
-    }
-
-    public Size getSize() {
-        return new Size( getRight() - getLeft(), getBottom() - getTop() );
     }
 
     public int getTop() {
@@ -62,22 +54,5 @@ public class Rectangle extends MetaObject {
 
     public int getLeft() {
         return left;
-    }
-
-    public Rectangle translate(final int x, final int y) {
-        return new Rectangle( getTop() + y, getRight() + x, getBottom() + y, getLeft() + x );
-    }
-
-    public Rectangle translate(final Coordinate offset) {
-        return translate( offset.getX(), offset.getY() );
-    }
-
-    public Rectangle shrink(final Rectangle shrinkBox) {
-        return new Rectangle( getTop() + shrinkBox.getTop(), getRight() - shrinkBox.getRight(), getBottom() - shrinkBox.getBottom(),
-                              getLeft() + shrinkBox.getLeft() );
-    }
-
-    public Rectangle size(final Size size) {
-        return new Rectangle( getTop(), getLeft() + size.getWidth(), getTop() + size.getHeight(), getLeft() );
     }
 }

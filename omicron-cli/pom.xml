@@ -11,7 +11,6 @@
         <version>GIT-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lyndir.lhunath.omicron</groupId>
     <artifactId>omicron-cli</artifactId>
     <version>GIT-SNAPSHOT</version>
 
@@ -77,6 +76,7 @@
         <dependency>
             <groupId>com.googlecode.lanterna</groupId>
             <artifactId>lanterna</artifactId>
+            <version>2.2.0-lyndir-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

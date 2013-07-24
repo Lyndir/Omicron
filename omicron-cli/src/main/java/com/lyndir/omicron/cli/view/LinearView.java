@@ -78,7 +78,7 @@ public class LinearView extends View {
     }
 
     @Override
-    protected Rectangle getMeasuredBoxForChild(final View child) {
+    protected Box getMeasuredBoxForChild(final View child) {
         int childIndex = getChildren().indexOf( child );
         int childOffset = measuredChildOffsets.get( childIndex );
         int newChildIndex = childIndex + 1;
@@ -88,14 +88,13 @@ public class LinearView extends View {
                 int newChildOffset = newChildIndex < measuredChildOffsets.size()? measuredChildOffsets.get( newChildIndex )
                         : getContentBoxOnScreen().getSize().getWidth() + 1;
 
-                return new Rectangle( 0, newChildOffset - 1, getContentBoxOnScreen().getSize().getHeight(), childOffset );
+                return new Box( 0, newChildOffset - 1, getContentBoxOnScreen().getSize().getHeight(), childOffset );
             }
-            case VERTICAL: {
+            case VERTICAL:
                 int newChildOffset = newChildIndex < measuredChildOffsets.size()? measuredChildOffsets.get( newChildIndex )
                         : getContentBoxOnScreen().getSize().getHeight() + 1;
 
-                return new Rectangle( childOffset, getContentBoxOnScreen().getSize().getWidth(), newChildOffset - 1, 0 );
-            }
+                return new Box( childOffset, getContentBoxOnScreen().getSize().getWidth(), newChildOffset - 1, 0 );
         }
 
         throw new UnsupportedOperationException( "Unsupported orientation: " + orientation );

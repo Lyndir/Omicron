@@ -14,37 +14,25 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli;
-
-import static com.googlecode.lanterna.terminal.Terminal.*;
-
+package com.lyndir.omicron.cli.view;
 
 /**
- * @author lhunath, 2013-07-19
+ * @author lhunath, 2013-07-23
  */
-public interface CLITheme {
+public class Inset extends Rectangle {
 
-    Color fg();
+    public Inset() {
+    }
 
-    Color bg();
+    public Inset(final int top, final int right, final int bottom, final int left) {
+        super( top, right, bottom, left );
+    }
 
-    String bgPattern();
+    public int getHorizontal() {
+        return getLeft() + getRight();
+    }
 
-    Color bgPatternFg();
-
-    Color barFg();
-
-    Color barBg();
-
-    Color textFg();
-
-    Color promptFg();
-
-    Color mapFg();
-
-    String mapBgPattern();
-
-    Color infoFg();
-
-    Color infoBg();
+    public int getVertical() {
+        return getTop() + getBottom();
+    }
 }
