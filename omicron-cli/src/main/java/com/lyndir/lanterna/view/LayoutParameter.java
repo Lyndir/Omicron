@@ -14,37 +14,9 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli;
-
-import static com.googlecode.lanterna.terminal.Terminal.*;
-
+package com.lyndir.lanterna.view;
 
 /**
- * @author lhunath, 2013-07-19
+ * @author lhunath, 2013-07-21
  */
-public interface CLITheme {
-
-    Color fg();
-
-    Color bg();
-
-    String bgPattern();
-
-    Color bgPatternFg();
-
-    Color barFg();
-
-    Color barBg();
-
-    Color textFg();
-
-    Color promptFg();
-
-    Color mapFg();
-
-    String mapBgPattern();
-
-    Color infoFg();
-
-    Color infoBg();
-}
+public interface LayoutParameter {}

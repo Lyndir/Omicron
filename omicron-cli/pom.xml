@@ -76,7 +76,6 @@
         <dependency>
             <groupId>com.googlecode.lanterna</groupId>
             <artifactId>lanterna</artifactId>
-            <version>2.2.0-lyndir-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

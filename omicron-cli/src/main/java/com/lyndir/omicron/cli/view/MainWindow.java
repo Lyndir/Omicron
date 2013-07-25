@@ -16,6 +16,11 @@
 
 package com.lyndir.omicron.cli.view;
 
+import com.lyndir.lanterna.view.LinearView;
+import com.lyndir.omicron.cli.view.CommandView;
+import com.lyndir.omicron.cli.view.DashboardView;
+
+
 /**
  * @author lhunath, 2013-07-19
  */

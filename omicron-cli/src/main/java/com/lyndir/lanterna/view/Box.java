@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
 /**
  * @author lhunath, 2013-07-23

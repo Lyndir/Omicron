@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;

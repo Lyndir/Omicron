@@ -24,6 +24,7 @@ import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.lyndir.lanterna.view.*;
 import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.model.Size;
@@ -45,7 +46,7 @@ public class MapView extends View {
                              Terminal.Color.YELLOW, ResourceType.RARE_ELEMENTS, Terminal.Color.MAGENTA );
 
     @Nonnull
-    private Coordinate offset = new Coordinate( 0, 0 );
+    private com.lyndir.lanterna.view.Coordinate offset = new com.lyndir.lanterna.view.Coordinate( 0, 0 );
     private LevelType      levelType;
     private Terminal.Color mapColor;
     private String         backgroundPattern;
@@ -75,7 +76,7 @@ public class MapView extends View {
 
         // Draw grid in view.
         Box contentBox = getContentBoxOnScreen();
-        com.lyndir.omicron.cli.view.Size contentSize = contentBox.getSize();
+        com.lyndir.lanterna.view.Size contentSize = contentBox.getSize();
         for (int x = contentBox.getLeft(); x <= contentBox.getRight(); ++x)
             for (int y = contentBox.getTop(); y <= contentBox.getBottom(); ++y) {
                 int v = y - contentBox.getTop() + getOffset().getY();
@@ -144,7 +145,7 @@ public class MapView extends View {
             return true;
         }
         if (key.getKind() == Key.Kind.Home && key.isCtrlPressed()) {
-            setOffset( new Coordinate() );
+            setOffset( new com.lyndir.lanterna.view.Coordinate() );
             return true;
         }
 
@@ -178,11 +179,11 @@ public class MapView extends View {
     }
 
     @Nonnull
-    public Coordinate getOffset() {
+    public com.lyndir.lanterna.view.Coordinate getOffset() {
         return offset;
     }
 
-    public void setOffset(@Nonnull final Coordinate offset) {
+    public void setOffset(@Nonnull final com.lyndir.lanterna.view.Coordinate offset) {
         this.offset = offset;
     }
 }

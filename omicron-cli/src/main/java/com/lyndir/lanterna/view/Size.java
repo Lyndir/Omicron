@@ -14,13 +14,13 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
 import com.googlecode.lanterna.terminal.TerminalSize;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -62,7 +62,7 @@ public class Size extends MetaObject {
         return coordinate.getX() >= 0 && coordinate.getY() >= 0 && coordinate.getX() < width && coordinate.getY() < height;
     }
 
-    public static Size max(@Nullable final Size size1, @NotNull final Size size2) {
+    public static Size max(@Nullable final Size size1, @Nonnull final Size size2) {
 
         if (size1 == null)
             return size2;

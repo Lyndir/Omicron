@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
@@ -25,8 +25,6 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.StringUtils;
-import com.lyndir.omicron.cli.CLITheme;
-import com.lyndir.omicron.cli.CLIThemes;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -49,12 +47,12 @@ public class View {
     private String         backgroundPattern;
     private Terminal.Color infoTextColor;
     private Terminal.Color infoBackgroundColor;
-    private CLITheme       theme;
+    private Theme          theme;
 
     public final void measure(final Screen screen) {
         measureInParent( screen );
         measureChildren( screen );
-        //                logger.dbg( "measured: %s: %s", getClass().getSimpleName(), getMeasuredBoxOnScreen() );
+        //logger.dbg( "measured: %s: %s", getClass().getSimpleName(), getMeasuredBoxOnScreen() );
 
         for (final View child : getChildren())
             child.measure( screen );
@@ -84,7 +82,7 @@ public class View {
     public final void draw(final Screen screen) {
         drawBackground( screen );
         drawForeground( screen );
-        //        drawLayoutDebug( screen );
+        //drawLayoutDebug( screen );
         drawChildren( screen );
     }
 
@@ -236,17 +234,17 @@ public class View {
         this.infoBackgroundColor = infoBackgroundColor;
     }
 
-    public CLITheme getTheme() {
+    public Theme getTheme() {
         if (theme != null)
             return theme;
 
         if (getParent().isPresent())
             return getParent().get().getTheme();
 
-        return CLIThemes.DEFAULT;
+        return Themes.DEFAULT;
     }
 
-    public void setTheme(final CLITheme theme) {
+    public void setTheme(final Theme theme) {
         this.theme = theme;
     }
 }

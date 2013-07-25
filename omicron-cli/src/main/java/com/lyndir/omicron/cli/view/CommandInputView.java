@@ -16,7 +16,23 @@
 
 package com.lyndir.omicron.cli.view;
 
+import com.google.common.base.Splitter;
+import com.lyndir.lanterna.view.InputView;
+import com.lyndir.omicron.cli.OmicronCLI;
+import com.lyndir.omicron.cli.command.RootCommand;
+import java.util.regex.Pattern;
+
+
 /**
- * @author lhunath, 2013-07-21
+ * @author lhunath, 2013-07-24
  */
-public interface LayoutParameter {}
+public class CommandInputView extends InputView {
+
+    private static final Splitter commandSplitter = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
+
+    @Override
+    protected void onEnterText(final String text) {
+        OmicronCLI.get().getLog().add( getPromptText() + text );
+        new RootCommand( OmicronCLI.get() ).evaluate( commandSplitter.split( text ).iterator() );
+    }
+}

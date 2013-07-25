@@ -14,12 +14,11 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
 import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
@@ -27,16 +26,13 @@ import com.lyndir.omicron.cli.OmicronCLI;
 import com.lyndir.omicron.cli.command.RootCommand;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 
 /**
  * @author lhunath, 2013-07-21
  */
-public class InputView extends View {
-
-    private static final Splitter commandSplitter = Splitter.on( Pattern.compile( "\\s+" ) ).omitEmptyStrings().trimResults();
+public abstract class InputView extends View {
 
     private final Deque<String> inputHistory = new LinkedList<>();
     private final Deque<String> inputFuture  = new LinkedList<>();
@@ -53,12 +49,12 @@ public class InputView extends View {
         super.drawForeground( screen );
 
         Box contentBox = getContentBoxOnScreen().shrink( getTextPadding() );
-        //        logger.dbg( "contentBox: %s, screen: %sx%s", contentBox, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows() );
         int inputOnScreenLength = Math.min( getInputText().length(), contentBox.getSize().getWidth() - getPromptText().length() );
         String inputOnScreen = getInputText().substring( getInputText().length() - inputOnScreenLength, getInputText().length() );
-        screen.putString( contentBox.getLeft(), contentBox.getTop(), getPromptText(), getPromptTextColor(), getBackgroundColor() );
-        screen.putString( contentBox.getLeft() + getPromptText().length(), contentBox.getTop(), inputOnScreen, getTextColor(),
-                          getBackgroundColor() );
+        screen.putString( contentBox.getLeft(), contentBox.getTop(), getPromptText(), //
+                          getPromptTextColor(), getBackgroundColor() );
+        screen.putString( contentBox.getLeft() + getPromptText().length(), contentBox.getTop(), inputOnScreen, //
+                          getTextColor(), getBackgroundColor() );
         screen.setCursorPosition( contentBox.getLeft() + getPromptText().length() + inputOnScreenLength, contentBox.getTop() );
     }
 
@@ -75,8 +71,8 @@ public class InputView extends View {
     protected boolean onKey(final Key key) {
         // BACKSPACE: Delete last character
         if (key.getKind() == Key.Kind.Backspace) {
-            if (inputText.length() > 0)
-                inputText.deleteCharAt( inputText.length() - 1 );
+            if (getInputText().length() > 0)
+                getInputText().deleteCharAt( getInputText().length() - 1 );
         }
 
         // ESC: Erase input.
@@ -85,44 +81,51 @@ public class InputView extends View {
 
             // ENTER: Execute input.
         else if (key.getKind() == Key.Kind.Enter) {
-            OmicronCLI.get().getLog().add( getPromptText() + inputText );
-            new RootCommand( OmicronCLI.get() ).evaluate( commandSplitter.split( inputText ).iterator() );
-
-            inputHistory.push( inputText.toString() );
+            onEnterText( getInputText().toString() );
+            getInputHistory().push( getInputText().toString() );
             clearInputText();
         }
 
-        // ARROWS: ALT = Scroll Control View, NONE = History navigation.
+        // UP/DOWN: History navigation, ALT UP/DOWN: Scroll Control View
         else if (key.getKind() == Key.Kind.ArrowUp) {
             if (key.isAltPressed() && getControlTextView() != null)
-                getControlTextView().updateTextOffset( -1 );
+                getControlTextView().updateTextOffset( 1 );
             else {
-                if (!inputHistory.isEmpty()) {
-                    if (inputText.length() > 0)
-                        inputFuture.push( inputText.toString() );
-                    clearInputText();
-                    inputText.append( inputHistory.pop() );
+                if (getInputText().length() > 0)
+                    getInputHistory().push( getInputText().toString() );
+                clearInputText();
+                if (!getInputFuture().isEmpty()) {
+                    getInputText().append( getInputFuture().pop() );
                 }
             }
         } else if (key.getKind() == Key.Kind.ArrowDown) {
             if (key.isAltPressed() && getControlTextView() != null)
-                getControlTextView().updateTextOffset( 1 );
+                getControlTextView().updateTextOffset( -1 );
             else {
-                if (inputText.length() > 0)
-                    inputHistory.push( inputText.toString() );
-                clearInputText();
-                if (!inputFuture.isEmpty()) {
-                    inputText.append( inputFuture.pop() );
+                if (!getInputHistory().isEmpty()) {
+                    if (getInputText().length() > 0)
+                        getInputFuture().push( getInputText().toString() );
+                    clearInputText();
+                    getInputText().append( getInputHistory().pop() );
                 }
             }
         }
 
+        // LEFT/RIGHT: Cursor character navigation, ALT LEFT/RIGHT: Cursor word navigation.
+        else if (key.getKind() == Key.Kind.ArrowLeft) {
+            // TODO
+        } else if (key.getKind() == Key.Kind.ArrowRight) {
+            // TODO
+        }
+
         // OTHERS: Add character to input.
         else
-            inputText.append( key.getCharacter() );
+            getInputText().append( key.getCharacter() );
 
         return true;
     }
+
+    protected abstract void onEnterText(final String text);
 
     private StringBuilder clearInputText() {
         return inputText.delete( 0, inputText.length() );
@@ -181,5 +184,13 @@ public class InputView extends View {
     @Nonnull
     public StringBuilder getInputText() {
         return inputText;
+    }
+
+    public Deque<String> getInputHistory() {
+        return inputHistory;
+    }
+
+    public Deque<String> getInputFuture() {
+        return inputFuture;
     }
 }

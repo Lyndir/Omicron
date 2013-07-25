@@ -18,6 +18,7 @@ package com.lyndir.omicron.cli.view;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.lyndir.lanterna.view.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import javax.annotation.Nonnull;
 
@@ -40,7 +41,7 @@ public class CommandView extends TitledView {
                 return Joiner.on( '\n' ).join( OmicronCLI.get().getLog() );
             }
         } );
-        content.addChild( commandInputView = new InputView() );
+        content.addChild( commandInputView = new CommandInputView() );
         commandInputView.setControlTextView( logView );
         addChild( content );
     }

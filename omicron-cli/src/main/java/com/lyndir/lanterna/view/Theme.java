@@ -14,22 +14,37 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
-import com.lyndir.lanterna.view.TitledView;
-import com.lyndir.omicron.api.model.LevelType;
+import static com.googlecode.lanterna.terminal.Terminal.*;
 
 
 /**
- * @author lhunath, 2013-07-20
+ * @author lhunath, 2013-07-19
  */
-public class DashboardView extends TitledView {
+public interface Theme {
 
-    private final MapView mapView;
+    Color fg();
 
-    public DashboardView() {
-        super( "Omicron - No game" );
+    Color bg();
 
-        addChild( mapView = new MapView( LevelType.GROUND ) );
-    }
+    String bgPattern();
+
+    Color bgPatternFg();
+
+    Color barFg();
+
+    Color barBg();
+
+    Color textFg();
+
+    Color promptFg();
+
+    Color mapFg();
+
+    String mapBgPattern();
+
+    Color infoFg();
+
+    Color infoBg();
 }

@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli;
+package com.lyndir.lanterna.view;
 
 import com.googlecode.lanterna.terminal.Terminal;
 
@@ -22,7 +22,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 /**
  * @author lhunath, 2013-07-19
  */
-public enum CLIThemes implements CLITheme {
+public enum Themes implements Theme {
     DEFAULT;
 
     @Override

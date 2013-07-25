@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.lanterna.view;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 

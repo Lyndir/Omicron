@@ -1,7 +1,6 @@
 package com.lyndir.omicron.cli;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.googlecode.lanterna.TerminalFacade;
 import com.googlecode.lanterna.input.Key;
@@ -11,10 +10,9 @@ import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.api.model.PlayerKey;
 import com.lyndir.omicron.cli.command.*;
 import com.lyndir.omicron.cli.view.MainWindow;
-import com.lyndir.omicron.cli.view.View;
+import com.lyndir.lanterna.view.View;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 
