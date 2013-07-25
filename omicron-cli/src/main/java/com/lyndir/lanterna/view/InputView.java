@@ -22,8 +22,6 @@ import com.google.common.base.Optional;
 import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.lyndir.omicron.cli.OmicronCLI;
-import com.lyndir.omicron.cli.command.RootCommand;
 import java.util.Deque;
 import java.util.LinkedList;
 import javax.annotation.Nonnull;
@@ -39,6 +37,7 @@ public abstract class InputView extends View {
     private final StringBuilder inputText    = new StringBuilder();
     private       Inset         textPadding  = new Inset( 0, 2, 0, 2 );
     private       String        promptText   = "> ";
+    private int            cursorOffset;
     private Terminal.Color textColor;
     private Terminal.Color promptTextColor;
     private Terminal.Color backgroundColor;
@@ -55,7 +54,7 @@ public abstract class InputView extends View {
                           getPromptTextColor(), getBackgroundColor() );
         screen.putString( contentBox.getLeft() + getPromptText().length(), contentBox.getTop(), inputOnScreen, //
                           getTextColor(), getBackgroundColor() );
-        screen.setCursorPosition( contentBox.getLeft() + getPromptText().length() + inputOnScreenLength, contentBox.getTop() );
+        screen.setCursorPosition( contentBox.getLeft() + getPromptText().length() + getCursorOffset(), contentBox.getTop() );
     }
 
     @Nonnull
@@ -71,8 +70,10 @@ public abstract class InputView extends View {
     protected boolean onKey(final Key key) {
         // BACKSPACE: Delete last character
         if (key.getKind() == Key.Kind.Backspace) {
-            if (getInputText().length() > 0)
-                getInputText().deleteCharAt( getInputText().length() - 1 );
+            if (key.isAltPressed())
+                deleteInputTextWord();
+            else
+                deleteInputTextCharacter();
         }
 
         // ESC: Erase input.
@@ -81,8 +82,8 @@ public abstract class InputView extends View {
 
             // ENTER: Execute input.
         else if (key.getKind() == Key.Kind.Enter) {
-            onEnterText( getInputText().toString() );
-            getInputHistory().push( getInputText().toString() );
+            onEnterText( getInputText() );
+            getInputHistory().push( getInputText() );
             clearInputText();
         }
 
@@ -91,11 +92,11 @@ public abstract class InputView extends View {
             if (key.isAltPressed() && getControlTextView() != null)
                 getControlTextView().updateTextOffset( 1 );
             else {
-                if (getInputText().length() > 0)
-                    getInputHistory().push( getInputText().toString() );
+                if (!getInputText().isEmpty())
+                    getInputHistory().push( getInputText() );
                 clearInputText();
                 if (!getInputFuture().isEmpty()) {
-                    getInputText().append( getInputFuture().pop() );
+                    addInputText( getInputFuture().pop() );
                 }
             }
         } else if (key.getKind() == Key.Kind.ArrowDown) {
@@ -103,32 +104,53 @@ public abstract class InputView extends View {
                 getControlTextView().updateTextOffset( -1 );
             else {
                 if (!getInputHistory().isEmpty()) {
-                    if (getInputText().length() > 0)
-                        getInputFuture().push( getInputText().toString() );
+                    if (!getInputText().isEmpty())
+                        getInputFuture().push( getInputText() );
                     clearInputText();
-                    getInputText().append( getInputHistory().pop() );
+                    addInputText( getInputHistory().pop() );
                 }
             }
         }
 
         // LEFT/RIGHT: Cursor character navigation, ALT LEFT/RIGHT: Cursor word navigation.
         else if (key.getKind() == Key.Kind.ArrowLeft) {
-            // TODO
+            if (key.isAltPressed())
+                moveCursorOffset( getPreviousWordOffset() - getCursorOffset() );
+            else
+                moveCursorOffset( -1 );
         } else if (key.getKind() == Key.Kind.ArrowRight) {
-            // TODO
+            if (key.isAltPressed())
+                moveCursorOffset( getNextWordOffset() - getCursorOffset() );
+            else
+                moveCursorOffset( 1 );
         }
 
         // OTHERS: Add character to input.
         else
-            getInputText().append( key.getCharacter() );
+            addInputText( String.valueOf( key.getCharacter() ) );
 
         return true;
     }
 
+    private int getPreviousWordOffset() {
+        String textToCursor = getInputText().substring( 0, getCursorOffset() );
+
+        int previousWordOffset = textToCursor.lastIndexOf( ' ' );
+        return previousWordOffset == -1? 0: previousWordOffset;
+    }
+
+    private int getNextWordOffset() {
+        String textFromCursor = getInputText().substring( getCursorOffset(), getInputText().length() );
+
+        int nextWordOffset = textFromCursor.indexOf( ' ', 1 );
+        return nextWordOffset == -1? getInputText().length(): getCursorOffset() + nextWordOffset;
+    }
+
     protected abstract void onEnterText(final String text);
 
-    private StringBuilder clearInputText() {
-        return inputText.delete( 0, inputText.length() );
+    private void clearInputText() {
+        inputText.delete( 0, inputText.length() );
+        moveCursorOffset( -getCursorOffset() );
     }
 
     public String getPromptText() {
@@ -182,8 +204,32 @@ public abstract class InputView extends View {
     }
 
     @Nonnull
-    public StringBuilder getInputText() {
-        return inputText;
+    public String getInputText() {
+        return inputText.toString();
+    }
+
+    public void addInputText(@Nonnull final String text) {
+        inputText.insert( getCursorOffset(), text );
+        moveCursorOffset( text.length() );
+    }
+
+    public boolean deleteInputTextCharacter() {
+        if (inputText.length() == 0)
+            return false;
+
+        inputText.delete( cursorOffset - 1, cursorOffset );
+        moveCursorOffset( -1 );
+        return true;
+    }
+
+    public boolean deleteInputTextWord() {
+        if (inputText.length() == 0)
+            return false;
+
+        int previousWordOffset = getPreviousWordOffset();
+        inputText.delete( previousWordOffset, cursorOffset );
+        moveCursorOffset( previousWordOffset - cursorOffset );
+        return true;
     }
 
     public Deque<String> getInputHistory() {
@@ -192,5 +238,13 @@ public abstract class InputView extends View {
 
     public Deque<String> getInputFuture() {
         return inputFuture;
+    }
+
+    public int getCursorOffset() {
+        return cursorOffset;
+    }
+
+    public void moveCursorOffset(final int dOffset) {
+        cursorOffset = Math.min( getInputText().length(), Math.max( 0, cursorOffset + dOffset ) );
     }
 }
