@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
  */
 public class View {
 
-    Logger logger = Logger.get( getClass() );
+    protected Logger logger = Logger.get( getClass() );
 
     private final List<View> children = new LinkedList<>();
     private View parent;

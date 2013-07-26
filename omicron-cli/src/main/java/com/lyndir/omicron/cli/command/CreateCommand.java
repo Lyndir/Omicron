@@ -32,8 +32,8 @@ public class CreateCommand extends Command {
 
         Game game = gameBuilder.build();
         getOmicron().setGameController( game.getController() );
-        getOmicron().setLocalPlayer( gameBuilder.getPlayers().iterator().next() );
         getOmicron().getBuilders().setGameBuilder( null );
+        game.getController().start();
         inf( "Created game: %s", game );
     }
 }

@@ -36,6 +36,13 @@ public class PrintCommand extends Command {
             return;
         }
 
+        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        if (!localPlayerOptional.isPresent()) {
+            err( "No local player in the game." );
+            return;
+        }
+        final Player localPlayer = localPlayerOptional.get();
+
         // Create an empty grid.
         Size maxSize = null;
         for (final Level level : gameController.get().listLevels())
@@ -47,7 +54,7 @@ public class PrintCommand extends Command {
                 grid.put( v, u, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
-        for (final Tile tile : getOmicron().getLocalPlayer().listObservableTiles( getOmicron().getLocalPlayer() )) {
+        for (final Tile tile : localPlayer.listObservableTiles( localPlayer )) {
             Optional<GameObject> contents = tile.getContents();
             char contentsChar;
             if (contents.isPresent())

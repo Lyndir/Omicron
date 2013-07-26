@@ -14,26 +14,30 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.cli.view;
+package com.lyndir.omicron.api.controller;
 
-import com.lyndir.lanterna.view.LinearView;
-import com.lyndir.omicron.cli.view.CommandView;
-import com.lyndir.omicron.cli.view.DashboardView;
+import com.lyndir.omicron.api.model.Player;
+import com.lyndir.omicron.api.model.Turn;
 
 
 /**
- * @author lhunath, 2013-07-19
+ * @author lhunath, 2013-07-25
  */
-public class MainWindow extends LinearView {
+public abstract class GameListener {
 
-    private final DashboardView dashboardView;
-    private final CommandView   commandView;
+    /**
+     * Called when the given player has ended his turn.
+     *
+     * @param readyPlayer The player who's just ended his turn.
+     */
+    public void onPlayerReady(final Player readyPlayer) {
+    }
 
-    public MainWindow() {
-
-        super( Orientation.VERTICAL );
-
-        addChild( dashboardView = new DashboardView() );
-        addChild( commandView = new CommandView() );
+    /**
+     * Called when a new turn has begun in the game.
+     *
+     * @param currentTurn The new turn that has just commenced.
+     */
+    public void onNewTurn(final Turn currentTurn) {
     }
 }

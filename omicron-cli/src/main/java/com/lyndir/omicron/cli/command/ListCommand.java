@@ -33,7 +33,14 @@ public class ListCommand extends Command {
             return;
         }
 
-        List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.get().listPlayerGameInfo( getOmicron().getLocalPlayer() ) );
+        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        if (!localPlayerOptional.isPresent()) {
+            err( "No local player in the game." );
+            return;
+        }
+        final Player localPlayer = localPlayerOptional.get();
+
+        List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.get().listPlayerGameInfo( localPlayer ) );
         Collections.sort( playerGameInfos, new Comparator<PlayerGameInfo>() {
             @Override
             public int compare(final PlayerGameInfo o1, final PlayerGameInfo o2) {
@@ -57,9 +64,16 @@ public class ListCommand extends Command {
             return;
         }
 
+        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        if (!localPlayerOptional.isPresent()) {
+            err( "No local player in the game." );
+            return;
+        }
+        final Player localPlayer = localPlayerOptional.get();
+
         ImmutableList.Builder<GameObject> gameObjectBuilder = ImmutableList.builder();
         for (final Player player : gameController.get().listPlayers())
-            gameObjectBuilder.addAll( player.getController().iterateObservableObjects( getOmicron().getLocalPlayer() ) );
+            gameObjectBuilder.addAll( player.getController().iterateObservableObjects( localPlayer ) );
 
         inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
         for (final GameObject gameObject : gameObjectBuilder.build())

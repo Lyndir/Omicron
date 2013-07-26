@@ -32,6 +32,10 @@ public class Box extends Rectangle {
         return new Coordinate( getLeft(), getTop() );
     }
 
+    public Coordinate getCenter() {
+        return new Coordinate( getLeft() + getSize().getWidth() / 2, getTop() + getSize().getHeight() / 2 );
+    }
+
     public Size getSize() {
         return new Size( getRight() - getLeft(), getBottom() - getTop() );
     }

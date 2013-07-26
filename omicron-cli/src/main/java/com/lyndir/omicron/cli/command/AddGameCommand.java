@@ -1,5 +1,6 @@
 package com.lyndir.omicron.cli.command;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.lyndir.omicron.api.model.*;
@@ -22,8 +23,9 @@ public class AddGameCommand extends Command {
     @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
     public void player(final Iterator<String> tokens) {
 
-        if (getOmicron().getLocalPlayer() != null) {
-            err( "There is already a local player: %s", getOmicron().getLocalPlayer().getName() );
+        Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        if (localPlayerOptional.isPresent()) {
+            err( "There is already a local player: %s", localPlayerOptional.get().getName() );
             return;
         }
 
@@ -44,9 +46,10 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        getOmicron().setLocalPlayer( new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, Color.of( playerPrimaryColor ),
-                                             Color.of( playerSecondaryColor ) ) );
-        gameBuilder.getPlayers().add( getOmicron().getLocalPlayer() );
-        inf( "Added player to game: %s", getOmicron().getLocalPlayer() );
+        Player newPlayer = new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, //
+                                       Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
+        gameBuilder.getPlayers().add( newPlayer );
+        getOmicron().setLocalPlayer( newPlayer );
+        inf( "Added player to game: %s", newPlayer );
     }
 }

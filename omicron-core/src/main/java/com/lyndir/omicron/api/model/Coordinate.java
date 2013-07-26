@@ -91,6 +91,10 @@ public class Coordinate extends MetaObject {
         return v;
     }
 
+    public Size getWrapSize() {
+        return wrapSize;
+    }
+
     private int getDU(final Coordinate other) {
 
         int du = other.getU() - u;

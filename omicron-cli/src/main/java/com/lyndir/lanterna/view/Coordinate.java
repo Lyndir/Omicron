@@ -51,6 +51,10 @@ public class Coordinate extends MetaObject {
         return y;
     }
 
+    public Coordinate translate(final Coordinate delta) {
+        return translate( delta.getX(), delta.getY() );
+    }
+
     public Coordinate translate(final int dx, final int dy) {
         return new Coordinate( x + dx, y + dy );
     }

@@ -1,18 +1,13 @@
 package com.lyndir.omicron.cli;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.googlecode.lanterna.TerminalFacade;
-import com.googlecode.lanterna.input.Key;
-import com.googlecode.lanterna.screen.Screen;
+import com.google.common.base.Preconditions;
+import com.lyndir.lanterna.view.OmicronWindow;
 import com.lyndir.omicron.api.controller.GameController;
+import com.lyndir.omicron.api.controller.GameListener;
 import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.api.model.PlayerKey;
-import com.lyndir.omicron.cli.command.*;
-import com.lyndir.omicron.cli.view.MainWindow;
-import com.lyndir.lanterna.view.View;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import javax.annotation.Nonnull;
 
 
@@ -23,11 +18,13 @@ import javax.annotation.Nonnull;
  */
 public class OmicronCLI {
 
-    private static final ThreadLocal<OmicronCLI> omicron  = new ThreadLocal<>();
-    private final        Builders                builders = new Builders();
-    private final        PlayerKey               localKey = new PlayerKey();
-    private final        List<String>            log      = new LinkedList<>();
-    private              boolean                 running  = true;
+    private static final OmicronCLI omicron = new OmicronCLI();
+
+    private final Builders          builders      = new Builders();
+    private final PlayerKey         localKey      = new PlayerKey();
+    private final List<String>      log           = new LinkedList<>();
+    private final Set<GameListener> gameListeners = new HashSet<>();
+    private       boolean           running       = true;
     private GameController gameController;
     private Player         localPlayer;
 
@@ -35,38 +32,14 @@ public class OmicronCLI {
     public static void main(final String... arguments)
             throws Exception {
 
-        Screen screen = new Screen( TerminalFacade.createTextTerminal() );
-        screen.startScreen();
-        screen.getTerminal().setCursorVisible( false );
-        try {
-            OmicronCLI omicron = new OmicronCLI();
-            new BuildCommand(omicron).game( ImmutableList.<String>of().iterator() );
-            new AddGameCommand(omicron).player( ImmutableList.of( "Simon,red,red" ).iterator() );
-            new CreateCommand(omicron).game( ImmutableList.<String>of().iterator() );
-            View ui = new MainWindow();
-
-            while (omicron.isRunning()) {
-                ui.measure( screen );
-                ui.draw( screen );
-                screen.refresh();
-
-                // Check for input.
-                for (Key key; (key = screen.readInput()) != null; )
-                    ui.handleKey( key );
-            }
-        }
-        finally {
-            screen.getTerminal().setCursorVisible( true );
-            screen.stopScreen();
-        }
+        new OmicronWindow().start();
     }
 
-    public OmicronCLI() {
-        omicron.set( this );
+    private OmicronCLI() {
     }
 
     public static OmicronCLI get() {
-        return omicron.get();
+        return omicron;
     }
 
     public boolean isRunning() {
@@ -86,16 +59,21 @@ public class OmicronCLI {
 
     public void setGameController(@Nonnull final GameController gameController) {
 
+        Preconditions.checkState( this.gameController == null, "Cannot assign a new game controller, one has already been assigned." );
         this.gameController = gameController;
+
+        for (final GameListener gameListener : gameListeners)
+            gameController.addGameListener( gameListener );
     }
 
-    public Player getLocalPlayer() {
+    public Optional<Player> getLocalPlayer() {
 
-        return localPlayer;
+        return Optional.fromNullable( localPlayer );
     }
 
     public void setLocalPlayer(final Player localPlayer) {
 
+        Preconditions.checkState( this.localPlayer == null, "Cannot assign a new local player, one has already been assigned." );
         this.localPlayer = localPlayer;
     }
 
@@ -111,5 +89,12 @@ public class OmicronCLI {
     public Builders getBuilders() {
 
         return builders;
+    }
+
+    public void addGameListener(final GameListener gameListener) {
+        gameListeners.add( gameListener );
+
+        if (gameController != null)
+            gameController.addGameListener( gameListener );
     }
 }

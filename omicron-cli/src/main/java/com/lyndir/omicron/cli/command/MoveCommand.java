@@ -25,6 +25,13 @@ public class MoveCommand extends Command {
     @Override
     public void evaluate(final Iterator<String> tokens) {
 
+        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        if (!localPlayerOptional.isPresent()) {
+            err( "No local player in the game." );
+            return;
+        }
+        final Player localPlayer = localPlayerOptional.get();
+
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
             err( "Missing objectID.  Syntax: objectID side/level" );
@@ -66,7 +73,7 @@ public class MoveCommand extends Command {
         }
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = getOmicron().getLocalPlayer().getController().getObject( getOmicron().getLocalPlayer(), objectId );
+        Optional<GameObject> optionalObject = localPlayer.getController().getObject( localPlayer, objectId );
         if (!optionalObject.isPresent()) {
             err( "No observable object with ID: %s", objectId );
             return;
@@ -82,7 +89,7 @@ public class MoveCommand extends Command {
         MobilityModule mobilityModule = optionalMobility.get();
 
         // Move the object.
-        mobilityModule.move( getOmicron().getLocalPlayer(), side.get() );
+        mobilityModule.move( localPlayer, side.get() );
         inf( "Object is now at: %s", gameObject.getLocation() );
     }
 }

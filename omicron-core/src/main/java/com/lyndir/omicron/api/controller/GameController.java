@@ -1,17 +1,18 @@
 package com.lyndir.omicron.api.controller;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 
 public class GameController {
 
     private final Game game;
+    private final Set<GameListener> gameListeners = new HashSet<>();
 
     public GameController(final Game game) {
 
@@ -24,6 +25,10 @@ public class GameController {
     public Game getGame() {
 
         return game;
+    }
+
+    public void addGameListener(final GameListener gameListener) {
+        gameListeners.add( gameListener );
     }
 
     /**
@@ -68,6 +73,8 @@ public class GameController {
     public boolean setReady(final Player currentPlayer) {
 
         game.getReadyPlayers().add( currentPlayer );
+        for (final GameListener gameListener : gameListeners)
+            gameListener.onPlayerReady( currentPlayer );
 
         if (game.getReadyPlayers().containsAll( game.getPlayers() )) {
             game.getReadyPlayers().clear();
@@ -78,9 +85,19 @@ public class GameController {
         return false;
     }
 
+    public void start() {
+
+        Preconditions.checkState( ! game.isRunning(), "The game cannot be started: It is already running." );
+
+        game.setRunning( true );
+        onNewTurn();
+    }
+
     public void onNewTurn() {
 
         game.setCurrentTurn( new Turn( game.getCurrentTurn() ) );
+        for (final GameListener gameListener : gameListeners)
+            gameListener.onNewTurn( game.getCurrentTurn() );
 
         for (final Player player : game.getPlayers())
             player.getController().onNewTurn( this );

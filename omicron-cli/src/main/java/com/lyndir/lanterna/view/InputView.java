@@ -82,9 +82,11 @@ public abstract class InputView extends View {
 
             // ENTER: Execute input.
         else if (key.getKind() == Key.Kind.Enter) {
-            onEnterText( getInputText() );
-            getInputHistory().push( getInputText() );
-            clearInputText();
+            if (inputText.length() > 0) {
+                onEnterText( getInputText() );
+                getInputHistory().push( getInputText() );
+                clearInputText();
+            }
         }
 
         // UP/DOWN: History navigation, ALT UP/DOWN: Scroll Control View

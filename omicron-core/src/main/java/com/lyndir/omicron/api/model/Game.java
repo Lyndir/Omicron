@@ -30,7 +30,8 @@ public class Game extends MetaObject {
 
     private final ImmutableList<Level>  levels;
     private final ImmutableList<Player> players;
-    private final Set<Player> readyPlayers = new HashSet<>();
+    private final Set<Player>           readyPlayers = new HashSet<>();
+    private boolean running;
 
     private Game(final Size worldSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig) {
 
@@ -124,7 +125,6 @@ public class Game extends MetaObject {
 
         // Start the game.
         gameController = new GameController( this );
-        gameController.onNewTurn();
     }
 
     public static Builder builder() {
@@ -171,6 +171,14 @@ public class Game extends MetaObject {
     public Set<Player> getReadyPlayers() {
 
         return readyPlayers;
+    }
+
+    public void setRunning(final boolean running) {
+        this.running = running;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     public static class Builder {

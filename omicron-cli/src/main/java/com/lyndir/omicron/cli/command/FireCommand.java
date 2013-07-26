@@ -33,6 +33,13 @@ public class FireCommand extends Command {
             return;
         }
 
+        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        if (!localPlayerOptional.isPresent()) {
+            err( "No local player in the game." );
+            return;
+        }
+        final Player localPlayer = localPlayerOptional.get();
+
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
             err( "Missing objectID.  Syntax: objectID dU dV [level]" );
@@ -63,7 +70,7 @@ public class FireCommand extends Command {
         int dv = ConversionUtils.toIntegerNN( dvArgument );
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = getOmicron().getLocalPlayer().getController().getObject( getOmicron().getLocalPlayer(), objectId );
+        Optional<GameObject> optionalObject = localPlayer.getController().getObject( localPlayer, objectId );
         if (!optionalObject.isPresent()) {
             err( "No observable object with ID: %s", objectId );
             return;
@@ -100,7 +107,7 @@ public class FireCommand extends Command {
         }
 
         // Fire at the target.
-        weaponModule.fireAt( getOmicron().getLocalPlayer(), target.get() );
+        weaponModule.fireAt( localPlayer, target.get() );
         Optional<GameObject> targetContents = target.get().getContents();
         inf( "Fired at: %s", targetContents.isPresent()? targetContents.get(): target );
     }
