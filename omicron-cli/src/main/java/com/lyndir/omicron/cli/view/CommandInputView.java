@@ -32,7 +32,8 @@ public class CommandInputView extends InputView {
 
     @Override
     protected void onEnterText(final String text) {
-        OmicronCLI.get().getLog().add( getPromptText() + text );
+        logger.inf( getPromptText() + text );
+
         new RootCommand( OmicronCLI.get() ).evaluate( commandSplitter.split( text ).iterator() );
     }
 }

@@ -60,8 +60,12 @@ public class MapView extends View {
 
     public MapView(@Nonnull final LevelType levelType) {
         this.levelType = levelType;
+    }
 
-        setHomeOffset();
+    @Override
+    protected void onReady() {
+        super.onReady();
+
         OmicronCLI.get().addGameListener( new GameListener() {
             @Override
             public void onNewTurn(final Turn currentTurn) {
@@ -192,9 +196,8 @@ public class MapView extends View {
                 // Transform game objects into their offset from the center of the map.
                 hasUnits = true;
                 Box contentBox = getContentBoxOnScreen();
-                OmicronCLI.get().getLog().add( String.format( "contentBox: %s", contentBox ) );
-                return positionToMapCoordinate( input.getLocation().getPosition() ).translate( contentBox.getSize().getWidth() / 2,
-                                                                                               contentBox.getSize().getHeight() / 2 );
+                return positionToMapCoordinate( input.getLocation().getPosition() ).translate( -contentBox.getSize().getWidth() / 2,
+                                                                                               -contentBox.getSize().getHeight() / 2 );
             }
         } ).first().or( new Supplier<Coordinate>() {
             @Override

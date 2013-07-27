@@ -94,22 +94,22 @@ public abstract class InputView extends View {
             if (key.isAltPressed() && getControlTextView() != null)
                 getControlTextView().updateTextOffset( 1 );
             else {
-                if (!getInputText().isEmpty())
-                    getInputHistory().push( getInputText() );
-                clearInputText();
-                if (!getInputFuture().isEmpty()) {
-                    addInputText( getInputFuture().pop() );
+                if (!getInputHistory().isEmpty()) {
+                    if (!getInputText().isEmpty())
+                        getInputFuture().push( getInputText() );
+                    clearInputText();
+                    addInputText( getInputHistory().pop() );
                 }
             }
         } else if (key.getKind() == Key.Kind.ArrowDown) {
             if (key.isAltPressed() && getControlTextView() != null)
                 getControlTextView().updateTextOffset( -1 );
             else {
-                if (!getInputHistory().isEmpty()) {
-                    if (!getInputText().isEmpty())
-                        getInputFuture().push( getInputText() );
-                    clearInputText();
-                    addInputText( getInputHistory().pop() );
+                if (!getInputText().isEmpty())
+                    getInputHistory().push( getInputText() );
+                clearInputText();
+                if (!getInputFuture().isEmpty()) {
+                    addInputText( getInputFuture().pop() );
                 }
             }
         }

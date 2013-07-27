@@ -28,6 +28,7 @@ public class Window {
 
     private final View    rootView;
     private       boolean running;
+    private       boolean ready;
 
     public Window(final View rootView) {
         this.rootView = rootView;
@@ -43,44 +44,75 @@ public class Window {
     }
 
     private void loop() {
-        Screen screen = new Screen( TerminalFacade.createTextTerminal() );
-        screen.startScreen();
-        screen.getTerminal().setCursorVisible( false );
+        // Initialize
+        Screen screen = TerminalFacade.createScreen( TerminalFacade.createTextTerminal() );
         try {
-            onStartup();
-            View rootView = getRootView();
-
+            onStartup( screen );
+            setRunning( true );
             while (isRunning()) {
-                rootView.measure( screen );
-                rootView.draw( screen );
+                // Measure
+                getRootView().measure( screen, new Box( 0, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows(), 0 ) );
+                if (!isReady()) fireReady();
+
+                // Draw
+                getRootView().draw( screen );
                 screen.refresh();
 
-                // Check for input.
+                // Input
                 for (Key key; (key = screen.readInput()) != null; )
-                    rootView.handleKey( key );
+                    getRootView().handleKey( key );
             }
         }
         finally {
-            onShutdown();
-            screen.getTerminal().setCursorVisible( true );
-            screen.stopScreen();
+            setRunning( false );
+            onShutdown( screen );
         }
     }
 
-    protected void onStartup() {
-        setRunning( true );
+    private void fireReady() {
+        fireReadyView( getRootView() );
+        onReady();
     }
 
-    protected void onShutdown() {
-        setRunning( false );
+    private static void fireReadyView(final View view) {
+        for (final View child : view.getChildren()) {
+            child.onReady();
+            fireReadyView( child );
+        }
+    }
+
+    /**
+     * The view hierarchy has been fully measured for the first time and all views have been notified.
+     */
+    protected void onReady() {
+        setReady( true );
+    }
+
+    protected void onStartup(final Screen screen) {
+        // Start screen and resize to terminal size.
+        screen.startScreen();
+        while (screen.readInput() != null) ;
+        screen.refresh();
+    }
+
+    protected void onShutdown(final Screen screen) {
+        screen.stopScreen();
     }
 
     protected synchronized boolean isRunning() {
         return running;
     }
 
-    protected synchronized void setRunning(final boolean running) {
+    private synchronized void setRunning(final boolean running) {
         this.running = running;
+    }
+
+    public synchronized boolean isReady() {
+        return ready;
+    }
+
+    public synchronized void setReady(final boolean ready) {
+        this.ready = ready;
     }
 
     public View getRootView() {

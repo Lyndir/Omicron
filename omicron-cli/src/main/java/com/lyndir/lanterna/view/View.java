@@ -39,9 +39,10 @@ public class View {
 
     private final List<View> children = new LinkedList<>();
     private View parent;
-    private Box   measuredBoxInParent = new Box();
-    private Inset padding             = new Inset();
-    private Inset margin              = new Inset();
+    private Box   oldMaximumMeasuredBoxInParent = new Box();
+    private Box   measuredBoxInParent           = new Box();
+    private Inset padding                       = new Inset();
+    private Inset margin                        = new Inset();
     private Terminal.Color backgroundColor;
     private Terminal.Color backgroundPatternColor;
     private String         backgroundPattern;
@@ -49,26 +50,22 @@ public class View {
     private Terminal.Color infoBackgroundColor;
     private Theme          theme;
 
-    public final void measure(final Screen screen) {
-        measureInParent( screen );
+    public final void measure(final Screen screen, final Box maximumMeasuredBoxInParent) {
+        boolean maximumMeasuredBoxChanged = !maximumMeasuredBoxInParent.equals( oldMaximumMeasuredBoxInParent );
+        measuredBoxInParent = measureInParent( screen, maximumMeasuredBoxInParent, maximumMeasuredBoxChanged );
         measureChildren( screen );
-        //logger.dbg( "measured: %s: %s", getClass().getSimpleName(), getMeasuredBoxOnScreen() );
-
-        for (final View child : getChildren())
-            child.measure( screen );
     }
 
-    protected void measureInParent(final Screen screen) {
-        if (getParent().isPresent())
-            measuredBoxInParent = getParent().get().getMeasuredBoxForChild( this );
-        else
-            measuredBoxInParent = new Box( 0, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows(), 0 );
+    protected Box measureInParent(final Screen screen, final Box maximumMeasuredBoxInParent, final boolean maximumMeasuredBoxChanged) {
+        return maximumMeasuredBoxInParent;
     }
 
     protected void measureChildren(final Screen screen) {
+        for (final View child : getChildren())
+            child.measure( screen, measuredBoxForChildInView( child ) );
     }
 
-    protected Box getMeasuredBoxForChild(final View child) {
+    protected Box measuredBoxForChildInView(final View child) {
         return new Box( 0, getMeasuredBoxInParent().getSize().getWidth(), getMeasuredBoxInParent().getSize().getHeight(), 0 );
     }
 
@@ -143,6 +140,12 @@ public class View {
      */
     protected boolean onKey(final Key key) {
         return false;
+    }
+
+    /**
+     * The view hierarchy has been fully measured for the first time.
+     */
+    protected void onReady() {
     }
 
     @Nonnull

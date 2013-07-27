@@ -32,13 +32,12 @@ public class OmicronWindow extends Window {
     }
 
     @Override
-    protected void onStartup() {
-        super.onStartup();
+    protected void onReady() {
+        super.onReady();
 
-        OmicronCLI omicron = OmicronCLI.get();
-        new BuildCommand( omicron ).game( ImmutableList.<String>of().iterator() );
-        new AddGameCommand( omicron ).player( ImmutableList.of( "Simon,red,red" ).iterator() );
-        new CreateCommand( omicron ).game( ImmutableList.<String>of().iterator() );
+        new BuildCommand( OmicronCLI.get() ).game( ImmutableList.<String>of().iterator() );
+        new AddGameCommand( OmicronCLI.get() ).player( ImmutableList.of( "Simon,red,red" ).iterator() );
+        new CreateCommand( OmicronCLI.get() ).game( ImmutableList.<String>of().iterator() );
     }
 
     @Override

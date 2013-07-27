@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import org.reflections.Reflections;
+import org.slf4j.helpers.BasicMarkerFactory;
 
 
 /**
@@ -17,8 +18,10 @@ import org.reflections.Reflections;
  */
 public abstract class Command {
 
-    static final Logger      logger             = Logger.get( Command.class );
-    static final Reflections packageReflections = new Reflections( Command.class.getPackage().getName() );
+    static final         Logger             logger             = Logger.get( Command.class );
+    static final         Reflections        packageReflections = new Reflections( Command.class.getPackage().getName() );
+
+    private static final BasicMarkerFactory markers            = new BasicMarkerFactory();
 
     private final OmicronCLI omicron;
 
@@ -79,17 +82,17 @@ public abstract class Command {
 
     protected void dbg(final String format, final Object... args) {
 
-        omicron.getLog().add( String.format( "[DBG] %s", commandPrefix() ) + String.format( format, args ) );
+        logger.dbg( markers.getMarker( commandPrefix() ), null, format, args );
     }
 
     protected void inf(final String format, final Object... args) {
 
-        omicron.getLog().add( commandPrefix() + String.format( format, args ) );
+        logger.inf( markers.getMarker( commandPrefix() ), null, format, args );
     }
 
     protected void err(final String format, final Object... args) {
 
-        omicron.getLog().add( String.format( "[ERR] %s", commandPrefix() ) + String.format( format, args ) );
+        logger.err( markers.getMarker( commandPrefix() ), null, format, args );
     }
 
     private String commandPrefix() {

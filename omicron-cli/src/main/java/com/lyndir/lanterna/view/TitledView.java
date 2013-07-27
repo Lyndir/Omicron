@@ -48,8 +48,8 @@ public class TitledView extends View {
     }
 
     @Override
-    protected Box getMeasuredBoxForChild(final View child) {
-        return super.getMeasuredBoxForChild( child ).shrink( new Inset( 1, 0, 0, 0 ) );
+    protected Box measuredBoxForChildInView(final View child) {
+        return super.measuredBoxForChildInView( child ).shrink( new Inset( 1, 0, 0, 0 ) );
     }
 
     @Override

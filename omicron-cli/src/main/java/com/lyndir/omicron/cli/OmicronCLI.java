@@ -1,5 +1,7 @@
 package com.lyndir.omicron.cli;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lanterna.view.OmicronWindow;
@@ -9,6 +11,7 @@ import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.api.model.PlayerKey;
 import java.util.*;
 import javax.annotation.Nonnull;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -31,6 +34,14 @@ public class OmicronCLI {
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments)
             throws Exception {
+
+        // Attach the omicron command log appender to logback.
+        LoggerContext logbackFactory = (LoggerContext) LoggerFactory.getILoggerFactory();
+        OmicronCLIAppender newAppender = new OmicronCLIAppender();
+        newAppender.setContext( logbackFactory );
+        Logger logger = logbackFactory.getLogger( Logger.ROOT_LOGGER_NAME );
+        logger.addAppender( newAppender );
+        newAppender.start();
 
         new OmicronWindow().start();
     }

@@ -47,8 +47,6 @@ public class LinearView extends View {
 
     @Override
     protected void measureChildren(final Screen screen) {
-        super.measureChildren( screen );
-
         // Calculate the amount of undesired space and the amount of dynamic views to divvy that space up for.
         int totalDesiredSpace = 0, amountDynamicViews = 0;
         for (final View child : getChildren()) {
@@ -59,15 +57,15 @@ public class LinearView extends View {
                 ++amountDynamicViews;
         }
         int totalRemainingSpace = getContentBoxOnScreen().getSize().getHeight() - totalDesiredSpace;
-//        logger.dbg( "totalDesiredSpace: %s, amountDynamicViews: %s, totalRemainingSpace: %s, contentBox: %s", totalDesiredSpace,
-//                    amountDynamicViews, totalRemainingSpace, getContentBoxOnScreen() );
+        //        logger.dbg( "totalDesiredSpace: %s, amountDynamicViews: %s, totalRemainingSpace: %s, contentBox: %s", totalDesiredSpace,
+        //                    amountDynamicViews, totalRemainingSpace, getContentBoxOnScreen() );
 
         // Determine the offset for each child depending on its desired or allocated space.
         int offset = 0;
         measuredChildOffsets.clear();
         for (final View child : getChildren()) {
             measuredChildOffsets.add( offset );
-//            logger.dbg( "offset for %s: %s", child.getClass().getSimpleName(), offset );
+            //logger.dbg( "offset for %s: %s", child.getClass().getSimpleName(), offset );
 
             Optional<?> desiredSpace = child.layoutValue( Parameters.DESIRED_SPACE );
             if (desiredSpace.isPresent())
@@ -75,10 +73,13 @@ public class LinearView extends View {
             else
                 offset += totalRemainingSpace / amountDynamicViews;
         }
+
+        // Measure the children.
+        super.measureChildren( screen );
     }
 
     @Override
-    protected Box getMeasuredBoxForChild(final View child) {
+    protected Box measuredBoxForChildInView(final View child) {
         int childIndex = getChildren().indexOf( child );
         int childOffset = measuredChildOffsets.get( childIndex );
         int newChildIndex = childIndex + 1;
