@@ -1,10 +1,11 @@
 package com.lyndir.omicron.api.controller;
 
-import static org.testng.Assert.assertEquals;
+import static com.lyndir.omicron.api.util.TestUtils.*;
+import static org.testng.Assert.*;
 
 import com.lyndir.lhunath.opal.system.logging.Logger;
-import com.lyndir.omicron.api.model.*;
-import com.lyndir.omicron.api.util.TestUtils;
+import com.lyndir.omicron.api.model.ResourceType;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
@@ -15,6 +16,12 @@ public class ExtractorModuleTest {
 
     static final Logger logger = Logger.get( ExtractorModuleTest.class );
 
+    @BeforeMethod
+    public void setUp()
+            throws Exception {
+        init();
+    }
+
     @Test
     public void testOnNewTurn()
             throws Exception {
@@ -22,8 +29,8 @@ public class ExtractorModuleTest {
         // Create an extractor unit on a tile with fuel.
         ExtractorModule extractorModule = new ExtractorModule( ResourceType.FUEL, 5 );
         ContainerModule unconnectedContainerModule = new ContainerModule( ResourceType.FUEL, 3 );
-        TestUtils.createObjectForModules( 0, 0, extractorModule );
-        TestUtils.createObjectForModules( 3, 0, unconnectedContainerModule );
+        createUnit( testUnitType( extractorModule ), 0, 0 );
+        createUnit( testUnitType( unconnectedContainerModule ), 3, 0 );
         extractorModule.getGameObject().getLocation().setResourceQuantity( ResourceType.FUEL, 10 );
 
         // There is no connected container yet, mining should fail.
@@ -33,7 +40,7 @@ public class ExtractorModuleTest {
 
         // Create a connected container unit.
         ContainerModule smallConnectedContainerModule = new ContainerModule( ResourceType.FUEL, 3 );
-        TestUtils.createObjectForModules( 1, 0, smallConnectedContainerModule );
+        createUnit( testUnitType( smallConnectedContainerModule ), 1, 0 );
 
         // Now we should be able to mine enough to fill the container.
         assertEquals( smallConnectedContainerModule.getAvailable(), 3 );
@@ -46,7 +53,7 @@ public class ExtractorModuleTest {
 
         // Create a bigger connected container unit.
         ContainerModule bigConnectedContainerModule = new ContainerModule( ResourceType.FUEL, 15 );
-        TestUtils.createObjectForModules( 0, 1, bigConnectedContainerModule );
+        createUnit( testUnitType( bigConnectedContainerModule ), 0, 1 );
 
         // Now we should be able to mine enough to max out the extractor's speed and then empty the tile.
         assertEquals( smallConnectedContainerModule.getAvailable(), 0 );

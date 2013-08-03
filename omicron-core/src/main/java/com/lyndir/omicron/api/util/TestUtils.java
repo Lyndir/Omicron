@@ -1,10 +1,9 @@
 package com.lyndir.omicron.api.util;
 
-import com.lyndir.omicron.api.controller.GameObjectController;
+import com.google.common.collect.Lists;
 import com.lyndir.omicron.api.controller.Module;
 import com.lyndir.omicron.api.model.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 
 
 /**
@@ -12,46 +11,56 @@ import javax.annotation.Nullable;
  */
 public abstract class TestUtils {
 
-    public static final Game   staticGame;
-    public static final Player staticPlayer;
+    public static Game   staticGame;
+    public static Player staticPlayer;
 
     static {
-        // Make a new game and player.
+        init();
+    }
+
+    public static void init() {
         Game.Builder builder = Game.builder();
         staticPlayer = new Player( builder.nextPlayerID(), new PlayerKey(), "testPlayer", Color.Template.randomColor(),
                                    Color.Template.randomColor() );
+        builder.setResourceConfig( Game.GameResourceConfigs.NONE );
+        builder.setUnitConfig( Game.GameUnitConfigs.NONE );
         builder.getPlayers().add( staticPlayer );
         staticGame = builder.build();
     }
 
-    public static PlayerObject createObjectForModules(final Module... modules) {
-
-        return createObjectForModules( 0, 0, modules );
-    }
-
-    public static PlayerObject createObjectForModules(final int u, final int v, final Module... modules) {
-
-        return createObjectForModules( staticGame, staticPlayer, u, v, modules );
-    }
-
-    public static PlayerObject createObjectForModules(final Game game, final Player player, final int u, final int v,
-                                                      final Module... modules) {
-
-        // Create and assign a game object to each module.
-        Tile location = game.getLevel( LevelType.GROUND ).getTile( u, v ).get();
-        return new PlayerObject( "TestGameObject", player, location, modules ) {
-            @Nonnull
+    public static UnitType testUnitType(final Module... modules) {
+        return new UnitType() {
             @Override
-            public GameObjectController<? extends GameObject> getController() {
+            public String getTypeName() {
+                return "Test Unit";
+            }
 
-                return new GameObjectController<GameObject>( this ) {
-                    @Nullable
-                    @Override
-                    public Player getPlayer() {
-                        return null;
-                    }
-                };
+            @Override
+            public int getComplexity() {
+                return 0;
+            }
+
+            @Override
+            public List<Module> createModules() {
+                return Lists.newArrayList( modules );
+            }
+
+            @Override
+            public String toString() {
+                return String.format( "{%s: %s}", getTypeName(), createModules() );
             }
         };
+    }
+
+    public static PlayerObject createUnit(final UnitType unitType) {
+        return createUnit( unitType, 0, 0 );
+    }
+
+    public static PlayerObject createUnit(final UnitType unitType, final int u, final int v) {
+        return createUnit( unitType, staticGame, staticPlayer, u, v );
+    }
+
+    public static PlayerObject createUnit(final UnitType unitType, final Game game, final Player player, final int u, final int v) {
+        return new PlayerObject( unitType, player, game.getLevel( LevelType.GROUND ).getTile( u, v ).get() );
     }
 }

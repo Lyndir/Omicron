@@ -80,6 +80,6 @@ public class ListCommand extends Command {
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
                  gameObject.getObjectID(), ifNotNullElse( Player.class, gameObject.getPlayer(), "-" ).getName(),
                  gameObject.getLocation().getLevel().getType().getName(), gameObject.getLocation().getPosition().getU(),
-                 gameObject.getLocation().getPosition().getV(), gameObject.getTypeName() );
+                 gameObject.getLocation().getPosition().getV(), gameObject.getType().getTypeName() );
     }
 }

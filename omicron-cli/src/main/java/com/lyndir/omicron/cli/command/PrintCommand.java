@@ -58,7 +58,7 @@ public class PrintCommand extends Command {
             Optional<GameObject> contents = tile.getContents();
             char contentsChar;
             if (contents.isPresent())
-                contentsChar = contents.get().getTypeName().charAt( 0 );
+                contentsChar = contents.get().getType().getTypeName().charAt( 0 );
             else
                 contentsChar = levelCharacters.get( tile.getLevel().getClass() );
 

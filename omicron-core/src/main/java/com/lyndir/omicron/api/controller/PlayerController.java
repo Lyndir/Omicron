@@ -103,7 +103,7 @@ public class PlayerController implements GameObserver {
     public void onNewTurn(final GameController gameController) {
 
         for (final GameObject gameObject : player.getObjects())
-            gameObject.getController().newTurn();
+            gameObject.getController().onNewTurn();
 
         if (player.isKeyLess())
             gameController.setReady( player );

@@ -30,40 +30,20 @@ public class Game extends MetaObject {
 
     private final ImmutableList<Level>  levels;
     private final ImmutableList<Player> players;
-    private final Set<Player>           readyPlayers = new HashSet<>();
+    private final Set<Player> readyPlayers = new HashSet<>();
     private boolean running;
 
-    private Game(final Size worldSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig) {
+    private Game(final Size worldSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig,
+                 final GameUnitConfig unitConfig) {
 
         levels = ImmutableList.of( new GroundLevel( worldSize, this ), new SkyLevel( worldSize, this ), new SpaceLevel( worldSize, this ) );
         this.players = players;
         currentTurn = new Turn();
+        gameController = new GameController( this );
 
         // Give each player some units.
-        for (final Player player : players) {
-            // Find tiles for the units.
-            Tile startTileEngineer, startTileAirship, startTileScout;
-            do {
-                Level ground = getLevel( LevelType.GROUND );
-                startTileEngineer = ground.getTile( RANDOM.nextInt( ground.getSize().getWidth() ),
-                                                    RANDOM.nextInt( ground.getSize().getHeight() ) ).get();
-
-                Level sky = getLevel( LevelType.SKY );
-                Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
-                startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
-
-                randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
-                startTileScout = startTileEngineer.neighbour( randomSide );
-            }
-            while (startTileEngineer.getContents().isPresent() || //
-                   startTileAirship.getContents().isPresent() || //
-                   startTileScout.getContents().isPresent());
-
-            // Add the units.
-            player.getController().addObject( new Engineer( startTileEngineer, player ) );
-            player.getController().addObject( new Airship( startTileAirship, player ) );
-            player.getController().addObject( new Scout( startTileScout, player ) );
-        }
+        for (final Player player : players)
+            unitConfig.addUnits( this, player );
 
         // Add resources to the tiles.
         // Figure out how many resources we're distributing for each of the resource types supported by our levels.
@@ -122,9 +102,6 @@ public class Game extends MetaObject {
                 }
             }
         }
-
-        // Start the game.
-        gameController = new GameController( this );
     }
 
     public static Builder builder() {
@@ -188,6 +165,7 @@ public class Game extends MetaObject {
         private int                nextPlayerID   = 1;
         private int                totalPlayers   = 4;
         private GameResourceConfig resourceConfig = GameResourceConfigs.PLENTY;
+        private GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
 
         public Game build() {
 
@@ -200,7 +178,7 @@ public class Game extends MetaObject {
                     players.add( randomPlayer );
             }
 
-            return new Game( worldSize, ImmutableList.copyOf( players ), resourceConfig );
+            return new Game( worldSize, ImmutableList.copyOf( players ), resourceConfig, unitConfig );
         }
 
         public Size getWorldSize() {
@@ -245,6 +223,14 @@ public class Game extends MetaObject {
             this.resourceConfig = resourceConfig;
         }
 
+        public GameUnitConfig getUnitConfig() {
+            return unitConfig;
+        }
+
+        public void setUnitConfig(final GameUnitConfig unitConfig) {
+            this.unitConfig = unitConfig;
+        }
+
         public int nextPlayerID() {
 
             return nextPlayerID++;
@@ -259,6 +245,12 @@ public class Game extends MetaObject {
         int quantityPerTile(ResourceType resourceType);
 
         int puddleSize(ResourceType resourceType);
+    }
+
+
+    public interface GameUnitConfig {
+
+        void addUnits(Game game, Player player);
     }
 
 
@@ -297,5 +289,41 @@ public class Game extends MetaObject {
             return puddleSize;
         }
 
+    }
+
+
+    public enum GameUnitConfigs implements GameUnitConfig {
+        NONE {
+            @Override
+            public void addUnits(final Game game, final Player player) {
+            }
+        },
+        BASIC {
+            @Override
+            public void addUnits(final Game game, final Player player) {
+                // Find tiles for the units.
+                Tile startTileEngineer, startTileAirship, startTileScout;
+                do {
+                    Level ground = game.getLevel( LevelType.GROUND );
+                    startTileEngineer = ground.getTile( RANDOM.nextInt( ground.getSize().getWidth() ),
+                                                        RANDOM.nextInt( ground.getSize().getHeight() ) ).get();
+
+                    Level sky = game.getLevel( LevelType.SKY );
+                    Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
+                    startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
+
+                    randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
+                    startTileScout = startTileEngineer.neighbour( randomSide );
+                }
+                while (startTileEngineer.getContents().isPresent() || //
+                       startTileAirship.getContents().isPresent() || //
+                       startTileScout.getContents().isPresent());
+
+                // Add the units.
+                player.getController().addObject( new PlayerObject( UnitTypes.ENGINEER, player, startTileEngineer ) );
+                player.getController().addObject( new PlayerObject( UnitTypes.AIRSHIP, player, startTileAirship ) );
+                player.getController().addObject( new PlayerObject( UnitTypes.SCOUT, player, startTileScout ) );
+            }
+        }
     }
 }

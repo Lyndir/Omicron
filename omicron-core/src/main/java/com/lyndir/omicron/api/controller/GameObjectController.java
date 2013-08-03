@@ -32,7 +32,7 @@ public abstract class GameObjectController<O extends GameObject> implements Game
         return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles( currentPlayer );
     }
 
-    public void newTurn() {
+    public void onNewTurn() {
 
         for (final Module module : getGameObject().listModules())
             module.onNewTurn();

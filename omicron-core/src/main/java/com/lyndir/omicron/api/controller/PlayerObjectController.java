@@ -3,9 +3,9 @@ package com.lyndir.omicron.api.controller;
 import com.lyndir.omicron.api.model.*;
 
 
-public abstract class PlayerObjectController<O extends GameObject> extends GameObjectController<O> {
+public class PlayerObjectController<O extends GameObject> extends GameObjectController<O> {
 
-    protected PlayerObjectController(final O gameObject) {
+    public PlayerObjectController(final O gameObject) {
 
         super( gameObject );
     }

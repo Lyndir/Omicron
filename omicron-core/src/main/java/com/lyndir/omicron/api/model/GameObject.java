@@ -18,23 +18,22 @@ import javax.annotation.Nullable;
  */
 public abstract class GameObject extends MetaObject implements GameObserver {
 
-    private final String                              typeName;
+    private final UnitType                            unitType;
     private final int                                 objectID;
     private final ListMultimap<ModuleType<?>, Module> modules;
     private       Tile                                location;
 
-    protected GameObject(final String typeName, final int objectID, final Tile location, final Module... modules) {
-
-        this.typeName = typeName;
+    protected GameObject(final UnitType unitType, final int objectID, final Tile location) {
+        this.unitType = unitType;
         this.objectID = objectID;
         this.location = location;
 
         ImmutableListMultimap.Builder<ModuleType<?>, Module> modulesBuilder = ImmutableListMultimap.builder();
-        for (final Module module : modules) {
+        for (final Module module : unitType.createModules()) {
             modulesBuilder.put( module.getType(), module );
             module.setGameObject( this );
         }
-        this.modules = modulesBuilder.build();
+        modules = modulesBuilder.build();
 
         location.setContents( this );
     }
@@ -78,9 +77,9 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         this.location = location;
     }
 
-    public String getTypeName() {
+    public UnitType getType() {
 
-        return typeName;
+        return unitType;
     }
 
     /**

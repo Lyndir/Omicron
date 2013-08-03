@@ -121,7 +121,7 @@ public class MapView extends View {
                             bgColor = resourceTypeColors.get( resourceType );
                 }
 
-                screen.putString( x + (y % 2 == 0? 0: 1), y, contents.isPresent()? contents.get().getTypeName().substring( 0, 1 ): " ",
+                screen.putString( x + (y % 2 == 0? 0: 1), y, contents.isPresent()? contents.get().getType().getTypeName().substring( 0, 1 ): " ",
                                   getMapColor(), bgColor, ScreenCharacterStyle.Bold );
             }
 
