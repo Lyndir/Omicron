@@ -1,5 +1,7 @@
 package com.lyndir.omicron.cli.command;
 
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
@@ -50,6 +52,7 @@ public class FireCommand extends Command {
             inf( "    objectID: The ID of the object to fire with (see list objects)." );
             inf( "          dU: The delta from the current position's u to the target u." );
             inf( "          dV: The delta from the current position's v to the target v." );
+            inf( "      weapon: The index of the weapon to fire with (optional, default=0 (primary))." );
             inf( "       level: The level into which to target the weapon (optional, default=current)." );
             return;
         }
@@ -77,7 +80,15 @@ public class FireCommand extends Command {
         }
         GameObject gameObject = optionalObject.get();
 
-        final String levelArgument = Iterators.getNext( tokens, gameObject.getLocation().getLevel().getType().getName() );
+        String weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
+        Optional<Integer> optionalWeaponIndex = ConversionUtils.toInteger( weaponIndexOrLevelArgument );
+        int weaponIndex = 0;
+        if (optionalWeaponIndex.isPresent()) {
+            weaponIndex = optionalWeaponIndex.get();
+            weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
+        }
+
+        final String levelArgument = ifNotNullElse( weaponIndexOrLevelArgument, gameObject.getLocation().getLevel().getType().getName() );
         Optional<Level> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<Level>() {
             @Override
             public boolean apply(final Level input) {
@@ -91,9 +102,12 @@ public class FireCommand extends Command {
         }
 
         // Check to see if it's mobile by finding its mobility module.
-        Optional<WeaponModule> optionalWeapon = gameObject.getModule( WeaponModule.class );
+        Optional<WeaponModule> optionalWeapon = gameObject.getModule( ModuleType.WEAPON, weaponIndex );
         if (!optionalWeapon.isPresent()) {
-            err( "Object has no weapons: %s", gameObject );
+            if (weaponIndex == 0)
+                err( "Object has no weapons: %s", gameObject );
+            else
+                err( "Object has no weapon at index %d: %s", weaponIndex, gameObject );
             return;
         }
         WeaponModule weaponModule = optionalWeapon.get();

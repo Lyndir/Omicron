@@ -59,4 +59,9 @@ public class ContainerModule extends Module {
     public void onNewTurn() {
 
     }
+
+    @Override
+    public ModuleType<?> getType() {
+        return ModuleType.CONTAINER;
+    }
 }

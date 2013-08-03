@@ -77,7 +77,7 @@ public class WeaponModule extends Module {
 
         Optional<GameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())
-            targetGameObject.get().onModule( BaseModule.class ).addDamage( firePower + RANDOM.nextInt( variance ) );
+            targetGameObject.get().onModule( ModuleType.BASE, 0 ).addDamage( firePower + RANDOM.nextInt( variance ) );
 
         ++repeated;
         --ammunition;
@@ -87,5 +87,10 @@ public class WeaponModule extends Module {
     public void onNewTurn() {
 
         repeated = 0;
+    }
+
+    @Override
+    public ModuleType<WeaponModule> getType() {
+        return ModuleType.WEAPON;
     }
 }

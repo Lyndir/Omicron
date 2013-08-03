@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.controller.GameObjectController;
 import com.lyndir.omicron.api.controller.Module;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,7 +20,7 @@ public abstract class GameObject extends MetaObject implements GameObserver {
 
     private final String                              typeName;
     private final int                                 objectID;
-    private final ImmutableClassToInstanceMap<Module> modules;
+    private final ListMultimap<ModuleType<?>, Module> modules;
     private       Tile                                location;
 
     protected GameObject(final String typeName, final int objectID, final Tile location, final Module... modules) {
@@ -28,10 +29,9 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         this.objectID = objectID;
         this.location = location;
 
-        ImmutableClassToInstanceMap.Builder<Module> modulesBuilder = ImmutableClassToInstanceMap.builder();
+        ImmutableListMultimap.Builder<ModuleType<?>, Module> modulesBuilder = ImmutableListMultimap.builder();
         for (final Module module : modules) {
-            //noinspection unchecked
-            modulesBuilder.put( (Class<Module>) module.getClass(), module );
+            modulesBuilder.put( module.getType(), module );
             module.setGameObject( this );
         }
         this.modules = modulesBuilder.build();
@@ -83,9 +83,33 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         return typeName;
     }
 
-    public <M extends Module> Optional<M> getModule(final Class<M> moduleType) {
+    /**
+     * Get this object's module of the given type at the given index.
+     *
+     * @param moduleType The type of module to get.
+     * @param index      The index of the module.
+     * @param <M>        The type of the module.
+     *
+     * @return The module of the given type at the given index.
+     */
+    public <M extends Module> Optional<M> getModule(final ModuleType<M> moduleType, final int index) {
 
-        return Optional.fromNullable( modules.getInstance( moduleType ) );
+        return Optional.fromNullable( Iterables.get( getModules( moduleType ), index, null ) );
+    }
+
+    /**
+     * Get this object's modules of the given type.
+     *
+     * @param moduleType The type of module to get.
+     * @param <M>        The type of the module.
+     *
+     * @return A list of modules of the given type or an empty list if there are none.
+     */
+    @SuppressWarnings("unchecked")
+    public <M extends Module> List<M> getModules(final ModuleType<M> moduleType) {
+
+        // Checked by Module's constructor.
+        return (List<M>) modules.get( moduleType );
     }
 
     /**
@@ -97,9 +121,9 @@ public abstract class GameObject extends MetaObject implements GameObserver {
      *
      * @return A proxy object that you can run your method on.
      */
-    public <M extends Module> M onModuleElse(final Class<M> moduleType, @Nullable final Object elseValue) {
+    public <M extends Module> M onModuleElse(final ModuleType<M> moduleType, final int index, @Nullable final Object elseValue) {
 
-        return ObjectUtils.ifNotNullElse( moduleType, getModule( moduleType ).orNull(), elseValue );
+        return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orNull(), elseValue );
     }
 
     /**
@@ -111,9 +135,9 @@ public abstract class GameObject extends MetaObject implements GameObserver {
      *
      * @return A proxy object that you can run your method on.
      */
-    public <M extends Module> M onModule(final Class<M> moduleType) {
+    public <M extends Module> M onModule(final ModuleType<M> moduleType, final int index) {
 
-        return onModuleElse( moduleType, null );
+        return onModuleElse( moduleType, index, null );
     }
 
     public ImmutableCollection<Module> listModules() {

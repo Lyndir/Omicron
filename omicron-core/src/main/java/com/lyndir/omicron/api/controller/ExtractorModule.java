@@ -50,16 +50,17 @@ public class ExtractorModule extends Module {
         PredicateNN<GameObject> foundFunction = new PredicateNN<GameObject>() {
             @Override
             public boolean apply(@Nonnull final GameObject input) {
+                for (final ContainerModule containerModule : input.getModules( ModuleType.CONTAINER ))
+                    if (containerModule.getAvailable() > 0)
+                        return true;
 
-                Optional<ContainerModule> container = input.getModule( ContainerModule.class );
-                return container.isPresent() && container.get().getAvailable() > 0;
+                return false;
             }
         };
         NNFunctionNN<PathUtils.Step<GameObject>, Double> costFunction = new NNFunctionNN<PathUtils.Step<GameObject>, Double>() {
             @Nonnull
             @Override
             public Double apply(@Nonnull final PathUtils.Step<GameObject> input) {
-
                 return 1d;
             }
         };
@@ -67,18 +68,14 @@ public class ExtractorModule extends Module {
             @Nonnull
             @Override
             public Iterable<GameObject> apply(@Nonnull final GameObject input) {
-
-                Iterable<Tile> neighbours = input.getLocation().neighbours();
-                FluentIterable<GameObject> neighbourcontents = FluentIterable.from( neighbours ).transform( new NFunctionNN<Tile, GameObject>() {
+                return FluentIterable.from( input.getLocation().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
                     @Nullable
                     @Override
                     public GameObject apply(@Nonnull final Tile input) {
 
                         return input.getContents().orNull();
                     }
-                } );
-                logger.dbg( "At %s, neighbour contents: %s", input.getLocation(), neighbourcontents);
-                return neighbourcontents.filter( Predicates.notNull() );
+                } ).filter( Predicates.notNull() );
             }
         };
 
@@ -86,15 +83,12 @@ public class ExtractorModule extends Module {
         while (minedResources > 0) {
             Optional<PathUtils.Path<GameObject>> path = PathUtils.find( getGameObject(), foundFunction, costFunction,
                                                                         MAX_DISTANCE_TO_CONTAINER, neighboursFunction );
-            if (!path.isPresent()) {
+            if (!path.isPresent())
                 // No more containers with available capacity.
-                logger.trc( "no more available containers." );
                 break;
-            }
 
-            int stockedResources = path.get().getTarget().getModule( ContainerModule.class ).get().addStock( minedResources );
-            minedResources -= stockedResources;
-            logger.trc( "stocked: %d %s (remaining unstocked: %d)", stockedResources, resourceType, minedResources );
+            for (final ContainerModule containerModule : path.get().getTarget().getModules( ModuleType.CONTAINER ))
+                minedResources -= containerModule.addStock( minedResources );
         }
 
         // If we have minedResources left that we weren't able to stock, put them back in the tile (ie. don't extract them).
@@ -103,5 +97,10 @@ public class ExtractorModule extends Module {
         // Update the amount of resources left in the tile after this turn's extraction.
         location.setResourceQuantity( resourceType, newAvailableResources );
         logger.trc( "unstocked resources: %d %s, left in tile: %d", minedResources, resourceType, newAvailableResources );
+    }
+
+    @Override
+    public ModuleType<?> getType() {
+        return ModuleType.EXTRACTOR;
     }
 }

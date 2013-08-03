@@ -81,7 +81,7 @@ public class MoveCommand extends Command {
         GameObject gameObject = optionalObject.get();
 
         // Check to see if it's mobile by finding its mobility module.
-        Optional<MobilityModule> optionalMobility = gameObject.getModule( MobilityModule.class );
+        Optional<MobilityModule> optionalMobility = gameObject.getModule( ModuleType.MOBILITY, 0 );
         if (!optionalMobility.isPresent()) {
             err( "Object is not mobile: %s", gameObject );
             return;

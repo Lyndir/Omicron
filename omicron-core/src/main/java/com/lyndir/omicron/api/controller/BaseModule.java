@@ -8,6 +8,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
+// TODO: Should this module's logic be moved to GameObjectController?
+// TODO: It uniquely describes a game object and can exist only once and lots of external code assumes there is one and only one...
 public class BaseModule extends Module implements GameObserver {
 
     private final int            maxHealth;
@@ -82,6 +84,11 @@ public class BaseModule extends Module implements GameObserver {
     @Override
     public void onNewTurn() {
 
+    }
+
+    @Override
+    public ModuleType<?> getType() {
+        return ModuleType.BASE;
     }
 
     public void addDamage(final int incomingDamage) {

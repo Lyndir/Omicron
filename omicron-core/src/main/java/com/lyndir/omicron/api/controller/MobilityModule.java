@@ -226,6 +226,11 @@ public class MobilityModule extends Module {
         remainingSpeed = movementSpeed;
     }
 
+    @Override
+    public ModuleType<?> getType() {
+        return ModuleType.MOBILITY;
+    }
+
     public class Movement {
 
         private final Optional<Path<Tile>> path;

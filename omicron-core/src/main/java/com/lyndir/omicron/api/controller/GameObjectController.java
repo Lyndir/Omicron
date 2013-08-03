@@ -22,14 +22,14 @@ public abstract class GameObjectController<O extends GameObject> implements Game
     @Override
     public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
-        return getGameObject().onModuleElse( BaseModule.class, false ).canObserve( currentPlayer, location );
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, false ).canObserve( currentPlayer, location );
     }
 
     @Nonnull
     @Override
     public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
 
-        return getGameObject().onModuleElse( BaseModule.class, ImmutableList.of() ).listObservableTiles( currentPlayer );
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles( currentPlayer );
     }
 
     public void newTurn() {
