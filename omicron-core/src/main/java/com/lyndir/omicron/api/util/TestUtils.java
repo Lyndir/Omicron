@@ -29,16 +29,16 @@ public abstract class TestUtils {
         return createObjectForModules( 0, 0, modules );
     }
 
-    public static PlayerObject createObjectForModules(final int ui, final int vi, final Module... modules) {
+    public static PlayerObject createObjectForModules(final int u, final int v, final Module... modules) {
 
-        return createObjectForModules( staticGame, staticPlayer, ui, vi, modules );
+        return createObjectForModules( staticGame, staticPlayer, u, v, modules );
     }
 
     public static PlayerObject createObjectForModules(final Game game, final Player player, final int u, final int v,
                                                       final Module... modules) {
 
         // Create and assign a game object to each module.
-        Tile location = new Tile( u, v, game.getLevel( LevelType.GROUND ) );
+        Tile location = game.getLevel( LevelType.GROUND ).getTile( u, v ).get();
         return new PlayerObject( "TestGameObject", player, location, modules ) {
             @Nonnull
             @Override

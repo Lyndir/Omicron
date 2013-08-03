@@ -68,14 +68,17 @@ public class ExtractorModule extends Module {
             @Override
             public Iterable<GameObject> apply(@Nonnull final GameObject input) {
 
-                return FluentIterable.from( input.getLocation().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
+                Iterable<Tile> neighbours = input.getLocation().neighbours();
+                FluentIterable<GameObject> neighbourcontents = FluentIterable.from( neighbours ).transform( new NFunctionNN<Tile, GameObject>() {
                     @Nullable
                     @Override
                     public GameObject apply(@Nonnull final Tile input) {
 
                         return input.getContents().orNull();
                     }
-                } ).filter( Predicates.notNull() );
+                } );
+                logger.dbg( "At %s, neighbour contents: %s", input.getLocation(), neighbourcontents);
+                return neighbourcontents.filter( Predicates.notNull() );
             }
         };
 
