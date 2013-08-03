@@ -4,8 +4,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.omicron.api.model.*;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class BaseModule extends Module implements GameObserver {
@@ -25,7 +25,7 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @Override
-    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
+    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
         Player owner = getGameObject().getPlayer();
         if (owner != null && !owner.equals( currentPlayer ))
@@ -34,9 +34,9 @@ public class BaseModule extends Module implements GameObserver {
         return getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) <= viewRange;
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
 
         return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override

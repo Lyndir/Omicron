@@ -3,7 +3,7 @@ package com.lyndir.omicron.api.controller;
 import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.omicron.api.model.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 
 public class PlayerController implements GameObserver {
@@ -32,7 +32,7 @@ public class PlayerController implements GameObserver {
     }
 
     @Override
-    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
+    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
         return FluentIterable.from( player.getObjects() ).anyMatch( new Predicate<GameObject>() {
             @Override
@@ -43,9 +43,9 @@ public class PlayerController implements GameObserver {
         } );
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
 
         return FluentIterable.from( player.getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
             @Override

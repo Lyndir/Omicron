@@ -5,8 +5,8 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import com.lyndir.omicron.api.controller.PlayerController;
 import java.util.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -46,21 +46,21 @@ public class Player extends MetaObject implements GameObserver {
         this.secondaryColor = secondaryColor;
     }
 
-    @NotNull
+    @Nonnull
     public PlayerController getController() {
 
         return controller;
     }
 
     @Override
-    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
+    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
         return getController().canObserve( currentPlayer, location );
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
 
         return getController().listObservableTiles( currentPlayer );
     }

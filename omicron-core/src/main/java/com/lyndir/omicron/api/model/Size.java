@@ -2,8 +2,8 @@ package com.lyndir.omicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -37,7 +37,7 @@ public class Size extends MetaObject {
         return coordinate.getU() >= 0 && coordinate.getV() >= 0 && coordinate.getU() < width && coordinate.getV() < height;
     }
 
-    public static Size max(@Nullable final Size size1, @NotNull final Size size2) {
+    public static Size max(@Nullable final Size size1, @Nonnull final Size size2) {
 
         if (size1 == null)
             return size2;

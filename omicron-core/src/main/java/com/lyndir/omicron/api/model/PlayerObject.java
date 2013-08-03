@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.lyndir.omicron.api.controller.Module;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 
 /**
@@ -20,7 +20,7 @@ public abstract class PlayerObject extends GameObject {
         this.owner = owner;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public final Player getPlayer() {
 

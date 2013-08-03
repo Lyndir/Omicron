@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import java.util.*;
+import javax.annotation.Nonnull;
 
 
 public abstract class PathUtils {
@@ -30,32 +31,33 @@ public abstract class PathUtils {
             return Optional.of( new Path<>( root, 0 ) );
 
         // Initialize breath-first.
-        Set<E> tested = new HashSet<>();
-        Deque<Path<E>> toTest = new LinkedList<>();
-        toTest.addLast( new Path<>( root, 0 ) );
-        tested.add( root );
+        Set<E> testedNodes = new HashSet<>();
+        Deque<Path<E>> testPaths = new LinkedList<>();
+        testPaths.addLast( new Path<>( root, 0 ) );
+        testedNodes.add( root );
 
         // Search breath-first.
-        while (!toTest.isEmpty()) {
-            Path<E> test = toTest.removeFirst();
+        while (!testPaths.isEmpty()) {
+            Path<E> testPath = testPaths.removeFirst();
 
             // Check each neighbour.
-            for (final E neighbour : neighboursFunction.apply( test.getTarget() )) {
-                if (!tested.add( neighbour ))
+            for (final E neighbour : neighboursFunction.apply( testPath.getTarget() )) {
+                if (!testedNodes.add( neighbour ))
                     // Neighbour was already tested.
                     continue;
 
-                double neighbourCost = test.getCost() + costFunction.apply( new Step<>( test.getTarget(), neighbour ) );
+                double neighbourCost = testPath.getCost() + costFunction.apply( new Step<>( testPath.getTarget(), neighbour ) );
                 if (neighbourCost > maxCost)
                     // Stepping to neighbour from here would exceed maximum cost.
                     continue;
 
                 // Did we find the target?
+                Path<E> neighbourPath = new Path<>( testPath, neighbour, neighbourCost );
                 if (foundFunction.apply( neighbour ))
-                    return Optional.of( new Path<>( neighbour, neighbourCost ) );
+                    return Optional.of( neighbourPath );
 
                 // Neighbour is not the target, add it for testing its neighbours later.
-                toTest.add( new Path<>( neighbour, neighbourCost ) );
+                testPaths.add( neighbourPath );
             }
         }
 
@@ -66,7 +68,8 @@ public abstract class PathUtils {
      * A variation of the breath-first search from root which just enumerates all the objects around root.
      *
      * @param root               The object to start the search from.
-     * @param radius             The maximum distance of an object.  Any objects farther removed from the root than the radius are abandoned
+     * @param radius             The maximum distance of an object.  Any objects farther removed from the root than the radius are
+     *                           abandoned
      *                           and not included.
      * @param neighboursFunction The function that determines what an object's direct neighbours are.
      * @param <E>                The type of objects we're searching.
@@ -80,27 +83,27 @@ public abstract class PathUtils {
 
         // Initialize breath-first.
         Set<E> neighbours = new HashSet<>();
-        Deque<Path<E>> toTest = new LinkedList<>();
-        toTest.addLast( new Path<>( root, 0 ) );
+        Deque<Path<E>> testPaths = new LinkedList<>();
+        testPaths.addLast( new Path<>( root, 0 ) );
         neighbours.add( root );
 
         // Search breath-first.
-        while (!toTest.isEmpty()) {
-            Path<E> test = toTest.removeFirst();
+        while (!testPaths.isEmpty()) {
+            Path<E> testPath = testPaths.removeFirst();
 
             // Check each neighbour.
-            for (final E neighbour : neighboursFunction.apply( test.getTarget() )) {
+            for (final E neighbour : neighboursFunction.apply( testPath.getTarget() )) {
                 if (!neighbours.add( neighbour ))
                     // Neighbour was already tested.
                     continue;
 
-                double neighbourCost = test.getCost() + 1;
+                double neighbourCost = testPath.getCost() + 1;
                 if (neighbourCost > radius)
                     // Stepping to neighbour from here would exceed maximum cost.
                     continue;
 
                 // Add it for testing its neighbours later.
-                toTest.add( new Path<>( neighbour, neighbourCost ) );
+                testPaths.add( new Path<>( testPath, neighbour, neighbourCost ) );
             }
         }
 
@@ -109,22 +112,31 @@ public abstract class PathUtils {
 
     public static class Path<E> {
 
-        private final E      target;
-        private final double cost;
+        private final Optional<Path<E>> parent;
+        private final E                 target;
+        private final double            cost;
 
-        public Path(final E target, final double cost) {
-
+        Path(final E target, final double cost) {
+            parent = Optional.absent();
             this.target = target;
             this.cost = cost;
         }
 
-        public double getCost() {
+        Path(@Nonnull final Path<E> parent, final E target, final double cost) {
+            this.parent = Optional.of( parent );
+            this.target = target;
+            this.cost = cost;
+        }
 
+        public Optional<Path<E>> getParent() {
+            return parent;
+        }
+
+        public double getCost() {
             return cost;
         }
 
         public E getTarget() {
-
             return target;
         }
     }
@@ -135,19 +147,16 @@ public abstract class PathUtils {
         private final E from;
         private final E to;
 
-        public Step(final E from, final E to) {
-
+        Step(final E from, final E to) {
             this.from = from;
             this.to = to;
         }
 
         public E getFrom() {
-
             return from;
         }
 
         public E getTo() {
-
             return to;
         }
     }

@@ -6,8 +6,8 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.controller.GameObjectController;
 import com.lyndir.omicron.api.controller.Module;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -39,7 +39,7 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         location.setContents( this );
     }
 
-    @NotNull
+    @Nonnull
     public abstract GameObjectController<? extends GameObject> getController();
 
     @Nullable
@@ -51,14 +51,14 @@ public abstract class GameObject extends MetaObject implements GameObserver {
 
     @Override
     @SuppressWarnings("ParameterHidesMemberVariable")
-    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
+    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
         return getController().canObserve( currentPlayer, location );
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
 
         return getController().listObservableTiles( currentPlayer );
     }

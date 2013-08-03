@@ -7,8 +7,8 @@ import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.EnumMap;
 import java.util.Map;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -39,7 +39,7 @@ public class Tile extends MetaObject {
         this( new Coordinate( u, v, level.getSize() ), level );
     }
 
-    @NotNull
+    @Nonnull
     public Optional<GameObject> getContents() {
 
         return Optional.fromNullable( contents );
@@ -80,7 +80,7 @@ public class Tile extends MetaObject {
         return ifNotNullElse( resourceQuantities.get( resourceType ), 0 );
     }
 
-    @NotNull
+    @Nonnull
     public Tile neighbour(final Coordinate.Side side) {
 
         return level.getTile( getPosition().neighbour( side ) ).get();
@@ -95,7 +95,7 @@ public class Tile extends MetaObject {
         return neighbours.build();
     }
 
-    public boolean contains(@NotNull final GameObserver target) {
+    public boolean contains(@Nonnull final GameObserver target) {
 
         if (contents == null)
             return false;

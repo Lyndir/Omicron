@@ -3,7 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.internal.ImmutableMap;
 import com.lyndir.omicron.api.controller.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 
 public class Airship extends PlayerObject {
@@ -17,7 +17,7 @@ public class Airship extends PlayerObject {
                new MobilityModule( 2, ImmutableMap.of( LevelType.SKY, 1d ), ImmutableMap.<LevelType, Double>of() ) );
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public AirshipController getController() {
 

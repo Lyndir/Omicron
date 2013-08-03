@@ -3,7 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.omicron.api.controller.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 
 public class Scout extends PlayerObject {
@@ -18,7 +18,7 @@ public class Scout extends PlayerObject {
                new WeaponModule( 3, 3, 5, 3, 20, ImmutableSet.of( LevelType.GROUND ) ) );
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public ScoutController getController() {
 

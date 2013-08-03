@@ -4,15 +4,11 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 import static com.lyndir.omicron.api.util.PathUtils.*;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.model.*;
 import java.util.EnumMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.jetbrains.annotations.NotNull;
 
 
 public class MobilityModule extends Module {
@@ -145,14 +141,15 @@ public class MobilityModule extends Module {
      * @param currentPlayer The player ordering the action.
      * @param target        The side of the adjacent tile relative to the current.
      */
-    public boolean move(final Player currentPlayer, final Tile target) {
+    public Movement movement(final Player currentPlayer, final Tile target) {
 
         if (!currentPlayer.equals( getGameObject().getPlayer() ))
             // Cannot move object that doesn't belong to the current player.
-            return false;
+            return new Movement();
 
         if (!level( currentPlayer, target.getLevel().getType() ))
-            return false;
+            // Cannot move because we can't level to the target's level.
+            return new Movement();
 
         // Initialize cost calculation.
         Tile currentLocation = getGameObject().getLocation();
@@ -167,9 +164,9 @@ public class MobilityModule extends Module {
             }
         };
         NNFunctionNN<Step<Tile>, Double> costFunction = new NNFunctionNN<Step<Tile>, Double>() {
-            @NotNull
+            @Nonnull
             @Override
-            public Double apply(@NotNull final Step<Tile> input) {
+            public Double apply(@Nonnull final Step<Tile> input) {
 
                 if (!input.getTo().isAccessible())
                     return Double.MAX_VALUE;
@@ -178,25 +175,16 @@ public class MobilityModule extends Module {
             }
         };
         NNFunctionNN<Tile, Iterable<Tile>> neighboursFunction = new NNFunctionNN<Tile, Iterable<Tile>>() {
-            @NotNull
+            @Nonnull
             @Override
-            public Iterable<Tile> apply(@NotNull final Tile input) {
+            public Iterable<Tile> apply(@Nonnull final Tile input) {
 
                 return input.neighbours();
             }
         };
 
         // Find the path!
-        Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction );
-        if (!path.isPresent())
-            return false;
-
-        remainingSpeed -= path.get().getCost();
-        getGameObject().getLocation().setContents( null );
-        getGameObject().setLocation( path.get().getTarget() );
-        path.get().getTarget().setContents( getGameObject() );
-
-        return true;
+        return new Movement( find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction ) );
     }
 
     /**
@@ -236,5 +224,50 @@ public class MobilityModule extends Module {
     public void onNewTurn() {
 
         remainingSpeed = movementSpeed;
+    }
+
+    public class Movement {
+
+        private final Optional<Path<Tile>> path;
+
+        Movement() {
+            this( Optional.<Path<Tile>>absent() );
+        }
+
+        Movement(final Optional<Path<Tile>> path) {
+            this.path = path;
+        }
+
+        public boolean isPossible() {
+            return path.isPresent();
+        }
+
+        public boolean execute() {
+            // Check that we still have sufficient remaining speed.
+            if (path.get().getCost() > remainingSpeed)
+                return false;
+
+            // Check that the path can still be walked.
+            Path<Tile> tracePath = path.get();
+            do {
+                if (!tracePath.getTarget().isAccessible())
+                    // Path can no longer be walked.
+                    return false;
+                Optional<Path<Tile>> parent = tracePath.getParent();
+                if (!parent.isPresent())
+                    break;
+
+                tracePath = parent.get();
+            }
+            while (true);
+
+            // Execute the path.
+            remainingSpeed -= path.get().getCost();
+            getGameObject().getLocation().setContents( null );
+            getGameObject().setLocation( path.get().getTarget() );
+            path.get().getTarget().setContents( getGameObject() );
+
+            return true;
+        }
     }
 }

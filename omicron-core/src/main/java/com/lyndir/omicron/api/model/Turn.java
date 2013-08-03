@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class Turn {
@@ -16,7 +16,7 @@ public class Turn {
         number = 0;
     }
 
-    public Turn(@NotNull final Turn previousTurn) {
+    public Turn(@Nonnull final Turn previousTurn) {
 
         this.previousTurn = previousTurn;
         number = previousTurn.getNumber() + 1;

@@ -2,7 +2,7 @@ package com.lyndir.omicron.api.controller;
 
 import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.model.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 
 public abstract class GameObjectController<O extends GameObject> implements GameObserver {
@@ -20,14 +20,14 @@ public abstract class GameObjectController<O extends GameObject> implements Game
     }
 
     @Override
-    public boolean canObserve(@NotNull final Player currentPlayer, @NotNull final Tile location) {
+    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
         return getGameObject().onModuleElse( BaseModule.class, false ).canObserve( currentPlayer, location );
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@NotNull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
 
         return getGameObject().onModuleElse( BaseModule.class, ImmutableList.of() ).listObservableTiles( currentPlayer );
     }

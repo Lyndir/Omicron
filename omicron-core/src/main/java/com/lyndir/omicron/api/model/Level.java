@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.Map;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 
 /**

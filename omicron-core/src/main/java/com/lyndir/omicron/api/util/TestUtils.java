@@ -3,7 +3,8 @@ package com.lyndir.omicron.api.util;
 import com.lyndir.omicron.api.controller.GameObjectController;
 import com.lyndir.omicron.api.controller.Module;
 import com.lyndir.omicron.api.model.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -39,11 +40,17 @@ public abstract class TestUtils {
         // Create and assign a game object to each module.
         Tile location = new Tile( u, v, game.getLevel( LevelType.GROUND ) );
         return new PlayerObject( "TestGameObject", player, location, modules ) {
-            @NotNull
+            @Nonnull
             @Override
             public GameObjectController<? extends GameObject> getController() {
 
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
+                return new GameObjectController<GameObject>( this ) {
+                    @Nullable
+                    @Override
+                    public Player getPlayer() {
+                        return null;
+                    }
+                };
             }
         };
     }

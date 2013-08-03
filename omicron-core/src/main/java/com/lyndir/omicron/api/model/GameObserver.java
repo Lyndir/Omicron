@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -19,7 +19,7 @@ public interface GameObserver {
      *
      * @return true if the current player is allowed to know and the given tile is visible to this observer.
      */
-    boolean canObserve(@NotNull Player currentPlayer, @NotNull Tile location);
+    boolean canObserve(@Nonnull Player currentPlayer, @Nonnull Tile location);
 
     /**
      * Enumerate the tiles this observer can observe.
@@ -28,8 +28,8 @@ public interface GameObserver {
      *
      * @return All the tiles observable both by this observer and the current player.
      */
-    @NotNull
-    Iterable<Tile> listObservableTiles(@NotNull Player currentPlayer);
+    @Nonnull
+    Iterable<Tile> listObservableTiles(@Nonnull Player currentPlayer);
 
     @Nullable
     Player getPlayer();
