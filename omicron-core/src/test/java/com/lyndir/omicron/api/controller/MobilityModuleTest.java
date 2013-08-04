@@ -5,7 +5,6 @@ import static org.testng.AssertJUnit.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.lyndir.omicron.api.model.LevelType;
-import com.lyndir.omicron.api.util.TestUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

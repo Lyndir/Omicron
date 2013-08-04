@@ -98,7 +98,7 @@ public class ConstructorModule extends Module {
         private final UnitType constructionUnitType;
         private final Map<ModuleType<?>, Integer> remainingComplexity = Maps.newHashMap();
 
-        private ConstructionSite(final UnitType constructionUnitType, final Player owner, final Tile location) {
+        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Player owner, @Nonnull final Tile location) {
             super( UnitTypes.CONSTRUCTION, owner, location );
             this.constructionUnitType = constructionUnitType;
             for (final Module module : constructionUnitType.createModules())
@@ -106,7 +106,7 @@ public class ConstructorModule extends Module {
                                                            + constructionUnitType.getComplexity() );
         }
 
-        private int getRemainingComplexity(final ModuleType<?> moduleType) {
+        public int getRemainingComplexity(final ModuleType<?> moduleType) {
             return ifNotNullElse( remainingComplexity.get( moduleType ), 0 );
         }
 
@@ -150,14 +150,18 @@ public class ConstructorModule extends Module {
                         @Nonnull
                         @Override
                         public Iterable<GameObject> apply(@Nonnull final GameObject input) {
-                            return FluentIterable.from( input.getLocation().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
-                                @Nullable
-                                @Override
-                                public GameObject apply(@Nonnull final Tile input) {
+                            Iterable<Tile> neighbours = input.getLocation().neighbours();
+                            FluentIterable<GameObject> neighbourobjects = FluentIterable.from( neighbours )
+                                                                                 .transform( new NFunctionNN<Tile, GameObject>() {
+                                                                                     @Nullable
+                                                                                     @Override
+                                                                                     public GameObject apply(@Nonnull final Tile input) {
 
-                                    return input.getContents().orNull();
-                                }
-                            } ).filter( Predicates.notNull() );
+                                                                                         return input.getContents().orNull();
+                                                                                     }
+                                                                                 } );
+                            logger.dbg( "neighbours: %s, objects: %s", neighbours, neighbourobjects );
+                            return neighbourobjects.filter( Predicates.notNull() );
                         }
                     };
 
@@ -182,8 +186,7 @@ public class ConstructorModule extends Module {
                     } ).isEmpty()) {
                         // No more complexity remaining; create the constructed unit.
                         die();
-                        getLocation().setContents(
-                                new PlayerObject( constructionUnitType, Preconditions.checkNotNull( getPlayer() ), getLocation() ) );
+                        new PlayerObject( constructionUnitType, Preconditions.checkNotNull( getPlayer() ), getLocation() );
                     }
                 }
             };

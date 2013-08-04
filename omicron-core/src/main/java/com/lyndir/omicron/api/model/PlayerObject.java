@@ -13,10 +13,11 @@ public class PlayerObject extends GameObject {
 
     private final Player owner;
 
-    public PlayerObject(final UnitType unitType, final Player owner, final Tile location) {
+    public PlayerObject(@Nonnull final UnitType unitType, @Nonnull final Player owner, @Nonnull final Tile location) {
         super(unitType, owner.nextObjectID(), location );
 
         this.owner = owner;
+        owner.getController().addObject( this );
     }
 
     @Nonnull

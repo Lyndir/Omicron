@@ -2,8 +2,8 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.lhunath.opal.system.logging.Logger;
+import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.controller.GameObjectController;
 import com.lyndir.omicron.api.controller.Module;
 import java.util.List;
@@ -18,12 +18,15 @@ import javax.annotation.Nullable;
  */
 public abstract class GameObject extends MetaObject implements GameObserver {
 
+    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
+    final Logger logger = Logger.get( getClass() );
+
     private final UnitType                            unitType;
     private final int                                 objectID;
     private final ListMultimap<ModuleType<?>, Module> modules;
     private       Tile                                location;
 
-    protected GameObject(final UnitType unitType, final int objectID, final Tile location) {
+    protected GameObject(@Nonnull final UnitType unitType, final int objectID, @Nonnull final Tile location) {
         this.unitType = unitType;
         this.objectID = objectID;
         this.location = location;

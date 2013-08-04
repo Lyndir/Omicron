@@ -15,9 +15,10 @@ import javax.annotation.Nullable;
  */
 public class Level extends MetaObject {
 
+    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Size      size;
     private final LevelType type;
-    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
+    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Game      game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)

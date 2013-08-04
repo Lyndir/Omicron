@@ -16,13 +16,14 @@
 
 package com.lyndir.omicron.api.model;
 
+import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.controller.*;
 
 
 /**
  * @author lhunath, 2013-08-02
  */
-public abstract class ModuleType<M extends Module> {
+public abstract class ModuleType<M extends Module> extends MetaObject {
 
     public static final ModuleType<ExtractorModule>   EXTRACTOR   = new ModuleType<ExtractorModule>( ExtractorModule.class ) {};
     public static final ModuleType<ContainerModule>   CONTAINER   = new ModuleType<ContainerModule>( ContainerModule.class ) {};

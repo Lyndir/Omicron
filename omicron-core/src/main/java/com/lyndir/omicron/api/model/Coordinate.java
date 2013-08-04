@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import java.util.Objects;
 
 
@@ -35,6 +36,7 @@ public class Coordinate extends MetaObject {
 
     private final int  u;
     private final int  v;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Size wrapSize;
 
 

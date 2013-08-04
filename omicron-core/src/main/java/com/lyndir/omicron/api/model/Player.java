@@ -27,12 +27,14 @@ public class Player extends MetaObject implements GameObserver {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final PlayerKey key;
     private final String    name;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Color     primaryColor;
+    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Color     secondaryColor;
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final Map<Integer, GameObject> objects = new HashMap<>();
 
-    @ObjectMeta(useFor = ObjectMeta.For.toString)
+    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private int score;
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private int nextObjectID;

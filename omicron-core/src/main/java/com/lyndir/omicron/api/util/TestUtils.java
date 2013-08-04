@@ -29,6 +29,10 @@ public abstract class TestUtils {
     }
 
     public static UnitType testUnitType(final Module... modules) {
+        return testUnitType( 0, modules );
+    }
+
+    public static UnitType testUnitType(final int complexity, final Module... modules) {
         return new UnitType() {
             @Override
             public String getTypeName() {
@@ -37,7 +41,7 @@ public abstract class TestUtils {
 
             @Override
             public int getComplexity() {
-                return 0;
+                return complexity;
             }
 
             @Override
