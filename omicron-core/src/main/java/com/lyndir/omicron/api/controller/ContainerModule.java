@@ -56,8 +56,11 @@ public class ContainerModule extends Module {
     }
 
     @Override
-    public void onNewTurn() {
+    public void onReset() {
+    }
 
+    @Override
+    public void onNewTurn() {
     }
 
     @Override

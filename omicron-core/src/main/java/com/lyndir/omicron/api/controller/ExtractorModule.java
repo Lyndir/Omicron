@@ -34,6 +34,10 @@ public class ExtractorModule extends Module {
     }
 
     @Override
+    public void onReset() {
+    }
+
+    @Override
     public void onNewTurn() {
 
         // Mine some resources.

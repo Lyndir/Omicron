@@ -28,15 +28,17 @@ public class Game extends MetaObject {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final GameController gameController;
 
+    private final Size levelSize;
     private final ImmutableList<Level>  levels;
     private final ImmutableList<Player> players;
     private final Set<Player> readyPlayers = new HashSet<>();
     private boolean running;
 
-    private Game(final Size worldSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig,
+    private Game(final Size levelSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig,
                  final GameUnitConfig unitConfig) {
 
-        levels = ImmutableList.of( new GroundLevel( worldSize, this ), new SkyLevel( worldSize, this ), new SpaceLevel( worldSize, this ) );
+        this.levelSize = levelSize;
+        levels = ImmutableList.of( new GroundLevel( levelSize, this ), new SkyLevel( levelSize, this ), new SpaceLevel( levelSize, this ) );
         this.players = players;
         currentTurn = new Turn();
         gameController = new GameController( this );
@@ -158,9 +160,13 @@ public class Game extends MetaObject {
         return running;
     }
 
+    public Size getLevelSize() {
+        return levelSize;
+    }
+
     public static class Builder {
 
-        private Size               worldSize      = new Size( 200, 200 );
+        private Size               levelSize      = new Size( 200, 200 );
         private List<Player>       players        = Lists.newLinkedList();
         private int                nextPlayerID   = 1;
         private int                totalPlayers   = 4;
@@ -178,17 +184,17 @@ public class Game extends MetaObject {
                     players.add( randomPlayer );
             }
 
-            return new Game( worldSize, ImmutableList.copyOf( players ), resourceConfig, unitConfig );
+            return new Game( levelSize, ImmutableList.copyOf( players ), resourceConfig, unitConfig );
         }
 
-        public Size getWorldSize() {
+        public Size getLevelSize() {
 
-            return worldSize;
+            return levelSize;
         }
 
-        public Builder setWorldSize(final Size worldSize) {
+        public Builder setLevelSize(final Size levelSize) {
 
-            this.worldSize = worldSize;
+            this.levelSize = levelSize;
 
             return this;
         }

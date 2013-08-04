@@ -38,14 +38,14 @@ public class SetGameCommand extends Command {
 
         String gameSettingValue = Iterators.getOnlyElement( tokens, null );
         if (gameSettingValue == null) {
-            inf( "worldSize (width['x'height]), currently: %s", gameBuilder.getWorldSize() );
+            inf( "worldSize (width['x'height]), currently: %s", gameBuilder.getLevelSize() );
             return;
         }
 
         Iterator<String> worldSizeValueIt = Splitter.on( 'x' ).limit( 2 ).split( gameSettingValue ).iterator();
         String worldSizeWidth = worldSizeValueIt.next();
         String worldSizeHeight = Iterators.getOnlyElement( worldSizeValueIt, worldSizeWidth );
-        gameBuilder.setWorldSize( new Size( Integer.parseInt( worldSizeWidth ), Integer.parseInt( worldSizeHeight ) ) );
+        gameBuilder.setLevelSize( new Size( Integer.parseInt( worldSizeWidth ), Integer.parseInt( worldSizeHeight ) ) );
     }
 
     @SubCommand( abbr = "p", desc = "The players that will compete in this game.")

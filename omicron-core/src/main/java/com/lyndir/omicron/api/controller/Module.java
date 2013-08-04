@@ -29,6 +29,8 @@ public abstract class Module extends MetaObject {
         return Preconditions.checkNotNull( gameObject, "This module has not yet been initialized by its game object." );
     }
 
+    public abstract void onReset();
+
     public abstract void onNewTurn();
 
     public abstract ModuleType<?> getType();

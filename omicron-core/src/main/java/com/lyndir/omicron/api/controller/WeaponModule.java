@@ -84,9 +84,12 @@ public class WeaponModule extends Module {
     }
 
     @Override
-    public void onNewTurn() {
-
+    public void onReset() {
         repeated = 0;
+    }
+
+    @Override
+    public void onNewTurn() {
     }
 
     @Override

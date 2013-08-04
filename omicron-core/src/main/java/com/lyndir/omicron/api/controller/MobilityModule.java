@@ -221,9 +221,12 @@ public class MobilityModule extends Module {
     }
 
     @Override
-    public void onNewTurn() {
-
+    public void onReset() {
         remainingSpeed = movementSpeed;
+    }
+
+    @Override
+    public void onNewTurn() {
     }
 
     @Override

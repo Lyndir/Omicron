@@ -82,8 +82,11 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @Override
-    public void onNewTurn() {
+    public void onReset() {
+    }
 
+    @Override
+    public void onNewTurn() {
     }
 
     @Override

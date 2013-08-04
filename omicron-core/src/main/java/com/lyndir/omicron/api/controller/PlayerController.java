@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.controller;
 
 import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.model.*;
 import javax.annotation.Nonnull;
 
@@ -100,9 +101,15 @@ public class PlayerController implements GameObserver {
         player.addObject( gameObject );
     }
 
-    public void onNewTurn(final GameController gameController) {
+    public void onReset() {
 
-        for (final GameObject gameObject : player.getObjects())
+        for (final GameObject gameObject : ImmutableList.copyOf( player.getObjects() ))
+            gameObject.getController().onReset();
+    }
+
+    public void onNewTurn() {
+
+        for (final GameObject gameObject : ImmutableList.copyOf( player.getObjects() ))
             gameObject.getController().onNewTurn();
 
         if (player.isKeyLess())

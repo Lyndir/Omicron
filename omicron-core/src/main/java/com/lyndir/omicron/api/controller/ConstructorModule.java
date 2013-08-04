@@ -43,8 +43,12 @@ public class ConstructorModule extends Module {
     }
 
     @Override
-    public void onNewTurn() {
+    public void onReset() {
         remainingSpeed = buildSpeed;
+    }
+
+    @Override
+    public void onNewTurn() {
     }
 
     private void construct(final ConstructionSite site) {
@@ -150,18 +154,14 @@ public class ConstructorModule extends Module {
                         @Nonnull
                         @Override
                         public Iterable<GameObject> apply(@Nonnull final GameObject input) {
-                            Iterable<Tile> neighbours = input.getLocation().neighbours();
-                            FluentIterable<GameObject> neighbourobjects = FluentIterable.from( neighbours )
-                                                                                 .transform( new NFunctionNN<Tile, GameObject>() {
-                                                                                     @Nullable
-                                                                                     @Override
-                                                                                     public GameObject apply(@Nonnull final Tile input) {
-
-                                                                                         return input.getContents().orNull();
-                                                                                     }
-                                                                                 } );
-                            logger.dbg( "neighbours: %s, objects: %s", neighbours, neighbourobjects );
-                            return neighbourobjects.filter( Predicates.notNull() );
+                            return FluentIterable.from( input.getLocation().neighbours() )
+                                                 .transform( new NFunctionNN<Tile, GameObject>() {
+                                                     @Nullable
+                                                     @Override
+                                                     public GameObject apply(@Nonnull final Tile input) {
+                                                         return input.getContents().orNull();
+                                                     }
+                                                 } ).filter( Predicates.notNull() );
                         }
                     };
 

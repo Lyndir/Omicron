@@ -87,7 +87,7 @@ public class GameController {
 
     public void start() {
 
-        Preconditions.checkState( ! game.isRunning(), "The game cannot be started: It is already running." );
+        Preconditions.checkState( !game.isRunning(), "The game cannot be started: It is already running." );
 
         game.setRunning( true );
         onNewTurn();
@@ -99,8 +99,10 @@ public class GameController {
         for (final GameListener gameListener : gameListeners)
             gameListener.onNewTurn( game.getCurrentTurn() );
 
-        for (final Player player : game.getPlayers())
-            player.getController().onNewTurn( this );
+        for (final Player player : ImmutableList.copyOf( game.getPlayers() )) {
+            player.getController().onReset();
+            player.getController().onNewTurn();
+        }
     }
 
     public ImmutableList<Level> listLevels() {

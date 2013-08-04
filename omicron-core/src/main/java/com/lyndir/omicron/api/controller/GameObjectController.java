@@ -38,6 +38,12 @@ public abstract class GameObjectController<O extends GameObject> extends MetaObj
         return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles( currentPlayer );
     }
 
+    public void onReset() {
+
+        for (final Module module : getGameObject().listModules())
+            module.onReset();
+    }
+
     public void onNewTurn() {
 
         for (final Module module : getGameObject().listModules())
