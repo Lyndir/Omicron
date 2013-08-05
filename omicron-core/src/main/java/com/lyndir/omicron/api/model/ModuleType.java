@@ -25,20 +25,32 @@ import com.lyndir.omicron.api.controller.*;
  */
 public abstract class ModuleType<M extends Module> extends MetaObject {
 
-    public static final ModuleType<ExtractorModule>   EXTRACTOR   = new ModuleType<ExtractorModule>( ExtractorModule.class ) {};
-    public static final ModuleType<ContainerModule>   CONTAINER   = new ModuleType<ContainerModule>( ContainerModule.class ) {};
-    public static final ModuleType<MobilityModule>    MOBILITY    = new ModuleType<MobilityModule>( MobilityModule.class ) {};
-    public static final ModuleType<ConstructorModule> CONSTRUCTOR = new ModuleType<ConstructorModule>( ConstructorModule.class ) {};
-    public static final ModuleType<BaseModule>        BASE        = new ModuleType<BaseModule>( BaseModule.class ) {};
-    public static final ModuleType<WeaponModule>      WEAPON      = new ModuleType<WeaponModule>( WeaponModule.class ) {};
+    public static final ModuleType<ExtractorModule>   EXTRACTOR   = //
+            new ModuleType<ExtractorModule>( ExtractorModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+    public static final ModuleType<ContainerModule>   CONTAINER   = //
+            new ModuleType<ContainerModule>( ContainerModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+    public static final ModuleType<MobilityModule>    MOBILITY    = //
+            new ModuleType<MobilityModule>( MobilityModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+    public static final ModuleType<ConstructorModule> CONSTRUCTOR = //
+            new ModuleType<ConstructorModule>( ConstructorModule.class, ResourceCost.of( ResourceType.METALS, 2 ) ) {};
+    public static final ModuleType<BaseModule>        BASE        = //
+            new ModuleType<BaseModule>( BaseModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+    public static final ModuleType<WeaponModule>      WEAPON      = //
+            new ModuleType<WeaponModule>( WeaponModule.class, ResourceCost.of( ResourceType.METALS, 2 ) ) {};
 
-    private final Class<M> moduleType;
+    private final Class<M>     moduleType;
+    private final ResourceCost standardCost;
 
-    ModuleType(final Class<M> moduleType) {
+    ModuleType(final Class<M> moduleType, final ResourceCost standardCost) {
         this.moduleType = moduleType;
+        this.standardCost = standardCost;
     }
 
     public Class<M> getModuleType() {
         return moduleType;
+    }
+
+    public ResourceCost getStandardCost() {
+        return standardCost;
     }
 }

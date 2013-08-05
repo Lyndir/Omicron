@@ -1,9 +1,6 @@
 package com.lyndir.omicron.api.controller;
 
-import com.google.common.base.Predicate;
 import com.lyndir.omicron.api.model.*;
-import com.lyndir.omicron.api.util.PathUtils;
-import javax.annotation.Nullable;
 
 
 public class ContainerModule extends Module {
@@ -12,10 +9,18 @@ public class ContainerModule extends Module {
     private final int          capacity;
     private       int          stock;
 
-    public ContainerModule(final ResourceType resourceType, final int capacity) {
-
+    protected ContainerModule(final ResourceCost resourceCost, final ResourceType resourceType, final int capacity) {
+        super( resourceCost );
         this.resourceType = resourceType;
         this.capacity = capacity;
+    }
+
+    public static Builder0 createWithStandardResourceCost() {
+        return createWithExtraResourceCost( new ResourceCost() );
+    }
+
+    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+        return new Builder0( ModuleType.CONTAINER.getStandardCost().add( resourceCost ) );
     }
 
     public ResourceType getResourceType() {
@@ -66,5 +71,33 @@ public class ContainerModule extends Module {
     @Override
     public ModuleType<?> getType() {
         return ModuleType.CONTAINER;
+    }
+
+    @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
+    public static class Builder0 {
+
+        private final ResourceCost resourceCost;
+
+        private Builder0(final ResourceCost resourceCost) {
+
+            this.resourceCost = resourceCost;
+        }
+
+        public Builder1 resourceType(final ResourceType resourceType) {
+            return new Builder1( resourceType );
+        }
+
+        public class Builder1 {
+
+            private final ResourceType resourceType;
+
+            private Builder1(final ResourceType resourceType) {
+                this.resourceType = resourceType;
+            }
+
+            public ContainerModule capacity(final int capacity) {
+                return new ContainerModule( resourceCost, resourceType, capacity );
+            }
+        }
     }
 }

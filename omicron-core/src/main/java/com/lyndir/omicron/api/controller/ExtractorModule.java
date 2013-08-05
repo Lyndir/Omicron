@@ -17,10 +17,19 @@ public class ExtractorModule extends Module {
     private final ResourceType resourceType;
     private final int          speed;
 
-    public ExtractorModule(final ResourceType resourceType, final int speed) {
+    protected ExtractorModule(final ResourceCost resourceCost, final ResourceType resourceType, final int speed) {
+        super( resourceCost );
 
         this.resourceType = resourceType;
         this.speed = speed;
+    }
+
+    public static Builder0 createWithStandardResourceCost() {
+        return createWithExtraResourceCost( new ResourceCost() );
+    }
+
+    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+        return new Builder0( ModuleType.EXTRACTOR.getStandardCost().add( resourceCost ) );
     }
 
     public ResourceType getResourceType() {
@@ -106,5 +115,32 @@ public class ExtractorModule extends Module {
     @Override
     public ModuleType<?> getType() {
         return ModuleType.EXTRACTOR;
+    }
+
+    @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
+    public static class Builder0 {
+
+        private final ResourceCost resourceCost;
+
+        private Builder0(final ResourceCost resourceCost) {
+            this.resourceCost = resourceCost;
+        }
+
+        public Builder1 resourceType(final ResourceType resourceType) {
+            return new Builder1(resourceType);
+        }
+
+        public class Builder1 {
+
+            private final ResourceType resourceType;
+
+            private Builder1(final ResourceType resourceType) {
+                this.resourceType = resourceType;
+            }
+
+            public ExtractorModule speed(final int speed) {
+                return new ExtractorModule( resourceCost, resourceType, speed );
+            }
+        }
     }
 }

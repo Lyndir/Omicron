@@ -19,11 +19,21 @@ public class MobilityModule extends Module {
 
     private double remainingSpeed;
 
-    public MobilityModule(final int movementSpeed, final Map<LevelType, Double> movementCost, final Map<LevelType, Double> levelingCost) {
+    protected MobilityModule(final ResourceCost resourceCost, final int movementSpeed, final Map<LevelType, Double> movementCost,
+                             final Map<LevelType, Double> levelingCost) {
+        super( resourceCost );
 
         this.movementSpeed = movementSpeed;
         this.movementCost.putAll( movementCost );
         this.levelingCost.putAll( levelingCost );
+    }
+
+    public static Builder0 createWithStandardResourceCost() {
+        return createWithExtraResourceCost( new ResourceCost() );
+    }
+
+    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+        return new Builder0( ModuleType.MOBILITY.getStandardCost().add( resourceCost ) );
     }
 
     /**
@@ -276,6 +286,48 @@ public class MobilityModule extends Module {
             path.get().getTarget().setContents( getGameObject() );
 
             return true;
+        }
+    }
+
+
+    @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
+    public static class Builder0 {
+
+        private final ResourceCost resourceCost;
+
+        private Builder0(final ResourceCost resourceCost) {
+
+            this.resourceCost = resourceCost;
+        }
+
+        public Builder1 movementSpeed(final int movementSpeed) {
+            return new Builder1( movementSpeed );
+        }
+
+        public class Builder1 {
+
+            private final int movementSpeed;
+
+            private Builder1(final int movementSpeed) {
+                this.movementSpeed = movementSpeed;
+            }
+
+            public Builder2 movementCost(final Map<LevelType, Double> movementCost) {
+                return new Builder2( movementCost );
+            }
+
+            public class Builder2 {
+
+                private final Map<LevelType, Double> movementCost;
+
+                private Builder2(final Map<LevelType, Double> movementCost) {
+                    this.movementCost = movementCost;
+                }
+
+                public MobilityModule levelingCost(final Map<LevelType, Double> levelingCost) {
+                    return new MobilityModule( resourceCost, movementSpeed, movementCost, levelingCost );
+                }
+            }
         }
     }
 }

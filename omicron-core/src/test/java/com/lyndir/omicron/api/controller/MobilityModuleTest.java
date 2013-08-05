@@ -1,12 +1,10 @@
 package com.lyndir.omicron.api.controller;
 
-import static com.lyndir.omicron.api.util.AbstractTest.*;
 import static org.testng.AssertJUnit.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.lyndir.omicron.api.model.LevelType;
 import com.lyndir.omicron.api.util.AbstractTest;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
@@ -16,7 +14,10 @@ public class MobilityModuleTest extends AbstractTest {
     public void testCostForMovingInLevel()
             throws Exception {
 
-        MobilityModule module = new MobilityModule( 0, ImmutableMap.of( LevelType.GROUND, 1d ), ImmutableMap.<LevelType, Double>of() );
+        MobilityModule module = MobilityModule.createWithStandardResourceCost()
+                                              .movementSpeed( 0 )
+                                              .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
+                                              .levelingCost( ImmutableMap.<LevelType, Double>of() );
         createUnit( testUnitType( "Mover", module ) );
 
         assertEquals( module.costForMovingInLevel( LevelType.GROUND ), 1d );
@@ -26,7 +27,10 @@ public class MobilityModuleTest extends AbstractTest {
         ImmutableMap.Builder<LevelType, Double> builder = ImmutableMap.builder();
         for (final LevelType levelType : LevelType.values())
             builder.put( levelType, (double) levelType.ordinal() );
-        module = new MobilityModule( 0, builder.build(), ImmutableMap.<LevelType, Double>of() );
+        module = MobilityModule.createWithStandardResourceCost()
+                               .movementSpeed( 0 )
+                               .movementCost( builder.build() )
+                               .levelingCost( ImmutableMap.<LevelType, Double>of() );
 
         for (final LevelType levelType : LevelType.values())
             assertEquals( module.costForMovingInLevel( levelType ), (double) levelType.ordinal() );
@@ -36,8 +40,11 @@ public class MobilityModuleTest extends AbstractTest {
     public void testCostForLevelingToLevel()
             throws Exception {
 
-        MobilityModule module = new MobilityModule( 0, ImmutableMap.<LevelType, Double>of(), //
-                                                    ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY, 2d, LevelType.SPACE, 3d ) );
+        MobilityModule module = MobilityModule.createWithStandardResourceCost()
+                                              .movementSpeed( 0 )
+                                              .movementCost( ImmutableMap.<LevelType, Double>of() )
+                                              .levelingCost(
+                                                      ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY, 2d, LevelType.SPACE, 3d ) );
         createUnit( testUnitType( "Leveler", module ) );
 
         assertEquals( module.costForLevelingToLevel( LevelType.GROUND ), 0f );

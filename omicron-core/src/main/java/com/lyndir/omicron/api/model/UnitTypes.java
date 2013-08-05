@@ -31,35 +31,63 @@ public enum UnitTypes implements UnitType {
               new Supplier<List<Module>>() {
                   @Override
                   public List<Module> get() {
-                      return ImmutableList.of( new BaseModule( 10, 2, 3, ImmutableSet.of( LevelType.GROUND ) ),
-                                               new MobilityModule( 5, ImmutableMap.of( LevelType.GROUND, 1d ),
-                                                                   ImmutableMap.<LevelType, Double>of() ) );
+                      return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                         .maxHealth( 10 )
+                                                         .armor( 2 )
+                                                         .viewRange( 3 )
+                                                         .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
+                                               MobilityModule.createWithStandardResourceCost()
+                                                             .movementSpeed( 5 )
+                                                             .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
+                                                             .levelingCost( ImmutableMap.<LevelType, Double>of() ) );
                   }
               } ),
     SCOUT( "Scout", 5, //
            new Supplier<List<Module>>() {
                @Override
                public List<Module> get() {
-                   return ImmutableList.of( new BaseModule( 5, 3, 5, ImmutableSet.of( LevelType.GROUND ) ),
-                                            new MobilityModule( 8, ImmutableMap.of( LevelType.GROUND, 1d ),
-                                                                ImmutableMap.<LevelType, Double>of() ),
-                                            new WeaponModule( 3, 3, 5, 3, 20, ImmutableSet.of( LevelType.GROUND ) ) );
+                   return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                      .maxHealth( 5 )
+                                                      .armor( 3 )
+                                                      .viewRange( 5 )
+                                                      .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
+                                            MobilityModule.createWithStandardResourceCost()
+                                                          .movementSpeed( 8 )
+                                                          .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
+                                                          .levelingCost( ImmutableMap.<LevelType, Double>of() ),
+                                            WeaponModule.createWithStandardResourceCost()
+                                                        .firePower( 3 )
+                                                        .armor( 3 )
+                                                        .range( 5 )
+                                                        .repeat( 3 )
+                                                        .ammunitionLoad( 20 )
+                                                        .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ) );
                }
            } ),
     AIRSHIP( "Airship", 10, //
              new Supplier<List<Module>>() {
                  @Override
                  public List<Module> get() {
-                     return ImmutableList.of( new BaseModule( 5, 1, 5, ImmutableSet.of( LevelType.SKY ) ),
-                                              new MobilityModule( 2, ImmutableMap.of( LevelType.SKY, 1d ),
-                                                                  ImmutableMap.<LevelType, Double>of() ) );
+                     return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                        .maxHealth( 5 )
+                                                        .armor( 1 )
+                                                        .viewRange( 5 )
+                                                        .supportedLayers( ImmutableSet.of( LevelType.SKY ) ),
+                                              MobilityModule.createWithStandardResourceCost()
+                                                            .movementSpeed( 2 )
+                                                            .movementCost( ImmutableMap.of( LevelType.SKY, 1d ) )
+                                                            .levelingCost( ImmutableMap.<LevelType, Double>of() ) );
                  }
              } ),
     CONSTRUCTION( "Construction Site", Integer.MAX_VALUE, //
                   new Supplier<List<Module>>() {
                       @Override
                       public List<Module> get() {
-                          return ImmutableList.<Module>of( new BaseModule( 1, 1, 1, ImmutableSet.copyOf( LevelType.values() ) ) );
+                          return ImmutableList.<Module>of( BaseModule.createWithStandardResourceCost()
+                                                                     .maxHealth( 1 )
+                                                                     .armor( 1 )
+                                                                     .viewRange( 1 )
+                                                                     .supportedLayers( ImmutableSet.copyOf( LevelType.values() ) ) );
                       }
                   } );
 

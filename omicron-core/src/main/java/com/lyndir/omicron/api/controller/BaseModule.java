@@ -18,12 +18,22 @@ public class BaseModule extends Module implements GameObserver {
     private final Set<LevelType> supportedLayers;
     private       int            damage;
 
-    public BaseModule(final int maxHealth, final int armor, final int viewRange, final Set<LevelType> supportedLayers) {
+    protected BaseModule(final ResourceCost resourceCost, final int maxHealth, final int armor, final int viewRange,
+                         final Set<LevelType> supportedLayers) {
+        super( resourceCost );
 
         this.maxHealth = maxHealth;
         this.armor = armor;
         this.viewRange = viewRange;
         this.supportedLayers = supportedLayers;
+    }
+
+    public static Builder0 createWithStandardResourceCost() {
+        return createWithExtraResourceCost( new ResourceCost() );
+    }
+
+    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+        return new Builder0( ModuleType.BASE.getStandardCost().add( resourceCost ) );
     }
 
     @Override
@@ -100,5 +110,58 @@ public class BaseModule extends Module implements GameObserver {
 
         if (getRemainingHealth() <= 0)
             getGameObject().getController().die();
+    }
+
+    @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
+    public static class Builder0 {
+
+        private final ResourceCost resourceCost;
+
+        private Builder0(final ResourceCost resourceCost) {
+            this.resourceCost = resourceCost;
+        }
+
+        public Builder1 maxHealth(final int maxHealth) {
+            return new Builder1( maxHealth );
+        }
+
+        public class Builder1 {
+
+            private final int maxHealth;
+
+            private Builder1(final int maxHealth) {
+                this.maxHealth = maxHealth;
+            }
+
+            public Builder2 armor(final int armor) {
+                return new Builder2( armor );
+            }
+
+            public class Builder2 {
+
+                private final int armor;
+
+                private Builder2(final int armor) {
+                    this.armor = armor;
+                }
+
+                public Builder3 viewRange(final int viewRange) {
+                    return new Builder3( viewRange );
+                }
+
+                public class Builder3 {
+
+                    private final int viewRange;
+
+                    private Builder3(final int viewRange) {
+                        this.viewRange = viewRange;
+                    }
+
+                    public BaseModule supportedLayers(final Set<LevelType> supportedLayers) {
+                        return new BaseModule( resourceCost, maxHealth, armor, viewRange, supportedLayers );
+                    }
+                }
+            }
+        }
     }
 }

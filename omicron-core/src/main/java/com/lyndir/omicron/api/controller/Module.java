@@ -4,8 +4,7 @@ import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import com.lyndir.omicron.api.model.GameObject;
-import com.lyndir.omicron.api.model.ModuleType;
+import com.lyndir.omicron.api.model.*;
 
 
 public abstract class Module extends MetaObject {
@@ -15,7 +14,7 @@ public abstract class Module extends MetaObject {
 
     private GameObject gameObject;
 
-    protected Module() {
+    protected Module(final ResourceCost resourceCost) {
         Preconditions.checkState( getType().getModuleType().isInstance( this ), "Invalid module type for module: %s", this );
     }
 

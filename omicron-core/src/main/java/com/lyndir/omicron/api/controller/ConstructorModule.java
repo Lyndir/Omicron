@@ -35,11 +35,22 @@ public class ConstructorModule extends Module {
     private final int           buildSpeed;
     private final ModuleType<?> buildsModule;
 
-    private int remainingSpeed;
+    private int        remainingSpeed;
+    private GameObject target;
 
-    public ConstructorModule(final int buildSpeed, final ModuleType<?> buildsModule) {
+    protected ConstructorModule(final ResourceCost resourceCost, final int buildSpeed, final ModuleType<?> buildsModule) {
+        super( resourceCost );
+
         this.buildSpeed = buildSpeed;
         this.buildsModule = buildsModule;
+    }
+
+    public static Builder0 createWithStandardResourceCost() {
+        return createWithExtraResourceCost( new ResourceCost() );
+    }
+
+    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+        return new Builder0( ModuleType.CONSTRUCTOR.getStandardCost().add( resourceCost ) );
     }
 
     @Override
@@ -68,6 +79,16 @@ public class ConstructorModule extends Module {
         return remainingSpeed;
     }
 
+    public GameObject getTarget() {
+        return target;
+    }
+
+    public void setTarget(final GameObject target) {
+        Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getPlayer(), target.getPlayer() ),
+                                     "Can only target units of the same player." );
+        this.target = target;
+    }
+
     @Override
     public ModuleType<?> getType() {
         return ModuleType.CONSTRUCTOR;
@@ -90,7 +111,10 @@ public class ConstructorModule extends Module {
         Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ) );
         Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1 );
 
-        return new ConstructionSite( unitType, Preconditions.checkNotNull( getGameObject().getPlayer() ), location );
+        ConstructionSite site = new ConstructionSite( unitType, Preconditions.checkNotNull( getGameObject().getPlayer() ), location );
+        setTarget( site );
+
+        return site;
     }
 
     /**
@@ -135,9 +159,8 @@ public class ConstructorModule extends Module {
                     PredicateNN<GameObject> foundFunction = new PredicateNN<GameObject>() {
                         @Override
                         public boolean apply(@Nonnull final GameObject input) {
-                            for (final ConstructorModule constructorModule : input.getModules( ModuleType.CONSTRUCTOR ))
-                                if (constructorModule.getRemainingSpeed() > 0
-                                    && getRemainingComplexity( constructorModule.getBuildsModule() ) > 0)
+                            for (final ConstructorModule module : input.getModules( ModuleType.CONSTRUCTOR ))
+                                if (module.getRemainingSpeed() > 0 && getRemainingComplexity( module.getBuildsModule() ) > 0)
                                     return true;
 
                             return false;
@@ -153,15 +176,27 @@ public class ConstructorModule extends Module {
                     NNFunctionNN<GameObject, Iterable<GameObject>> neighboursFunction = new NNFunctionNN<GameObject, Iterable<GameObject>>() {
                         @Nonnull
                         @Override
-                        public Iterable<GameObject> apply(@Nonnull final GameObject input) {
-                            return FluentIterable.from( input.getLocation().neighbours() )
+                        public Iterable<GameObject> apply(@Nonnull final GameObject neighbourInput) {
+                            return FluentIterable.from( neighbourInput.getLocation().neighbours() )
                                                  .transform( new NFunctionNN<Tile, GameObject>() {
                                                      @Nullable
                                                      @Override
                                                      public GameObject apply(@Nonnull final Tile input) {
-                                                         return input.getContents().orNull();
+                                                         Optional<GameObject> contents = input.getContents();
+                                                         if (contents.isPresent()) {
+                                                             for (final ConstructorModule module : contents.get()
+                                                                                                           .getModules(
+                                                                                                                   ModuleType.CONSTRUCTOR )) {
+                                                                 if (ObjectUtils.isEqual( module.getTarget(), neighbourInput )) {
+                                                                     return contents.get();
+                                                                 }
+                                                             }
+                                                         }
+
+                                                         return null;
                                                      }
-                                                 } ).filter( Predicates.notNull() );
+                                                 } )
+                                                 .filter( Predicates.notNull() );
                         }
                     };
 
@@ -190,6 +225,34 @@ public class ConstructorModule extends Module {
                     }
                 }
             };
+        }
+    }
+
+
+    @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
+    public static class Builder0 {
+
+        private final ResourceCost resourceCost;
+
+        private Builder0(final ResourceCost resourceCost) {
+            this.resourceCost = resourceCost;
+        }
+
+        public Builder1 buildSpeed(final int buildSpeed) {
+            return new Builder1( buildSpeed );
+        }
+
+        public class Builder1 {
+
+            private final int buildSpeed;
+
+            private Builder1(final int buildSpeed) {
+                this.buildSpeed = buildSpeed;
+            }
+
+            public ConstructorModule supportedLayers(final ModuleType<?> buildsModule) {
+                return new ConstructorModule( resourceCost, buildSpeed, buildsModule );
+            }
         }
     }
 }
