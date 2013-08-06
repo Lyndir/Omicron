@@ -92,12 +92,12 @@ public enum UnitTypes implements UnitType {
                   } );
 
     private final String                 typeName;
-    private final int                    complexity;
+    private final int                    constructionWork;
     private final Supplier<List<Module>> moduleSupplier;
 
-    UnitTypes(final String typeName, final int complexity, final Supplier<List<Module>> moduleSupplier) {
+    UnitTypes(final String typeName, final int constructionWork, final Supplier<List<Module>> moduleSupplier) {
         this.typeName = typeName;
-        this.complexity = complexity;
+        this.constructionWork = constructionWork;
         this.moduleSupplier = moduleSupplier;
     }
 
@@ -107,8 +107,8 @@ public enum UnitTypes implements UnitType {
     }
 
     @Override
-    public int getComplexity() {
-        return complexity;
+    public int getConstructionWork() {
+        return constructionWork;
     }
 
     @Override

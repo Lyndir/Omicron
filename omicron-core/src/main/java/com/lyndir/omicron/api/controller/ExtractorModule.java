@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.Constants;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.PathUtils;
 import javax.annotation.Nonnull;
@@ -12,12 +13,10 @@ import javax.annotation.Nullable;
 
 public class ExtractorModule extends Module {
 
-    private static final double MAX_DISTANCE_TO_CONTAINER = 10;
-
     private final ResourceType resourceType;
     private final int          speed;
 
-    protected ExtractorModule(final ResourceCost resourceCost, final ResourceType resourceType, final int speed) {
+    protected ExtractorModule(final ImmutableResourceCost resourceCost, final ResourceType resourceType, final int speed) {
         super( resourceCost );
 
         this.resourceType = resourceType;
@@ -25,10 +24,10 @@ public class ExtractorModule extends Module {
     }
 
     public static Builder0 createWithStandardResourceCost() {
-        return createWithExtraResourceCost( new ResourceCost() );
+        return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.EXTRACTOR.getStandardCost().add( resourceCost ) );
     }
 
@@ -95,7 +94,7 @@ public class ExtractorModule extends Module {
         // Find paths to containers and deposit mined resources.
         while (minedResources > 0) {
             Optional<PathUtils.Path<GameObject>> path = PathUtils.find( getGameObject(), foundFunction, costFunction,
-                                                                        MAX_DISTANCE_TO_CONTAINER, neighboursFunction );
+                                                                        Constants.MAX_DISTANCE_TO_CONTAINER, neighboursFunction );
             if (!path.isPresent())
                 // No more containers with available capacity.
                 break;
@@ -120,14 +119,14 @@ public class ExtractorModule extends Module {
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
     public static class Builder0 {
 
-        private final ResourceCost resourceCost;
+        private final ImmutableResourceCost resourceCost;
 
-        private Builder0(final ResourceCost resourceCost) {
+        private Builder0(final ImmutableResourceCost resourceCost) {
             this.resourceCost = resourceCost;
         }
 
         public Builder1 resourceType(final ResourceType resourceType) {
-            return new Builder1(resourceType);
+            return new Builder1( resourceType );
         }
 
         public class Builder1 {

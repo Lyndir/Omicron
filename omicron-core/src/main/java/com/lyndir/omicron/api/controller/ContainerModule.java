@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.controller;
 
+import com.google.common.base.Preconditions;
 import com.lyndir.omicron.api.model.*;
 
 
@@ -9,17 +10,17 @@ public class ContainerModule extends Module {
     private final int          capacity;
     private       int          stock;
 
-    protected ContainerModule(final ResourceCost resourceCost, final ResourceType resourceType, final int capacity) {
+    protected ContainerModule(final ImmutableResourceCost resourceCost, final ResourceType resourceType, final int capacity) {
         super( resourceCost );
         this.resourceType = resourceType;
         this.capacity = capacity;
     }
 
     public static Builder0 createWithStandardResourceCost() {
-        return createWithExtraResourceCost( new ResourceCost() );
+        return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.CONTAINER.getStandardCost().add( resourceCost ) );
     }
 
@@ -52,12 +53,31 @@ public class ContainerModule extends Module {
      *         how much available stock this container has left.
      */
     public int addStock(final int amount) {
+        Preconditions.checkArgument( amount >= 0, "Amount of stock to add must be positive." );
 
         int newStock = Math.min( stock + amount, capacity );
         int stocked = newStock - stock;
         stock = newStock;
 
         return stocked;
+    }
+
+    /**
+     * Deplete an amount of this container's resource type in resources from the container's stock.
+     *
+     * @param amount The amount of resources to remove.
+     *
+     * @return The amount of resources that has been removed from the stock.  It will be a value between 0 and the given amount, depending
+     *         on how much available stock this container had left.
+     */
+    public int depleteStock(final int amount) {
+        Preconditions.checkArgument( amount >= 0, "Amount of stock to deplete must be positive." );
+
+        int newStock = Math.max( stock - amount, 0 );
+        int depleted = stock - newStock;
+        stock = newStock;
+
+        return depleted;
     }
 
     @Override
@@ -76,9 +96,9 @@ public class ContainerModule extends Module {
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
     public static class Builder0 {
 
-        private final ResourceCost resourceCost;
+        private final ImmutableResourceCost resourceCost;
 
-        private Builder0(final ResourceCost resourceCost) {
+        private Builder0(final ImmutableResourceCost resourceCost) {
 
             this.resourceCost = resourceCost;
         }

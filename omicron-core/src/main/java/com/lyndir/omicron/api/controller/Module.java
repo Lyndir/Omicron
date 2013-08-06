@@ -10,12 +10,19 @@ import com.lyndir.omicron.api.model.*;
 public abstract class Module extends MetaObject {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    final Logger logger = Logger.get( getClass() );
+    protected final Logger logger = Logger.get( getClass() );
+
+    private final ImmutableResourceCost resourceCost;
 
     private GameObject gameObject;
 
-    protected Module(final ResourceCost resourceCost) {
+    protected Module(final ImmutableResourceCost resourceCost) {
+        this.resourceCost = resourceCost;
         Preconditions.checkState( getType().getModuleType().isInstance( this ), "Invalid module type for module: %s", this );
+    }
+
+    public ImmutableResourceCost getResourceCost() {
+        return resourceCost;
     }
 
     public void setGameObject(final GameObject gameObject) {

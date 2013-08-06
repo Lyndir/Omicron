@@ -26,22 +26,22 @@ import com.lyndir.omicron.api.controller.*;
 public abstract class ModuleType<M extends Module> extends MetaObject {
 
     public static final ModuleType<ExtractorModule>   EXTRACTOR   = //
-            new ModuleType<ExtractorModule>( ExtractorModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<ExtractorModule>( ExtractorModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
     public static final ModuleType<ContainerModule>   CONTAINER   = //
-            new ModuleType<ContainerModule>( ContainerModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<ContainerModule>( ContainerModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
     public static final ModuleType<MobilityModule>    MOBILITY    = //
-            new ModuleType<MobilityModule>( MobilityModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<MobilityModule>( MobilityModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
     public static final ModuleType<ConstructorModule> CONSTRUCTOR = //
-            new ModuleType<ConstructorModule>( ConstructorModule.class, ResourceCost.of( ResourceType.METALS, 2 ) ) {};
+            new ModuleType<ConstructorModule>( ConstructorModule.class, ResourceCost.immutableOf( ResourceType.METALS, 2 ) ) {};
     public static final ModuleType<BaseModule>        BASE        = //
-            new ModuleType<BaseModule>( BaseModule.class, ResourceCost.of( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<BaseModule>( BaseModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
     public static final ModuleType<WeaponModule>      WEAPON      = //
-            new ModuleType<WeaponModule>( WeaponModule.class, ResourceCost.of( ResourceType.METALS, 2 ) ) {};
+            new ModuleType<WeaponModule>( WeaponModule.class, ResourceCost.immutableOf( ResourceType.METALS, 2 ) ) {};
 
-    private final Class<M>     moduleType;
-    private final ResourceCost standardCost;
+    private final Class<M>              moduleType;
+    private final ImmutableResourceCost standardCost;
 
-    ModuleType(final Class<M> moduleType, final ResourceCost standardCost) {
+    ModuleType(final Class<M> moduleType, final ImmutableResourceCost standardCost) {
         this.moduleType = moduleType;
         this.standardCost = standardCost;
     }
@@ -50,7 +50,7 @@ public abstract class ModuleType<M extends Module> extends MetaObject {
         return moduleType;
     }
 
-    public ResourceCost getStandardCost() {
+    public ImmutableResourceCost getStandardCost() {
         return standardCost;
     }
 }

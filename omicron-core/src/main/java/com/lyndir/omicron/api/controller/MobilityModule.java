@@ -19,7 +19,7 @@ public class MobilityModule extends Module {
 
     private double remainingSpeed;
 
-    protected MobilityModule(final ResourceCost resourceCost, final int movementSpeed, final Map<LevelType, Double> movementCost,
+    protected MobilityModule(final ImmutableResourceCost resourceCost, final int movementSpeed, final Map<LevelType, Double> movementCost,
                              final Map<LevelType, Double> levelingCost) {
         super( resourceCost );
 
@@ -29,10 +29,10 @@ public class MobilityModule extends Module {
     }
 
     public static Builder0 createWithStandardResourceCost() {
-        return createWithExtraResourceCost( new ResourceCost() );
+        return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.MOBILITY.getStandardCost().add( resourceCost ) );
     }
 
@@ -293,9 +293,9 @@ public class MobilityModule extends Module {
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
     public static class Builder0 {
 
-        private final ResourceCost resourceCost;
+        private final ImmutableResourceCost resourceCost;
 
-        private Builder0(final ResourceCost resourceCost) {
+        private Builder0(final ImmutableResourceCost resourceCost) {
 
             this.resourceCost = resourceCost;
         }

@@ -14,20 +14,13 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.api.model;
-
-import com.lyndir.omicron.api.controller.Module;
-import java.util.List;
-
+package com.lyndir.omicron.api;
 
 /**
- * @author lhunath, 2013-08-03
+ * @author lhunath, 2013-08-05
  */
-public interface UnitType {
+public class Constants {
 
-    String getTypeName();
-
-    int getConstructionWork();
-
-    List<Module> createModules();
+    public static final double MAX_DISTANCE_TO_CONTAINER   = 10;
+    public static final double MAX_DISTANCE_TO_CONSTRUCTOR = 5;
 }

@@ -19,7 +19,7 @@ public class WeaponModule extends Module {
     private       int            repeated;
     private       int            ammunition;
 
-    protected WeaponModule(final ResourceCost resourceCost, final int firePower, final int variance, final int range, final int repeat,
+    protected WeaponModule(final ImmutableResourceCost resourceCost, final int firePower, final int variance, final int range, final int repeat,
                            final int ammunitionLoad, final Set<LevelType> supportedLayers) {
         super( resourceCost );
 
@@ -34,10 +34,10 @@ public class WeaponModule extends Module {
     }
 
     public static Builder0 createWithStandardResourceCost() {
-        return createWithExtraResourceCost( new ResourceCost() );
+        return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.WEAPON.getStandardCost().add( resourceCost ) );
     }
 
@@ -109,9 +109,9 @@ public class WeaponModule extends Module {
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
     public static class Builder0 {
 
-        private final ResourceCost resourceCost;
+        private final ImmutableResourceCost resourceCost;
 
-        private Builder0(final ResourceCost resourceCost) {
+        private Builder0(final ImmutableResourceCost resourceCost) {
             this.resourceCost = resourceCost;
         }
 

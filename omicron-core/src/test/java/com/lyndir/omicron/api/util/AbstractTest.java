@@ -86,7 +86,7 @@ public abstract class AbstractTest {
         return testUnitType( typeName, 0, modules );
     }
 
-    protected UnitType testUnitType(final String typeName, final int complexity, final Module... modules) {
+    protected UnitType testUnitType(final String typeName, final int constructionWork, final Module... modules) {
         return new UnitType() {
             @Override
             public String getTypeName() {
@@ -94,8 +94,8 @@ public abstract class AbstractTest {
             }
 
             @Override
-            public int getComplexity() {
-                return complexity;
+            public int getConstructionWork() {
+                return constructionWork;
             }
 
             @Override

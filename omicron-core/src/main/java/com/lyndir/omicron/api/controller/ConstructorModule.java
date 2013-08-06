@@ -21,24 +21,24 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.Constants;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.PathUtils;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
 public class ConstructorModule extends Module {
 
-    private static final double MAX_DISTANCE_TO_CONSTRUCTOR = 5;
     private final int           buildSpeed;
     private final ModuleType<?> buildsModule;
 
+    private boolean    resourceConstrained;
     private int        remainingSpeed;
     private GameObject target;
 
-    protected ConstructorModule(final ResourceCost resourceCost, final int buildSpeed, final ModuleType<?> buildsModule) {
+    protected ConstructorModule(final ImmutableResourceCost resourceCost, final int buildSpeed, final ModuleType<?> buildsModule) {
         super( resourceCost );
 
         this.buildSpeed = buildSpeed;
@@ -46,15 +46,16 @@ public class ConstructorModule extends Module {
     }
 
     public static Builder0 createWithStandardResourceCost() {
-        return createWithExtraResourceCost( new ResourceCost() );
+        return createWithExtraResourceCost( ImmutableResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ResourceCost resourceCost) {
+    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.CONSTRUCTOR.getStandardCost().add( resourceCost ) );
     }
 
     @Override
     public void onReset() {
+        resourceConstrained = false;
         remainingSpeed = buildSpeed;
     }
 
@@ -62,9 +63,82 @@ public class ConstructorModule extends Module {
     public void onNewTurn() {
     }
 
+    // This method assumes a target link between this module and the site exists.
     private void construct(final ConstructionSite site) {
-        int reducedComplexity = site.reduceComplexity( buildsModule, remainingSpeed );
-        remainingSpeed -= reducedComplexity;
+        if (isResourceConstrained())
+            return;
+
+        for (; remainingSpeed > 0; --remainingSpeed) {
+            /* Find resource cost */
+            Optional<ImmutableResourceCost> resourceCostOptional = site.getResourceCostToPerformWork( getBuildsModule() );
+            if (!resourceCostOptional.isPresent())
+                // No work left to do.
+                return;
+            final MutableResourceCost resourceCost = ResourceCost.mutable( resourceCostOptional.get() );
+
+            /* Find resource stock to cover cost */
+            // Initialize path finding functions.
+            PredicateNN<GameObject> foundFunction = new PredicateNN<GameObject>() {
+                @Override
+                public boolean apply(@Nonnull final GameObject input) {
+                    for (final ContainerModule containerModule : input.getModules( ModuleType.CONTAINER ))
+                        if (resourceCost.get( containerModule.getResourceType() ) > 0 && containerModule.getStock() > 0)
+                            return true;
+
+                    return false;
+                }
+            };
+            NNFunctionNN<PathUtils.Step<GameObject>, Double> costFunction = new NNFunctionNN<PathUtils.Step<GameObject>, Double>() {
+                @Nonnull
+                @Override
+                public Double apply(@Nonnull final PathUtils.Step<GameObject> input) {
+                    return 1d;
+                }
+            };
+            NNFunctionNN<GameObject, Iterable<GameObject>> neighboursFunction = new NNFunctionNN<GameObject, Iterable<GameObject>>() {
+                @Nonnull
+                @Override
+                public Iterable<GameObject> apply(@Nonnull final GameObject input) {
+                    return FluentIterable.from( input.getLocation().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
+                        @Nullable
+                        @Override
+                        public GameObject apply(@Nonnull final Tile input) {
+                            return input.getContents().orNull();
+                        }
+                    } ).filter( Predicates.notNull() );
+                }
+            };
+
+            /* Find paths to containers and deposit mined resources. */
+            ImmutableMap.Builder<ContainerModule, Integer> borrowedResources = ImmutableMap.builder();
+            while (!resourceCost.isZero()) {
+                Optional<PathUtils.Path<GameObject>> path = PathUtils.find( getGameObject(), foundFunction, costFunction,
+                                                                            Constants.MAX_DISTANCE_TO_CONTAINER, neighboursFunction );
+                if (!path.isPresent()) {
+                    resourceConstrained = true;
+                    // No more containers with available stock: not enough resources available to complete work unit.
+                    // Give borrowed resources back to containers.
+                    for (final Map.Entry<ContainerModule, Integer> borrowEntry : borrowedResources.build().entrySet())
+                        borrowEntry.getKey().addStock( borrowEntry.getValue() );
+
+                    return;
+                }
+
+                for (final ContainerModule containerModule : path.get().getTarget().getModules( ModuleType.CONTAINER )) {
+                    int moduleResourceCost = resourceCost.get( containerModule.getResourceType() );
+                    int depletedStock = containerModule.depleteStock( moduleResourceCost );
+                    borrowedResources.put( containerModule, depletedStock );
+                    resourceCost.reduce( containerModule.getResourceType(), depletedStock );
+                }
+            }
+
+            /* Complete a unit of work. */
+            if (!site.performWork( getBuildsModule() ))
+                // Failed to perform unit of work.  Shouldn't happen: this condition was tested at the beginning of the iteration.
+                // Give borrowed resources back to containers.
+                for (final Map.Entry<ContainerModule, Integer> borrowEntry : borrowedResources.build().entrySet())
+                    borrowEntry.getKey().addStock( borrowEntry.getValue() );
+        }
     }
 
     public ModuleType<?> getBuildsModule() {
@@ -73,6 +147,10 @@ public class ConstructorModule extends Module {
 
     public int getBuildSpeed() {
         return buildSpeed;
+    }
+
+    public boolean isResourceConstrained() {
+        return resourceConstrained;
     }
 
     public int getRemainingSpeed() {
@@ -124,26 +202,56 @@ public class ConstructorModule extends Module {
     public static class ConstructionSite extends PlayerObject {
 
         private final UnitType constructionUnitType;
-        private final Map<ModuleType<?>, Integer> remainingComplexity = Maps.newHashMap();
+        private final Map<ModuleType<?>, Integer> remainingWork = Maps.newHashMap();
+        private final List<Module> constructionModules;
 
         private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Player owner, @Nonnull final Tile location) {
             super( UnitTypes.CONSTRUCTION, owner, location );
+
             this.constructionUnitType = constructionUnitType;
-            for (final Module module : constructionUnitType.createModules())
-                remainingComplexity.put( module.getType(), ifNotNullElse( remainingComplexity.get( module.getType() ), 0 )
-                                                           + constructionUnitType.getComplexity() );
+            constructionModules = constructionUnitType.createModules();
+
+            for (final Module module : constructionModules)
+                remainingWork.put( module.getType(),
+                                   ifNotNullElse( remainingWork.get( module.getType() ), 0 ) + constructionUnitType.getConstructionWork() );
         }
 
-        public int getRemainingComplexity(final ModuleType<?> moduleType) {
-            return ifNotNullElse( remainingComplexity.get( moduleType ), 0 );
+        public int getRemainingWork(final ModuleType<?> moduleType) {
+            return ifNotNullElse( remainingWork.get( moduleType ), 0 );
         }
 
-        private int reduceComplexity(final ModuleType<?> moduleType, final int reduction) {
-            int remaining = getRemainingComplexity( moduleType );
-            int reduced = Math.min( remaining, reduction );
-            remainingComplexity.put( moduleType, remaining - reduced );
+        public ImmutableResourceCost getRemainingResourceCost() {
+            MutableResourceCost remainingResourceCost = ResourceCost.mutable();
+            for (final Module constructionModule : constructionModules)
+                remainingResourceCost.add(
+                        constructionModule.getResourceCost().multiply( getRemainingWork( constructionModule.getType() ) ) );
 
-            return reduced;
+            return ResourceCost.immutable( remainingResourceCost );
+        }
+
+        public Optional<ImmutableResourceCost> getResourceCostToPerformWork(final ModuleType<?> moduleType) {
+            for (final Module constructionModule : constructionModules)
+                if (constructionModule.getType().equals( moduleType ) && getRemainingWork( constructionModule.getType() ) > 0)
+                    return Optional.of( constructionModule.getResourceCost() );
+
+            return Optional.absent();
+        }
+
+        /**
+         * Reduce the amount of work left for building the modules of the given type by one unit.
+         *
+         * @param moduleType The module for which a constructor wants to complete a unit of work for.
+         *
+         * @return {@code true} if there was work left to complete for the given module type and a unit of work has now been completed.
+         */
+        private boolean performWork(final ModuleType<?> moduleType) {
+            int remaining = getRemainingWork( moduleType );
+            if (remaining > 0) {
+                remainingWork.put( moduleType, --remaining );
+                return true;
+            }
+
+            return false;
         }
 
         @Nonnull
@@ -160,7 +268,8 @@ public class ConstructorModule extends Module {
                         @Override
                         public boolean apply(@Nonnull final GameObject input) {
                             for (final ConstructorModule module : input.getModules( ModuleType.CONSTRUCTOR ))
-                                if (module.getRemainingSpeed() > 0 && getRemainingComplexity( module.getBuildsModule() ) > 0)
+                                if (module.getRemainingSpeed() > 0 && !module.isResourceConstrained()
+                                    && getRemainingWork( module.getBuildsModule() ) > 0)
                                     return true;
 
                             return false;
@@ -176,7 +285,8 @@ public class ConstructorModule extends Module {
                     NNFunctionNN<GameObject, Iterable<GameObject>> neighboursFunction = new NNFunctionNN<GameObject, Iterable<GameObject>>() {
                         @Nonnull
                         @Override
-                        public Iterable<GameObject> apply(@Nonnull final GameObject neighbourInput) {
+                        public Iterable<GameObject> apply(
+                                @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") @Nonnull final GameObject neighbourInput) {
                             return FluentIterable.from( neighbourInput.getLocation().neighbours() )
                                                  .transform( new NFunctionNN<Tile, GameObject>() {
                                                      @Nullable
@@ -203,7 +313,8 @@ public class ConstructorModule extends Module {
                     // Find paths to constructor and use them to work on the job.
                     while (true) {
                         Optional<PathUtils.Path<GameObject>> path = PathUtils.find( getGameObject(), foundFunction, costFunction,
-                                                                                    MAX_DISTANCE_TO_CONSTRUCTOR, neighboursFunction );
+                                                                                    Constants.MAX_DISTANCE_TO_CONSTRUCTOR,
+                                                                                    neighboursFunction );
                         if (!path.isPresent())
                             // No more constructors with remaining speed or construction finished.
                             break;
@@ -212,14 +323,14 @@ public class ConstructorModule extends Module {
                             constructorModule.construct( ConstructionSite.this );
                     }
 
-                    // Check if we managed to resolve all the complexity.
-                    if (FluentIterable.from( remainingComplexity.values() ).filter( new PredicateNN<Integer>() {
+                    // Check if we managed to complete all the work.
+                    if (FluentIterable.from( remainingWork.values() ).filter( new PredicateNN<Integer>() {
                         @Override
                         public boolean apply(@Nonnull final Integer input) {
                             return input > 0;
                         }
                     } ).isEmpty()) {
-                        // No more complexity remaining; create the constructed unit.
+                        // No more work remaining; create the constructed unit.
                         die();
                         new PlayerObject( constructionUnitType, Preconditions.checkNotNull( getPlayer() ), getLocation() );
                     }
@@ -232,9 +343,9 @@ public class ConstructorModule extends Module {
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
     public static class Builder0 {
 
-        private final ResourceCost resourceCost;
+        private final ImmutableResourceCost resourceCost;
 
-        private Builder0(final ResourceCost resourceCost) {
+        private Builder0(final ImmutableResourceCost resourceCost) {
             this.resourceCost = resourceCost;
         }
 
