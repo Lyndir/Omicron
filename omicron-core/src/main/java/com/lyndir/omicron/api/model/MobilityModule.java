@@ -118,8 +118,8 @@ public class MobilityModule extends PlayerModule {
             // Cannot move object that doesn't belong to the current player.
             return new Movement();
 
-        Levelling levelling = level( currentPlayer, target.getLevel().getType() );
-        if (!levelling.isPossible())
+        Leveling leveling = leveling( currentPlayer, target.getLevel().getType() );
+        if (!leveling.isPossible())
             // Cannot move because we can't level to the target's level.
             return new Movement();
 
@@ -156,7 +156,7 @@ public class MobilityModule extends PlayerModule {
         };
 
         // Find the path!
-        return new Movement( levelling, find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction ) );
+        return new Movement( leveling, find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction ) );
     }
 
     /**
@@ -165,22 +165,22 @@ public class MobilityModule extends PlayerModule {
      * @param currentPlayer The player ordering the action.
      * @param levelType     The side of the adjacent tile relative to the current.
      */
-    public Levelling level(final Player currentPlayer, final LevelType levelType) {
+    public Leveling leveling(final Player currentPlayer, final LevelType levelType) {
 
         if (levelType == getGameObject().getLocation().getLevel().getType())
             // Already in the destination level.
-            return new Levelling( false, levelType, 0 );
+            return new Leveling( false, levelType, 0 );
 
         if (!currentPlayer.equals( getGameObject().getPlayer() ))
             // Cannot level object that doesn't belong to the current player.
-            return new Levelling( false, levelType, 0 );
+            return new Leveling( false, levelType, 0 );
 
         double cost = costForLevelingToLevel( levelType );
         if (cost > remainingSpeed)
             // Cannot move: insufficient speed remaining this turn.
-            return new Levelling( false, levelType, cost );
+            return new Leveling( false, levelType, cost );
 
-        return new Levelling( true, levelType, cost );
+        return new Leveling( true, levelType, cost );
     }
 
     @Override
@@ -197,13 +197,13 @@ public class MobilityModule extends PlayerModule {
         return ModuleType.MOBILITY;
     }
 
-    public class Levelling {
+    public class Leveling {
 
         private final boolean   possible;
         private final LevelType levelType;
         private final double    cost;
 
-        Levelling(final boolean possible, @Nonnull final LevelType levelType, final double cost) {
+        Leveling(final boolean possible, @Nonnull final LevelType levelType, final double cost) {
             this.possible = possible;
             this.levelType = levelType;
             this.cost = cost;
@@ -237,16 +237,16 @@ public class MobilityModule extends PlayerModule {
 
     public class Movement {
 
-        private final Levelling levelling;
+        private final Leveling             leveling;
         private final Optional<Path<Tile>> path;
 
         Movement() {
-            levelling = null;
+            leveling = null;
             path = Optional.absent();
         }
 
-        Movement(@Nonnull final Levelling levelling, final Optional<Path<Tile>> path) {
-            this.levelling = levelling;
+        Movement(@Nonnull final Leveling leveling, final Optional<Path<Tile>> path) {
+            this.leveling = leveling;
             this.path = path;
         }
 
@@ -260,7 +260,7 @@ public class MobilityModule extends PlayerModule {
 
         public boolean execute() {
             // Check that this movement was deemed possible.
-            if (!isPossible() || levelling == null)
+            if (!isPossible() || leveling == null)
                 return false;
 
             // Check that we still have sufficient remaining speed.
@@ -281,8 +281,8 @@ public class MobilityModule extends PlayerModule {
             }
             while (true);
 
-            // Perform the levelling.
-            if (!levelling.execute())
+            // Perform the leveling.
+            if (!leveling.execute())
                 return false;
 
             // Execute the path.

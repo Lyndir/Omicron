@@ -54,14 +54,14 @@ public class MobilityModuleTest extends AbstractTest {
     }
 
     @Test
-    public void testMove()
+    public void testMovement()
             throws Exception {
-
+        // TODO
     }
 
     @Test
     public void testLevel()
             throws Exception {
-
+        // TODO
     }
 }
