@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.StringUtils;
-import com.lyndir.omicron.api.controller.*;
 import com.lyndir.omicron.api.model.*;
 import java.util.*;
 import javax.annotation.Nonnull;
@@ -99,7 +98,7 @@ public abstract class AbstractTest {
             }
 
             @Override
-            public List<Module> createModules() {
+            public List<? extends Module> createModules() {
                 return Lists.newArrayList( modules );
             }
 
@@ -119,7 +118,7 @@ public abstract class AbstractTest {
     }
 
     protected PlayerObject createUnit(final UnitType unitType, final Game game, final Player player, final int u, final int v) {
-        return new PlayerObject( unitType, player, game.getLevel( LevelType.GROUND ).getTile( u, v ).get() );
+        return new PlayerObject( unitType, game, player, game.getLevel( LevelType.GROUND ).getTile( u, v ).get() );
     }
 
     @BeforeMethod

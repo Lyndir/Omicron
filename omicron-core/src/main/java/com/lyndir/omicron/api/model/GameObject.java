@@ -4,8 +4,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
-import com.lyndir.omicron.api.controller.GameObjectController;
-import com.lyndir.omicron.api.controller.Module;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,12 +20,14 @@ public abstract class GameObject extends MetaObject implements GameObserver {
     final Logger logger = Logger.get( getClass() );
 
     private final UnitType                            unitType;
+    private final Game                                game;
     private final int                                 objectID;
     private final ListMultimap<ModuleType<?>, Module> modules;
     private       Tile                                location;
 
-    protected GameObject(@Nonnull final UnitType unitType, final int objectID, @Nonnull final Tile location) {
+    protected GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, final int objectID, @Nonnull final Tile location) {
         this.unitType = unitType;
+        this.game = game;
         this.objectID = objectID;
         this.location = location;
 
@@ -37,8 +37,6 @@ public abstract class GameObject extends MetaObject implements GameObserver {
             module.setGameObject( this );
         }
         modules = modulesBuilder.build();
-
-        location.setContents( this );
     }
 
     @Nonnull
@@ -70,12 +68,16 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         return objectID;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public Tile getLocation() {
 
         return location;
     }
 
-    public void setLocation(final Tile location) {
+    void setLocation(final Tile location) {
 
         this.location = location;
     }
@@ -142,7 +144,7 @@ public abstract class GameObject extends MetaObject implements GameObserver {
         return onModuleElse( moduleType, index, null );
     }
 
-    public ImmutableCollection<Module> listModules() {
+    public ImmutableCollection<? extends Module> listModules() {
 
         return ImmutableList.copyOf( modules.values() );
     }

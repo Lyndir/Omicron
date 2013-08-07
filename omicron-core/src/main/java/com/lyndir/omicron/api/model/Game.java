@@ -5,7 +5,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
-import com.lyndir.omicron.api.controller.GameController;
 import com.lyndir.omicron.api.util.PathUtils;
 import java.util.*;
 import javax.annotation.Nonnull;
@@ -326,9 +325,9 @@ public class Game extends MetaObject {
                        startTileScout.getContents().isPresent());
 
                 // Add the units.
-                new PlayerObject( UnitTypes.ENGINEER, player, startTileEngineer );
-                new PlayerObject( UnitTypes.AIRSHIP, player, startTileAirship );
-                new PlayerObject( UnitTypes.SCOUT, player, startTileScout );
+                new PlayerObject( UnitTypes.ENGINEER, game, player, startTileEngineer );
+                new PlayerObject( UnitTypes.AIRSHIP, game, player, startTileAirship );
+                new PlayerObject( UnitTypes.SCOUT, game, player, startTileScout );
             }
         }
     }

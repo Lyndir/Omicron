@@ -1,8 +1,7 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import com.lyndir.omicron.api.model.*;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

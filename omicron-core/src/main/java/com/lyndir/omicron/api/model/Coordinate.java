@@ -51,9 +51,16 @@ public class Coordinate extends MetaObject {
             this.dv = dv;
         }
 
-        public Coordinate delta(final Coordinate coordinate) {
+        /**
+         * Use this side as a delta from a given coordinate to find the adjacent coordinate.
+         *
+         * @param source The source coordinate.
+         *
+         * @return The destination coordinate.  This is the coordinate to the side of the source coordinate expressed by this instance.
+         */
+        public Coordinate delta(final Coordinate source) {
 
-            return coordinate.delta( du, dv );
+            return source.delta( du, dv );
         }
 
         public int getDu() {

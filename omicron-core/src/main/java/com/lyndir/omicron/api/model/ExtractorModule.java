@@ -1,17 +1,16 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Constants;
-import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.PathUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class ExtractorModule extends Module {
+public class ExtractorModule extends PlayerModule {
 
     private final ResourceType resourceType;
     private final int          speed;

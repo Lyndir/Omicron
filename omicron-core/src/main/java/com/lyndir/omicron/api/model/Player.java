@@ -3,7 +3,6 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Joiner;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import com.lyndir.omicron.api.controller.PlayerController;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -134,7 +133,7 @@ public class Player extends MetaObject implements GameObserver {
         return objects.get( objectId );
     }
 
-    public void addObject(final GameObject gameObject) {
+    void addObject(final GameObject gameObject) {
 
         objects.put( gameObject.getObjectID(), gameObject );
     }

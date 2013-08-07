@@ -1,4 +1,4 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.lyndir.omicron.api.model.*;
 

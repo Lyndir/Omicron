@@ -4,9 +4,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.lyndir.omicron.api.controller.GameController;
-import com.lyndir.omicron.api.model.GameObject;
-import com.lyndir.omicron.api.model.Player;
+import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;

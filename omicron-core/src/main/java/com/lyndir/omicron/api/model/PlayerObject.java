@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.lyndir.omicron.api.controller.*;
 import javax.annotation.Nonnull;
 
 
@@ -13,11 +12,10 @@ public class PlayerObject extends GameObject {
 
     private final Player owner;
 
-    public PlayerObject(@Nonnull final UnitType unitType, @Nonnull final Player owner, @Nonnull final Tile location) {
-        super(unitType, owner.nextObjectID(), location );
+    public PlayerObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner, @Nonnull final Tile location) {
+        super(unitType, game, owner.nextObjectID(), location );
 
         this.owner = owner;
-        owner.getController().addObject( this );
     }
 
     @Nonnull

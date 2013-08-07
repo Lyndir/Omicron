@@ -1,9 +1,8 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.lyndir.omicron.api.model.*;
 import javax.annotation.Nonnull;
 
 
@@ -95,7 +94,7 @@ public class PlayerController implements GameObserver {
         return player.nextObjectID();
     }
 
-    public void addObject(final GameObject gameObject) {
+    void addObject(final GameObject gameObject) {
 
         Preconditions.checkState( gameObject.getPlayer() == player, "Cannot add object to this player: belongs to another player." );
         player.addObject( gameObject );

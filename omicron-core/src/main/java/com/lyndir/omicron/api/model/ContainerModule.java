@@ -1,10 +1,9 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Preconditions;
-import com.lyndir.omicron.api.model.*;
 
 
-public class ContainerModule extends Module {
+public class ContainerModule extends PlayerModule {
 
     private final ResourceType resourceType;
     private final int          capacity;

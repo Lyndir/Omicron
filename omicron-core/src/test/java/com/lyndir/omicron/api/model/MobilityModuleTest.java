@@ -1,9 +1,10 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import static org.testng.AssertJUnit.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.lyndir.omicron.api.model.LevelType;
+import com.lyndir.omicron.api.model.MobilityModule;
 import com.lyndir.omicron.api.util.AbstractTest;
 import org.testng.annotations.Test;
 

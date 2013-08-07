@@ -16,7 +16,6 @@
 
 package com.lyndir.omicron.api.model;
 
-import com.lyndir.omicron.api.controller.Module;
 import java.util.List;
 
 
@@ -29,5 +28,5 @@ public interface UnitType {
 
     int getConstructionWork();
 
-    List<Module> createModules();
+    List<? extends Module> createModules();
 }

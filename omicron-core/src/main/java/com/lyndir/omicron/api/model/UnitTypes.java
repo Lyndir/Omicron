@@ -18,7 +18,6 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.*;
-import com.lyndir.omicron.api.controller.*;
 import java.util.List;
 
 
@@ -28,9 +27,9 @@ import java.util.List;
 public enum UnitTypes implements UnitType {
 
     ENGINEER( "Engineer", 5, //
-              new Supplier<List<Module>>() {
+              new Supplier<List<? extends Module>>() {
                   @Override
-                  public List<Module> get() {
+                  public List<? extends Module> get() {
                       return ImmutableList.of( BaseModule.createWithStandardResourceCost()
                                                          .maxHealth( 10 )
                                                          .armor( 2 )
@@ -43,9 +42,9 @@ public enum UnitTypes implements UnitType {
                   }
               } ),
     SCOUT( "Scout", 5, //
-           new Supplier<List<Module>>() {
+           new Supplier<List<? extends Module>>() {
                @Override
-               public List<Module> get() {
+               public List<? extends Module> get() {
                    return ImmutableList.of( BaseModule.createWithStandardResourceCost()
                                                       .maxHealth( 5 )
                                                       .armor( 3 )
@@ -65,9 +64,9 @@ public enum UnitTypes implements UnitType {
                }
            } ),
     AIRSHIP( "Airship", 10, //
-             new Supplier<List<Module>>() {
+             new Supplier<List<? extends Module>>() {
                  @Override
-                 public List<Module> get() {
+                 public List<? extends Module> get() {
                      return ImmutableList.of( BaseModule.createWithStandardResourceCost()
                                                         .maxHealth( 5 )
                                                         .armor( 1 )
@@ -80,9 +79,9 @@ public enum UnitTypes implements UnitType {
                  }
              } ),
     CONSTRUCTION( "Construction Site", Integer.MAX_VALUE, //
-                  new Supplier<List<Module>>() {
+                  new Supplier<List<? extends Module>>() {
                       @Override
-                      public List<Module> get() {
+                      public List<? extends Module> get() {
                           return ImmutableList.<Module>of( BaseModule.createWithStandardResourceCost()
                                                                      .maxHealth( 1 )
                                                                      .armor( 1 )
@@ -91,11 +90,11 @@ public enum UnitTypes implements UnitType {
                       }
                   } );
 
-    private final String                 typeName;
-    private final int                    constructionWork;
-    private final Supplier<List<Module>> moduleSupplier;
+    private final String                           typeName;
+    private final int                              constructionWork;
+    private final Supplier<List<? extends Module>> moduleSupplier;
 
-    UnitTypes(final String typeName, final int constructionWork, final Supplier<List<Module>> moduleSupplier) {
+    UnitTypes(final String typeName, final int constructionWork, final Supplier<List<? extends Module>> moduleSupplier) {
         this.typeName = typeName;
         this.constructionWork = constructionWork;
         this.moduleSupplier = moduleSupplier;
@@ -112,7 +111,7 @@ public enum UnitTypes implements UnitType {
     }
 
     @Override
-    public List<Module> createModules() {
+    public List<? extends Module> createModules() {
         return moduleSupplier.get();
     }
 }

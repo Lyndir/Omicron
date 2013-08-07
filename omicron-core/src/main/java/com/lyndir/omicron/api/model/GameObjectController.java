@@ -1,10 +1,9 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import com.lyndir.omicron.api.model.*;
 import javax.annotation.Nonnull;
 
 
@@ -23,6 +22,19 @@ public abstract class GameObjectController<O extends GameObject> extends MetaObj
     public O getGameObject() {
 
         return gameObject;
+    }
+
+    public void setLocation(final Tile location) {
+
+        Tile oldLocation = getGameObject().getLocation();
+        if (oldLocation != null)
+            oldLocation.setContents( null );
+
+        getGameObject().setLocation( location );
+
+        Tile newLocation = getGameObject().getLocation();
+        if (newLocation != null)
+            newLocation.setContents( getGameObject() );
     }
 
     @Override

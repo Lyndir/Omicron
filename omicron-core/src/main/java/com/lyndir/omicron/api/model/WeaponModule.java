@@ -1,13 +1,12 @@
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.lyndir.omicron.api.model.*;
 import java.util.Random;
 import java.util.Set;
 
 
-public class WeaponModule extends Module {
+public class WeaponModule extends PlayerModule {
 
     private static final Random RANDOM = new Random();
     private final int            firePower;

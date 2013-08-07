@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.api.controller;
+package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
@@ -22,14 +22,13 @@ import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Constants;
-import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.PathUtils;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class ConstructorModule extends Module {
+public class ConstructorModule extends PlayerModule {
 
     private final int           buildSpeed;
     private final ModuleType<?> buildsModule;
@@ -189,7 +188,7 @@ public class ConstructorModule extends Module {
         Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ) );
         Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1 );
 
-        ConstructionSite site = new ConstructionSite( unitType, Preconditions.checkNotNull( getGameObject().getPlayer() ), location );
+        ConstructionSite site = new ConstructionSite( unitType, getGameObject().getGame(), getGameObject().getPlayer(), location );
         setTarget( site );
 
         return site;
@@ -203,10 +202,11 @@ public class ConstructorModule extends Module {
 
         private final UnitType constructionUnitType;
         private final Map<ModuleType<?>, Integer> remainingWork = Maps.newHashMap();
-        private final List<Module> constructionModules;
+        private final List<? extends Module> constructionModules;
 
-        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Player owner, @Nonnull final Tile location) {
-            super( UnitTypes.CONSTRUCTION, owner, location );
+        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner,
+                                 @Nonnull final Tile location) {
+            super( UnitTypes.CONSTRUCTION, game, owner, location );
 
             this.constructionUnitType = constructionUnitType;
             constructionModules = constructionUnitType.createModules();
@@ -332,7 +332,7 @@ public class ConstructorModule extends Module {
                     } ).isEmpty()) {
                         // No more work remaining; create the constructed unit.
                         die();
-                        new PlayerObject( constructionUnitType, Preconditions.checkNotNull( getPlayer() ), getLocation() );
+                        new PlayerObject( constructionUnitType, getGame(), getPlayer(), getLocation() );
                     }
                 }
             };

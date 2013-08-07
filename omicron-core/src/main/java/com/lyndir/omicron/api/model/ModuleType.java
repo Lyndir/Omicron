@@ -17,7 +17,6 @@
 package com.lyndir.omicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.omicron.api.controller.*;
 
 
 /**

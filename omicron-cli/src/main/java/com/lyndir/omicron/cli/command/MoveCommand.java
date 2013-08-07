@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
-import com.lyndir.omicron.api.controller.MobilityModule;
+import com.lyndir.omicron.api.model.MobilityModule;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
@@ -88,8 +88,15 @@ public class MoveCommand extends Command {
         }
         MobilityModule mobilityModule = optionalMobility.get();
 
+        Coordinate targetPosition = side.get().delta( mobilityModule.getGameObject().getLocation().getPosition() );
+        Optional<Tile> targetLocation = mobilityModule.getGameObject().getLocation().getLevel().getTile( targetPosition );
+        if (!targetLocation.isPresent()) {
+            err( "No tile at that side for position: %s.", targetPosition );
+            return;
+        }
+
         // Move the object.
-        mobilityModule.move( localPlayer, side.get() );
+        mobilityModule.movement( localPlayer, targetLocation.get() );
         inf( "Object is now at: %s", gameObject.getLocation() );
     }
 }
