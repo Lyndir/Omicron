@@ -7,7 +7,6 @@ import com.lyndir.lhunath.opal.system.util.*;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -28,7 +27,7 @@ public class GameObject extends MetaObject implements GameObserver {
     private       Player                              owner;
     private       Tile                                location;
 
-    public GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @NotNull final Player owner,
+    public GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner,
                          @Nonnull final Tile location) {
         this( unitType, game, owner, owner.nextObjectID(), location );
     }
