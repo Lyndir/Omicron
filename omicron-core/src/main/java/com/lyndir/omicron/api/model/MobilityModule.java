@@ -35,6 +35,10 @@ public class MobilityModule extends Module {
         return new Builder0( ModuleType.MOBILITY.getStandardCost().add( resourceCost ) );
     }
 
+    public double getRemainingSpeed() {
+        return remainingSpeed;
+    }
+
     /**
      * Get the speed cost related to moving around in the given level.
      *
@@ -56,12 +60,11 @@ public class MobilityModule extends Module {
      */
     public double costForLevelingToLevel(final LevelType levelType) {
 
+        // Level up until we reach the target level.
+        double cost = 0;
         LevelType currentLevel = getGameObject().getLocation().getLevel().getType();
         if (levelType == currentLevel)
             return 0;
-
-        // Level up until we reach the target level.
-        double cost = 0;
         do {
             Optional<LevelType> newLevel = currentLevel.up();
             if (!newLevel.isPresent())
@@ -83,6 +86,7 @@ public class MobilityModule extends Module {
 
         // Level down until we reach the target level.
         cost = 0;
+        currentLevel = getGameObject().getLocation().getLevel().getType();
         do {
             Optional<LevelType> newLevel = currentLevel.down();
             if (!newLevel.isPresent())
