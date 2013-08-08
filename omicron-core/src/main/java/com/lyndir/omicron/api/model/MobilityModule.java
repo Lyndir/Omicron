@@ -131,7 +131,6 @@ public class MobilityModule extends Module {
         PredicateNN<Tile> foundFunction = new PredicateNN<Tile>() {
             @Override
             public boolean apply(@Nonnull final Tile input) {
-
                 return ObjectUtils.isEqual( input, target );
             }
         };
@@ -139,7 +138,6 @@ public class MobilityModule extends Module {
             @Nonnull
             @Override
             public Double apply(@Nonnull final Step<Tile> input) {
-
                 if (!input.getTo().isAccessible())
                     return Double.MAX_VALUE;
 
@@ -150,7 +148,6 @@ public class MobilityModule extends Module {
             @Nonnull
             @Override
             public Iterable<Tile> apply(@Nonnull final Tile input) {
-
                 return input.neighbours();
             }
         };
@@ -169,7 +166,7 @@ public class MobilityModule extends Module {
 
         if (levelType == getGameObject().getLocation().getLevel().getType())
             // Already in the destination level.
-            return new Leveling( false, levelType, 0 );
+            return new Leveling( true, levelType, 0 );
 
         if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
             // Cannot level object that doesn't belong to the current player.
@@ -270,7 +267,7 @@ public class MobilityModule extends Module {
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
             do {
-                if (!tracePath.getTarget().isAccessible())
+                if (!tracePath.getTarget().isAccessible() && !ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ))
                     // Path can no longer be walked.
                     return false;
                 Optional<Path<Tile>> parent = tracePath.getParent();

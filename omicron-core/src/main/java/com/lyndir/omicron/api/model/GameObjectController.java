@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class GameObjectController<O extends GameObject> extends MetaObject implements GameObserver {
@@ -19,9 +20,9 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
         this.gameObject = gameObject;
 
-        Optional<Player> owner = getOwner();
-        if (owner.isPresent())
-            owner.get().getController().addObject( getGameObject() );
+        // Register ourselves into the game.
+        setOwner( getGameObject().getOwner().orNull() );
+        setLocation( getGameObject().getLocation() );
     }
 
     public O getGameObject() {
@@ -35,7 +36,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         return getGameObject().getOwner();
     }
 
-    public void setOwner(final Player owner) {
+    public void setOwner(@Nullable final Player owner) {
         Optional<Player> oldOwner = getOwner();
         if (oldOwner.isPresent())
             oldOwner.get().getObjects().remove( getGameObject() );

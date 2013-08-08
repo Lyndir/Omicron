@@ -46,9 +46,9 @@ public class MobilityModuleTest extends AbstractTest {
                                                       ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY, 2d, LevelType.SPACE, 3d ) );
         createUnit( testUnitType( "Leveler", module ) );
 
-        assertEquals( module.costForLevelingToLevel( LevelType.GROUND ), 0f );
-        assertEquals( module.costForLevelingToLevel( LevelType.SKY ), 2f );
-        assertEquals( module.costForLevelingToLevel( LevelType.SPACE ), 5f );
+        assertEquals( module.costForLevelingToLevel( LevelType.GROUND ), 0d );
+        assertEquals( module.costForLevelingToLevel( LevelType.SKY ), 2d );
+        assertEquals( module.costForLevelingToLevel( LevelType.SPACE ), 5d );
     }
 
     @Test
@@ -56,17 +56,18 @@ public class MobilityModuleTest extends AbstractTest {
             throws Exception {
 
         GameObject mover = createUnit( testUnitType( "Mover", MobilityModule.createWithStandardResourceCost()
-                                                                              .movementSpeed( 6 )
-                                                                              .movementCost( ImmutableMap.<LevelType, Double>of() )
-                                                                              .levelingCost(
-                                                                                      ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY,
-                                                                                                       2d, LevelType.SPACE, 3d ) ) ) );
+                                                                            .movementSpeed( 6 )
+                                                                            .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
+                                                                            .levelingCost( ImmutableMap.<LevelType, Double>of() ) ) );
+        staticGame.getController().start();
 
-        mover.onModule( ModuleType.MOBILITY, 0).movement( staticPlayer, mover.getLocation().neighbour( Coordinate.Side.E ) );
+        mover.onModule( ModuleType.MOBILITY, 0 ).movement( staticPlayer, mover.getLocation().neighbour( Coordinate.Side.E ) ).execute();
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
         assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 0, staticGame.getLevelSize() ) );
 
-        mover.onModule( ModuleType.MOBILITY, 0).movement( staticPlayer, staticGame.getLevel( LevelType.GROUND ).getTile( 1, 5 ).get() );
+        mover.onModule( ModuleType.MOBILITY, 0 )
+             .movement( staticPlayer, staticGame.getLevel( LevelType.GROUND ).getTile( 1, 5 ).get() )
+             .execute();
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
         assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );
     }
