@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class ConstructorModule extends PlayerModule {
+public class ConstructorModule extends Module {
 
     private final int           buildSpeed;
     private final ModuleType<?> buildsModule;
@@ -161,7 +161,7 @@ public class ConstructorModule extends PlayerModule {
     }
 
     public void setTarget(final GameObject target) {
-        Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getPlayer(), target.getPlayer() ),
+        Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner(), target.getOwner() ),
                                      "Can only target units of the same player." );
         this.target = target;
     }
@@ -188,7 +188,7 @@ public class ConstructorModule extends PlayerModule {
         Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ) );
         Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1 );
 
-        ConstructionSite site = new ConstructionSite( unitType, getGameObject().getGame(), getGameObject().getPlayer(), location );
+        ConstructionSite site = new ConstructionSite( unitType, getGameObject().getGame(), getGameObject().getOwner().get(), location );
         setTarget( site );
 
         return site;
@@ -198,7 +198,7 @@ public class ConstructorModule extends PlayerModule {
      * A construction site is a unit that is under construction.  Its controller manages its construction progress and it turns into the
      * constructed unit upon completion.
      */
-    public static class ConstructionSite extends PlayerObject {
+    public static class ConstructionSite extends GameObject {
 
         private final UnitType constructionUnitType;
         private final Map<ModuleType<?>, Integer> remainingWork = Maps.newHashMap();
@@ -256,8 +256,8 @@ public class ConstructorModule extends PlayerModule {
 
         @Nonnull
         @Override
-        public PlayerObjectController<? extends PlayerObject> getController() {
-            return new PlayerObjectController<PlayerObject>( this ) {
+        public GameObjectController<? extends GameObject> getController() {
+            return new GameObjectController<GameObject>( this ) {
 
                 @Override
                 public void onNewTurn() {
@@ -332,7 +332,7 @@ public class ConstructorModule extends PlayerModule {
                     } ).isEmpty()) {
                         // No more work remaining; create the constructed unit.
                         die();
-                        new PlayerObject( constructionUnitType, getGame(), getPlayer(), getLocation() );
+                        new GameObject( constructionUnitType, getGame(), getOwner().get(), getLocation() );
                     }
                 }
             };

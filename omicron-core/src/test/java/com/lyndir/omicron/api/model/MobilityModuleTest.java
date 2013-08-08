@@ -3,8 +3,6 @@ package com.lyndir.omicron.api.model;
 import static org.testng.AssertJUnit.*;
 
 import com.google.common.collect.ImmutableMap;
-import com.lyndir.omicron.api.model.LevelType;
-import com.lyndir.omicron.api.model.MobilityModule;
 import com.lyndir.omicron.api.util.AbstractTest;
 import org.testng.annotations.Test;
 
@@ -56,7 +54,21 @@ public class MobilityModuleTest extends AbstractTest {
     @Test
     public void testMovement()
             throws Exception {
-        // TODO
+
+        GameObject mover = createUnit( testUnitType( "Mover", MobilityModule.createWithStandardResourceCost()
+                                                                              .movementSpeed( 6 )
+                                                                              .movementCost( ImmutableMap.<LevelType, Double>of() )
+                                                                              .levelingCost(
+                                                                                      ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY,
+                                                                                                       2d, LevelType.SPACE, 3d ) ) ) );
+
+        mover.onModule( ModuleType.MOBILITY, 0).movement( staticPlayer, mover.getLocation().neighbour( Coordinate.Side.E ) );
+        assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
+        assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 0, staticGame.getLevelSize() ) );
+
+        mover.onModule( ModuleType.MOBILITY, 0).movement( staticPlayer, staticGame.getLevel( LevelType.GROUND ).getTile( 1, 5 ).get() );
+        assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
+        assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );
     }
 
     @Test

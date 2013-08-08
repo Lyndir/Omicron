@@ -325,9 +325,9 @@ public class Game extends MetaObject {
                        startTileScout.getContents().isPresent());
 
                 // Add the units.
-                new PlayerObject( UnitTypes.ENGINEER, game, player, startTileEngineer );
-                new PlayerObject( UnitTypes.AIRSHIP, game, player, startTileAirship );
-                new PlayerObject( UnitTypes.SCOUT, game, player, startTileScout );
+                new GameObject( UnitTypes.ENGINEER, game, player, startTileEngineer );
+                new GameObject( UnitTypes.AIRSHIP, game, player, startTileAirship );
+                new GameObject( UnitTypes.SCOUT, game, player, startTileScout );
             }
         }
     }

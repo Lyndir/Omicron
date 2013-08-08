@@ -1,10 +1,11 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 // TODO: Should this module's logic be moved to GameObjectController?
@@ -38,8 +39,8 @@ public class BaseModule extends Module implements GameObserver {
     @Override
     public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
 
-        Player owner = getGameObject().getPlayer();
-        if (owner != null && !owner.equals( currentPlayer ))
+        Optional<Player> owner = getGameObject().getOwner();
+        if (owner.isPresent() && !ObjectUtils.isEqual( owner.get(), currentPlayer ))
             return false;
 
         return getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) <= viewRange;
@@ -58,11 +59,10 @@ public class BaseModule extends Module implements GameObserver {
         } );
     }
 
-    @Nullable
+    @Nonnull
     @Override
-    public Player getPlayer() {
-
-        return getGameObject().getPlayer();
+    public Optional<Player> getOwner() {
+        return getGameObject().getOwner();
     }
 
     public int getMaxHealth() {

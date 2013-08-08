@@ -1,8 +1,8 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Joiner;
-import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectMeta;
+import com.google.common.base.Optional;
+import com.lyndir.lhunath.opal.system.util.*;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +38,8 @@ public class Player extends MetaObject implements GameObserver {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private int nextObjectID;
 
-    public Player(final int playerID, @Nullable final PlayerKey key, final String name, final Color primaryColor, final Color secondaryColor) {
+    public Player(final int playerID, @Nullable final PlayerKey key, final String name, final Color primaryColor,
+                  final Color secondaryColor) {
 
         this.playerID = playerID;
         this.key = key;
@@ -66,10 +67,11 @@ public class Player extends MetaObject implements GameObserver {
         return getController().listObservableTiles( currentPlayer );
     }
 
+    @Nonnull
     @Override
-    public Player getPlayer() {
+    public Optional<Player> getOwner() {
 
-        return this;
+        return Optional.of( this );
     }
 
     public int getPlayerID() {
@@ -79,7 +81,7 @@ public class Player extends MetaObject implements GameObserver {
 
     public boolean hasKey(final PlayerKey playerKey) {
 
-        return key == playerKey;
+        return ObjectUtils.isEqual( key , playerKey);
     }
 
     public boolean isKeyLess() {

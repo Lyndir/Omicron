@@ -3,7 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Preconditions;
 
 
-public class ContainerModule extends PlayerModule {
+public class ContainerModule extends Module {
 
     private final ResourceType resourceType;
     private final int          capacity;

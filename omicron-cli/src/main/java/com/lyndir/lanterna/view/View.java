@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
  */
 public class View {
 
-    protected Logger logger = Logger.get( getClass() );
+    protected final Logger logger = Logger.get( getClass() );
 
     private final List<View> children = new LinkedList<>();
     private View parent;
@@ -52,6 +52,8 @@ public class View {
 
     public final void measure(final Screen screen, final Box maximumMeasuredBoxInParent) {
         boolean maximumMeasuredBoxChanged = !maximumMeasuredBoxInParent.equals( oldMaximumMeasuredBoxInParent );
+        oldMaximumMeasuredBoxInParent = maximumMeasuredBoxInParent;
+
         measuredBoxInParent = measureInParent( screen, maximumMeasuredBoxInParent, maximumMeasuredBoxChanged );
         measureChildren( screen );
     }

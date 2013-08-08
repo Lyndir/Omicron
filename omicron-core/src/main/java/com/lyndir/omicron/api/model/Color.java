@@ -42,35 +42,35 @@ public class Color extends MetaObject implements Serializable {
     }
 
 
-    private final byte r;
-    private final byte g;
-    private final byte b;
+    private final byte red;
+    private final byte green;
+    private final byte blue;
 
-    public Color(final int r, final int g, final int b) {
+    public Color(final int red, final int green, final int blue) {
 
-        this( (byte) r, (byte) g, (byte) b );
+        this( (byte) red, (byte) green, (byte) blue );
     }
 
-    public Color(final byte r, final byte g, final byte b) {
+    public Color(final byte red, final byte green, final byte blue) {
 
-        this.r = r;
-        this.g = g;
-        this.b = b;
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
     }
 
-    public byte getR() {
+    public byte getRed() {
 
-        return r;
+        return red;
     }
 
-    public byte getG() {
+    public byte getGreen() {
 
-        return g;
+        return green;
     }
 
-    public byte getB() {
+    public byte getBlue() {
 
-        return b;
+        return blue;
     }
 
     public static Color of(final String colorString) {

@@ -1,8 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.lyndir.omicron.api.model.*;
-
-
 public class ObjectController<O extends GameObject> {
 
     private final O gameObject;

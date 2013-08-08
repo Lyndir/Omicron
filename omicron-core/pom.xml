@@ -11,7 +11,6 @@
         <version>GIT-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.lyndir.lhunath.omicron</groupId>
     <artifactId>omicron-core</artifactId>
     <version>GIT-SNAPSHOT</version>
 

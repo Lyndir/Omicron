@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class ExtractorModule extends PlayerModule {
+public class ExtractorModule extends Module {
 
     private final ResourceType resourceType;
     private final int          speed;

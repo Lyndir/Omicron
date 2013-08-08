@@ -2,11 +2,12 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import java.util.Random;
 import java.util.Set;
 
 
-public class WeaponModule extends PlayerModule {
+public class WeaponModule extends Module {
 
     private static final Random RANDOM = new Random();
     private final int            firePower;
@@ -18,8 +19,8 @@ public class WeaponModule extends PlayerModule {
     private       int            repeated;
     private       int            ammunition;
 
-    protected WeaponModule(final ImmutableResourceCost resourceCost, final int firePower, final int variance, final int range, final int repeat,
-                           final int ammunitionLoad, final Set<LevelType> supportedLayers) {
+    protected WeaponModule(final ImmutableResourceCost resourceCost, final int firePower, final int variance, final int range,
+                           final int repeat, final int ammunitionLoad, final Set<LevelType> supportedLayers) {
         super( resourceCost );
 
         this.firePower = firePower;
@@ -72,7 +73,7 @@ public class WeaponModule extends PlayerModule {
 
     public void fireAt(final Player currentPlayer, final Tile target) {
 
-        Preconditions.checkArgument( currentPlayer.equals( getGameObject().getPlayer() ), //
+        Preconditions.checkArgument( ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ), //
                                      "Cannot fire: unit is not owned by player." );
         Preconditions.checkArgument( currentPlayer.canObserve( currentPlayer, target ), //
                                      "Cannot fire: target not observed." );

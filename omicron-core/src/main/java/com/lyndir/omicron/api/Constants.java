@@ -19,8 +19,8 @@ package com.lyndir.omicron.api;
 /**
  * @author lhunath, 2013-08-05
  */
-public class Constants {
+public interface Constants {
 
-    public static final double MAX_DISTANCE_TO_CONTAINER   = 10;
-    public static final double MAX_DISTANCE_TO_CONSTRUCTOR = 5;
+    double MAX_DISTANCE_TO_CONTAINER   = 10;
+    double MAX_DISTANCE_TO_CONSTRUCTOR = 5;
 }

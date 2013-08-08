@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 
-public class MobilityModule extends PlayerModule {
+public class MobilityModule extends Module {
 
     private final int movementSpeed;
     private final Map<LevelType, Double> movementCost = new EnumMap<>( LevelType.class );
@@ -114,7 +114,7 @@ public class MobilityModule extends PlayerModule {
      */
     public Movement movement(final Player currentPlayer, final Tile target) {
 
-        if (!currentPlayer.equals( getGameObject().getPlayer() ))
+        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
             // Cannot move object that doesn't belong to the current player.
             return new Movement();
 
@@ -171,7 +171,7 @@ public class MobilityModule extends PlayerModule {
             // Already in the destination level.
             return new Leveling( false, levelType, 0 );
 
-        if (!currentPlayer.equals( getGameObject().getPlayer() ))
+        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
             // Cannot level object that doesn't belong to the current player.
             return new Leveling( false, levelType, 0 );
 

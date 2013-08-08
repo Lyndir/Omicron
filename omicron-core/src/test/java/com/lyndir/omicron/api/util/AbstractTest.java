@@ -109,16 +109,16 @@ public abstract class AbstractTest {
         };
     }
 
-    protected PlayerObject createUnit(final UnitType unitType) {
+    protected GameObject createUnit(final UnitType unitType) {
         return createUnit( unitType, 0, 0 );
     }
 
-    protected PlayerObject createUnit(final UnitType unitType, final int u, final int v) {
+    protected GameObject createUnit(final UnitType unitType, final int u, final int v) {
         return createUnit( unitType, staticGame, staticPlayer, u, v );
     }
 
-    protected PlayerObject createUnit(final UnitType unitType, final Game game, final Player player, final int u, final int v) {
-        return new PlayerObject( unitType, game, player, game.getLevel( LevelType.GROUND ).getTile( u, v ).get() );
+    protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final int u, final int v) {
+        return new GameObject( unitType, game, player, game.getLevel( LevelType.GROUND ).getTile( u, v ).get() );
     }
 
     @BeforeMethod

@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import javax.annotation.Nonnull;
 
 
@@ -16,10 +17,11 @@ public class PlayerController implements GameObserver {
         this.player = player;
     }
 
+    @Nonnull
     @Override
-    public Player getPlayer() {
+    public Optional<Player> getOwner() {
 
-        return player;
+        return Optional.of( player );
     }
 
     public void setGameController(final GameController gameController) {
@@ -69,11 +71,11 @@ public class PlayerController implements GameObserver {
             @Override
             public boolean apply(final GameObject input) {
 
-                Player player = observer.getPlayer();
-                if (player == null)
-                    return observer.equals( input );
+                Optional<Player> owner = observer.getOwner();
+                if (owner.isPresent())
+                    return observer.canObserve( owner.get(), input.getLocation() );
 
-                return observer.canObserve( player, input.getLocation() );
+                return observer.equals( input );
             }
         } );
     }
@@ -96,7 +98,8 @@ public class PlayerController implements GameObserver {
 
     void addObject(final GameObject gameObject) {
 
-        Preconditions.checkState( gameObject.getPlayer() == player, "Cannot add object to this player: belongs to another player." );
+        Preconditions.checkState( ObjectUtils.isEqual( player, gameObject.getOwner().orNull() ),
+                                  "Cannot add object to this player: belongs to another player." );
         player.addObject( gameObject );
     }
 

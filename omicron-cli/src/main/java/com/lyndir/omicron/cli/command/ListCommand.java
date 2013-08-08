@@ -1,6 +1,6 @@
 package com.lyndir.omicron.cli.command;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -76,7 +76,7 @@ public class ListCommand extends Command {
         inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
         for (final GameObject gameObject : gameObjectBuilder.build())
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
-                 gameObject.getObjectID(), ifNotNullElse( Player.class, gameObject.getPlayer(), "-" ).getName(),
+                 gameObject.getObjectID(), ifNotNullElse( Player.class, gameObject.getOwner().orNull(), "-" ).getName(),
                  gameObject.getLocation().getLevel().getType().getName(), gameObject.getLocation().getPosition().getU(),
                  gameObject.getLocation().getPosition().getV(), gameObject.getType().getTypeName() );
     }

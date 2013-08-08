@@ -103,9 +103,9 @@ public class Tile extends MetaObject {
         if (ObjectUtils.isEqual( contents, target ))
             return true;
 
-        Player player = contents.getPlayer();
-        if (player != null)
-            return ObjectUtils.isEqual( player.getController(), target );
+        Optional<Player> owner = contents.getOwner();
+        if (owner.isPresent())
+            return ObjectUtils.isEqual( owner.get(), target ) || ObjectUtils.isEqual( owner.get().getController(), target );
 
         return false;
     }

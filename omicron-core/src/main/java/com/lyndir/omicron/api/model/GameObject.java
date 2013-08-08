@@ -7,6 +7,7 @@ import com.lyndir.lhunath.opal.system.util.*;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -14,20 +15,29 @@ import javax.annotation.Nullable;
  *
  * @author lhunath
  */
-public abstract class GameObject extends MetaObject implements GameObserver {
+public class GameObject extends MetaObject implements GameObserver {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     final Logger logger = Logger.get( getClass() );
 
+    private final GameObjectController<?>             controller;
     private final UnitType                            unitType;
     private final Game                                game;
     private final int                                 objectID;
     private final ListMultimap<ModuleType<?>, Module> modules;
+    private       Player                              owner;
     private       Tile                                location;
 
-    protected GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, final int objectID, @Nonnull final Tile location) {
+    public GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @NotNull final Player owner,
+                         @Nonnull final Tile location) {
+        this( unitType, game, owner, owner.nextObjectID(), location );
+    }
+
+    public GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final int objectID,
+                         @Nonnull final Tile location) {
         this.unitType = unitType;
         this.game = game;
+        this.owner = owner;
         this.objectID = objectID;
         this.location = location;
 
@@ -37,16 +47,24 @@ public abstract class GameObject extends MetaObject implements GameObserver {
             module.setGameObject( this );
         }
         modules = modulesBuilder.build();
+
+        controller = new GameObjectController<>( this );
     }
 
     @Nonnull
-    public abstract GameObjectController<? extends GameObject> getController();
+    public GameObjectController<? extends GameObject> getController() {
+        return controller;
+    }
 
-    @Nullable
+    @Nonnull
     @Override
-    public Player getPlayer() {
+    public Optional<Player> getOwner() {
 
-        return null;
+        return Optional.fromNullable( owner );
+    }
+
+    void setOwner(final Player owner) {
+        this.owner = owner;
     }
 
     @Override

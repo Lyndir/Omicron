@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
@@ -7,7 +8,7 @@ import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import javax.annotation.Nonnull;
 
 
-public abstract class GameObjectController<O extends GameObject> extends MetaObject implements GameObserver {
+public class GameObjectController<O extends GameObject> extends MetaObject implements GameObserver {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     final Logger logger = Logger.get( getClass() );
@@ -17,11 +18,33 @@ public abstract class GameObjectController<O extends GameObject> extends MetaObj
     protected GameObjectController(final O gameObject) {
 
         this.gameObject = gameObject;
+
+        Optional<Player> owner = getOwner();
+        if (owner.isPresent())
+            owner.get().getController().addObject( getGameObject() );
     }
 
     public O getGameObject() {
 
         return gameObject;
+    }
+
+    @Nonnull
+    @Override
+    public Optional<Player> getOwner() {
+        return getGameObject().getOwner();
+    }
+
+    public void setOwner(final Player owner) {
+        Optional<Player> oldOwner = getOwner();
+        if (oldOwner.isPresent())
+            oldOwner.get().getObjects().remove( getGameObject() );
+
+        getGameObject().setOwner( owner );
+
+        Optional<Player> newOwner = getOwner();
+        if (newOwner.isPresent())
+            newOwner.get().getController().addObject( getGameObject() );
     }
 
     public void setLocation(final Tile location) {
@@ -66,8 +89,8 @@ public abstract class GameObjectController<O extends GameObject> extends MetaObj
 
         getGameObject().getLocation().setContents( null );
 
-        Player player = getPlayer();
-        if (player != null)
-            player.getObjects().remove( getGameObject() );
+        Optional<Player> owner = getOwner();
+        if (owner.isPresent())
+            owner.get().getObjects().remove( getGameObject() );
     }
 }

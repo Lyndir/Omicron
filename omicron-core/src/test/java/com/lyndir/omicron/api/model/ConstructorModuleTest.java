@@ -41,7 +41,7 @@ public class ConstructorModuleTest extends AbstractTest {
         ConstructorModule initMobilityConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                                            .buildSpeed( 2 )
                                                                            .supportedLayers( ModuleType.MOBILITY );
-        PlayerObject baseMobilityConstructorUnit = createUnit(
+        GameObject baseMobilityConstructorUnit = createUnit(
                 testUnitType( "Base Mobility Constructor", initBaseConstructorModule, initMobilityConstructorModule ), 0, 0 );
         staticGame.getController().start();
 
@@ -82,7 +82,7 @@ public class ConstructorModuleTest extends AbstractTest {
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(), ImmutableSet.of( baseMobilityConstructorUnit, site1 ) ) );
 
         // Now provide resources, work = 5 so should take 2 turns at a speed of 3.
-        PlayerObject containerUnit = createUnit( testUnitType( "Metal Container", ContainerModule.createWithStandardResourceCost()
+        GameObject containerUnit = createUnit( testUnitType( "Metal Container", ContainerModule.createWithStandardResourceCost()
                                                                                                  .resourceType( ResourceType.METALS )
                                                                                                  .capacity( 100 ) ), 0, 1 );
         int metals = baseUnit.getConstructionWork() * ModuleType.BASE.getStandardCost().get( ResourceType.METALS );
@@ -171,7 +171,7 @@ public class ConstructorModuleTest extends AbstractTest {
 
         // Build a BASE & MOBILITY unit, using a constructor that can do only BASE, then help out with one that can do only MOBILITY.
         initBaseConstructorModule = ConstructorModule.createWithStandardResourceCost().buildSpeed( 3 ).supportedLayers( ModuleType.BASE );
-        PlayerObject baseConstructorUnit = createUnit( testUnitType( "Base Constructor", initBaseConstructorModule ), 5, 5 );
+        GameObject baseConstructorUnit = createUnit( testUnitType( "Base Constructor", initBaseConstructorModule ), 5, 5 );
         baseConstructorModule = baseConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         containerUnit = createUnit( testUnitType( "Metal Container", ContainerModule.createWithStandardResourceCost()
                                                                                     .resourceType( ResourceType.METALS )
@@ -225,7 +225,7 @@ public class ConstructorModuleTest extends AbstractTest {
         initMobilityConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                          .buildSpeed( 2 )
                                                          .supportedLayers( ModuleType.MOBILITY );
-        PlayerObject mobilityConstructorUnit = createUnit( testUnitType( "Mobility Constructor", initMobilityConstructorModule ), 5, 6 );
+        GameObject mobilityConstructorUnit = createUnit( testUnitType( "Mobility Constructor", initMobilityConstructorModule ), 5, 6 );
         mobilityConstructorModule = mobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         staticGame.getController().setReady( staticPlayer );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );

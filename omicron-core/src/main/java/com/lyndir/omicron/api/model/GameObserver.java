@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -31,6 +32,6 @@ public interface GameObserver {
     @Nonnull
     Iterable<Tile> listObservableTiles(@Nonnull Player currentPlayer);
 
-    @Nullable
-    Player getPlayer();
+    @Nonnull
+    Optional<Player> getOwner();
 }
