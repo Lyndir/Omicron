@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.util;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import java.util.*;
@@ -9,6 +10,8 @@ import javax.annotation.Nonnull;
 
 
 public abstract class PathUtils {
+
+    private static final Logger logger = Logger.get( PathUtils.class );
 
     /**
      * A breath-first search from root.

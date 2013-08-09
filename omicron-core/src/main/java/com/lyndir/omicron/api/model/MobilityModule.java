@@ -111,24 +111,47 @@ public class MobilityModule extends Module {
     }
 
     /**
+     * Move the unit to the given level.
+     *
+     * @param currentPlayer The player ordering the action.
+     * @param levelType     The side of the adjacent tile relative to the current.
+     */
+    public Leveling leveling(final Player currentPlayer, final LevelType levelType) {
+        Tile currentLocation = getGameObject().getLocation();
+        if (levelType == currentLocation.getLevel().getType())
+            // Already in the destination level.
+            return new Leveling( 0, currentLocation );
+
+        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
+            // Cannot level object that doesn't belong to the current player.
+            return new Leveling( 0 );
+
+        double cost = costForLevelingToLevel( levelType );
+        if (cost > remainingSpeed)
+            // Cannot move: insufficient speed remaining this turn.
+            return new Leveling( cost );
+
+        return new Leveling( cost, getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get() );
+    }
+
+    /**
      * Move the unit to an adjacent tile.
      *
      * @param currentPlayer The player ordering the action.
      * @param target        The side of the adjacent tile relative to the current.
      */
     public Movement movement(final Player currentPlayer, final Tile target) {
-
         if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
             // Cannot move object that doesn't belong to the current player.
-            return new Movement();
+            return new Movement( 0 );
 
         Leveling leveling = leveling( currentPlayer, target.getLevel().getType() );
         if (!leveling.isPossible())
             // Cannot move because we can't level to the target's level.
-            return new Movement();
+            return new Movement( leveling.getCost() );
 
         // Initialize cost calculation.
-        Tile currentLocation = getGameObject().getLocation();
+        Tile currentLocation = leveling.getTarget();
         final double stepCost = costForMovingInLevel( currentLocation.getLevel().getType() );
 
         // Initialize path finding data functions.
@@ -157,31 +180,8 @@ public class MobilityModule extends Module {
         };
 
         // Find the path!
-        return new Movement( leveling, find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction ) );
-    }
-
-    /**
-     * Move the unit to the given level.
-     *
-     * @param currentPlayer The player ordering the action.
-     * @param levelType     The side of the adjacent tile relative to the current.
-     */
-    public Leveling leveling(final Player currentPlayer, final LevelType levelType) {
-
-        if (levelType == getGameObject().getLocation().getLevel().getType())
-            // Already in the destination level.
-            return new Leveling( true, levelType, 0 );
-
-        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
-            // Cannot level object that doesn't belong to the current player.
-            return new Leveling( false, levelType, 0 );
-
-        double cost = costForLevelingToLevel( levelType );
-        if (cost > remainingSpeed)
-            // Cannot move: insufficient speed remaining this turn.
-            return new Leveling( false, levelType, cost );
-
-        return new Leveling( true, levelType, cost );
+        Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, Double.MAX_VALUE, neighboursFunction );
+        return new Movement( leveling.getCost() + (path.isPresent()? path.get().getCost(): 0), leveling, path );
     }
 
     @Override
@@ -200,36 +200,48 @@ public class MobilityModule extends Module {
 
     public class Leveling {
 
-        private final boolean   possible;
-        private final LevelType levelType;
-        private final double    cost;
+        private final double         cost;
+        private final Optional<Tile> target;
 
-        Leveling(final boolean possible, @Nonnull final LevelType levelType, final double cost) {
-            this.possible = possible;
-            this.levelType = levelType;
+        Leveling(final double cost) {
             this.cost = cost;
+            target = Optional.absent();
+        }
+
+        Leveling(final double cost, final Tile target) {
+            this.cost = cost;
+            this.target = Optional.of( target );
         }
 
         public boolean isPossible() {
-            return possible;
+            return target.isPresent();
         }
 
-        public LevelType getLevelType() {
-            return levelType;
-        }
-
+        /**
+         * The cost for executing the leveling.  If not possible, the cost is either zero if unknown or the cost for the action that
+         * exceeded the module's remaining speed (not the cost of getting to the target).
+         *
+         * @return An amount of speed.
+         */
         public double getCost() {
             return cost;
+        }
+
+        /**
+         * @return The target tile after leveling.
+         *
+         * @throws IllegalStateException if the leveling is not possible ({@link #isPossible()} returns {@code false})
+         */
+        public Tile getTarget() {
+            return target.get();
         }
 
         public boolean execute() {
             if (!isPossible())
                 return false;
 
-            Tile newLocation = getGameObject().getGame().getLevel( levelType ).getTile( getGameObject().getLocation().getPosition() ).get();
-
             remainingSpeed -= cost;
-            getGameObject().getController().setLocation( newLocation );
+            getGameObject().getController().setLocation( target.get() );
 
             return true;
         }
@@ -238,21 +250,39 @@ public class MobilityModule extends Module {
 
     public class Movement {
 
+        private final double               cost;
         private final Leveling             leveling;
         private final Optional<Path<Tile>> path;
 
-        Movement() {
+        Movement(final double cost) {
+            this.cost = cost;
             leveling = null;
             path = Optional.absent();
         }
 
-        Movement(@Nonnull final Leveling leveling, final Optional<Path<Tile>> path) {
+        Movement(final double cost, @Nonnull final Leveling leveling, final Optional<Path<Tile>> path) {
+            this.cost = cost;
             this.leveling = leveling;
             this.path = path;
         }
 
-        public Optional<Path<Tile>> getPath() {
-            return path;
+        /**
+         * The cost for executing the movement.  If not possible, the cost is either zero if unknown or the cost for the action that
+         * exceeded the module's remaining speed (not the cost of getting to the target).
+         *
+         * @return An amount of speed.
+         */
+        public double getCost() {
+            return cost;
+        }
+
+        /**
+         * @return The target tile after leveling.
+         *
+         * @throws IllegalStateException if the leveling is not possible ({@link #isPossible()} returns {@code false})
+         */
+        public Path<Tile> getPath() {
+            return path.get();
         }
 
         public boolean isPossible() {
