@@ -117,20 +117,22 @@ public class MobilityModule extends Module {
      * @param levelType     The side of the adjacent tile relative to the current.
      */
     public Leveling leveling(final Player currentPlayer, final LevelType levelType) {
+        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
+            // Cannot level object that doesn't belong to the current player.
+            return new Leveling( 0 );
+
         Tile currentLocation = getGameObject().getLocation();
         if (levelType == currentLocation.getLevel().getType())
             // Already in the destination level.
             return new Leveling( 0, currentLocation );
-
-        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
-            // Cannot level object that doesn't belong to the current player.
-            return new Leveling( 0 );
 
         double cost = costForLevelingToLevel( levelType );
         if (cost > remainingSpeed)
             // Cannot move: insufficient speed remaining this turn.
             return new Leveling( cost );
 
+        // TODO: Decide whether we want to give access to arbitrary Tile objects.
+        // TODO: If so, Tile's accessors need to do permission checks, if not we should remove Tile from Leveling or make it package-private.
         return new Leveling( cost, getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get() );
     }
 
@@ -180,6 +182,8 @@ public class MobilityModule extends Module {
         };
 
         // Find the path!
+        // TODO: Decide whether we want to give access to arbitrary Tile objects.
+        // TODO: If so, Tile's accessors need to do permission checks, if not we should remove Tile from Movement's Path or make it package-private.
         Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, Double.MAX_VALUE, neighboursFunction );
         return new Movement( leveling.getCost() + (path.isPresent()? path.get().getCost(): 0), leveling, path );
     }
@@ -232,16 +236,26 @@ public class MobilityModule extends Module {
          *
          * @throws IllegalStateException if the leveling is not possible ({@link #isPossible()} returns {@code false})
          */
-        public Tile getTarget() {
+        Tile getTarget() {
             return target.get();
         }
 
         public boolean execute() {
+            // Check that this movement was deemed possible.
             if (!isPossible())
                 return false;
 
-            remainingSpeed -= cost;
+            // Check that we still have sufficient remaining speed.
+            if (cost > remainingSpeed)
+                return false;
+
+            // Check that the path can still be walked.
+            if (!target.get().isAccessible())
+                return false;
+
+            // Execute the leveling.
             getGameObject().getController().setLocation( target.get() );
+            remainingSpeed -= cost;
 
             return true;
         }
@@ -281,7 +295,7 @@ public class MobilityModule extends Module {
          *
          * @throws IllegalStateException if the leveling is not possible ({@link #isPossible()} returns {@code false})
          */
-        public Path<Tile> getPath() {
+        Path<Tile> getPath() {
             return path.get();
         }
 
@@ -291,11 +305,11 @@ public class MobilityModule extends Module {
 
         public boolean execute() {
             // Check that this movement was deemed possible.
-            if (!isPossible() || leveling == null)
+            if (!isPossible())
                 return false;
 
             // Check that we still have sufficient remaining speed.
-            if (path.get().getCost() > remainingSpeed)
+            if (cost > remainingSpeed)
                 return false;
 
             // Check that the path can still be walked.
@@ -312,15 +326,13 @@ public class MobilityModule extends Module {
             }
             while (true);
 
-            // Perform the leveling.
+            // Execute the leveling.
             if (!leveling.execute())
                 return false;
 
             // Execute the path.
+            getGameObject().getController().setLocation( path.get().getTarget() );
             remainingSpeed -= path.get().getCost();
-            getGameObject().getLocation().setContents( null );
-            getGameObject().setLocation( path.get().getTarget() );
-            path.get().getTarget().setContents( getGameObject() );
 
             return true;
         }
@@ -341,7 +353,7 @@ public class MobilityModule extends Module {
             return new Builder1( movementSpeed );
         }
 
-         class Builder1 {
+        class Builder1 {
 
             private final int movementSpeed;
 

@@ -18,7 +18,6 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.*;
-import java.util.List;
 
 
 /**
@@ -90,8 +89,8 @@ public enum UnitTypes implements UnitType {
                       }
                   } );
 
-    private final String                           typeName;
-    private final int                              constructionWork;
+    private final String                                    typeName;
+    private final int                                       constructionWork;
     private final Supplier<ImmutableList<? extends Module>> moduleSupplier;
 
     UnitTypes(final String typeName, final int constructionWork, final Supplier<ImmutableList<? extends Module>> moduleSupplier) {

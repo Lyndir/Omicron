@@ -37,7 +37,8 @@ public class Game extends MetaObject {
                  final GameUnitConfig unitConfig) {
 
         this.levelSize = levelSize;
-        levels = ImmutableList.of( new GroundLevel( levelSize, this ), new SkyLevel( levelSize, this ), new SpaceLevel( levelSize, this ) );
+        levels = ImmutableList.of( new Level( levelSize, LevelType.GROUND, this ), new Level( levelSize, LevelType.SKY, this ),
+                                   new Level( levelSize, LevelType.SPACE, this ) );
         this.players = players;
         currentTurn = new Turn();
         gameController = new GameController( this );
@@ -146,7 +147,7 @@ public class Game extends MetaObject {
         return players;
     }
 
-    public Set<Player> getReadyPlayers() {
+    Set<Player> getReadyPlayers() {
 
         return readyPlayers;
     }

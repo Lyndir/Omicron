@@ -15,11 +15,11 @@ public class ContainerModule extends Module {
         this.capacity = capacity;
     }
 
-     static Builder0 createWithStandardResourceCost() {
+    static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-     static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+    static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.CONTAINER.getStandardCost().add( resourceCost ) );
     }
 
@@ -51,7 +51,7 @@ public class ContainerModule extends Module {
      * @return The amount of resources that has been added to the stock.  It will be a value between 0 and the given amount, depending on
      *         how much available stock this container has left.
      */
-     int addStock(final int amount) {
+    int addStock(final int amount) {
         Preconditions.checkArgument( amount >= 0, "Amount of stock to add must be positive." );
 
         int newStock = Math.min( stock + amount, capacity );
@@ -69,7 +69,7 @@ public class ContainerModule extends Module {
      * @return The amount of resources that has been removed from the stock.  It will be a value between 0 and the given amount, depending
      *         on how much available stock this container had left.
      */
-     int depleteStock(final int amount) {
+    int depleteStock(final int amount) {
         Preconditions.checkArgument( amount >= 0, "Amount of stock to deplete must be positive." );
 
         int newStock = Math.max( stock - amount, 0 );
@@ -93,7 +93,7 @@ public class ContainerModule extends Module {
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-     static class Builder0 {
+    static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -102,11 +102,11 @@ public class ContainerModule extends Module {
             this.resourceCost = resourceCost;
         }
 
-         Builder1 resourceType(final ResourceType resourceType) {
+        Builder1 resourceType(final ResourceType resourceType) {
             return new Builder1( resourceType );
         }
 
-         class Builder1 {
+        class Builder1 {
 
             private final ResourceType resourceType;
 

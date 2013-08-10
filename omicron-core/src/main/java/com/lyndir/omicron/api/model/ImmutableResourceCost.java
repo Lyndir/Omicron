@@ -50,9 +50,9 @@ public class ImmutableResourceCost extends ResourceCost {
     public ImmutableResourceCost reduce(final ResourceType resourceType, final int term) {
         Preconditions.checkArgument( term >= 0, "Amount to reduce resource cost with must be positive." );
         return new ImmutableResourceCost( ImmutableMap.<ResourceType, Integer>builder()
-                                             .putAll( resourceQuantities )
-                                             .put( resourceType, get( resourceType ) - term )
-                                             .build() );
+                                                      .putAll( resourceQuantities )
+                                                      .put( resourceType, get( resourceType ) - term )
+                                                      .build() );
     }
 
     /**
@@ -64,9 +64,9 @@ public class ImmutableResourceCost extends ResourceCost {
     public ImmutableResourceCost add(final ResourceType resourceType, final int term) {
         Preconditions.checkArgument( term >= 0, "Amount to increase resource cost with must be positive." );
         return new ImmutableResourceCost( ImmutableMap.<ResourceType, Integer>builder()
-                                             .putAll( resourceQuantities )
-                                             .put( resourceType, get( resourceType ) + term )
-                                             .build() );
+                                                      .putAll( resourceQuantities )
+                                                      .put( resourceType, get( resourceType ) + term )
+                                                      .build() );
     }
 
     /**
@@ -91,9 +91,9 @@ public class ImmutableResourceCost extends ResourceCost {
     @Override
     public ImmutableResourceCost multiply(final ResourceType resourceType, final int factor) {
         return new ImmutableResourceCost( ImmutableMap.<ResourceType, Integer>builder()
-                                             .putAll( resourceQuantities )
-                                             .put( resourceType, get( resourceType ) * factor )
-                                             .build() );
+                                                      .putAll( resourceQuantities )
+                                                      .put( resourceType, get( resourceType ) * factor )
+                                                      .build() );
     }
 
     /**

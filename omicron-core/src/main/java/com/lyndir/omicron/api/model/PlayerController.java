@@ -12,7 +12,7 @@ public class PlayerController implements GameObserver {
     private final Player         player;
     private       GameController gameController;
 
-    PlayerController(final Player player) {
+    PlayerController(@Nonnull final Player player) {
 
         this.player = player;
     }
@@ -59,23 +59,23 @@ public class PlayerController implements GameObserver {
     }
 
     /**
-     * Iterate the objects of this player that the given observer can observe.
+     * Iterate the objects of this player that the given observer (and the current player) can observe.
      *
-     * @param observer The observer that we want to observe the player's objects with.
+     * @param currentPlayer The player that's making the request.
+     * @param observer      The observer that we want to observe the player's objects with.
      *
      * @return An iterable of game objects owned by this controller's player.
      */
-    public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {
+    public Iterable<GameObject> iterateObservableObjects(final Player currentPlayer, final GameObserver observer) {
 
         return FluentIterable.from( player.getObjects() ).filter( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
 
-                Optional<Player> owner = observer.getOwner();
-                if (owner.isPresent())
-                    return observer.canObserve( owner.get(), input.getLocation() );
+                if (!currentPlayer.canObserve( currentPlayer, input.getLocation() ))
+                    return false;
 
-                return observer.equals( input );
+                return observer.canObserve( currentPlayer, input.getLocation() );
             }
         } );
     }

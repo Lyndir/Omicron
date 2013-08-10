@@ -2,7 +2,6 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 /**

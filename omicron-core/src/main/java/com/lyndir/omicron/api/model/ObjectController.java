@@ -4,7 +4,7 @@ public class ObjectController<O extends GameObject> {
 
     private final O gameObject;
 
-    public ObjectController(final O gameObject) {
+    ObjectController(final O gameObject) {
 
         this.gameObject = gameObject;
     }

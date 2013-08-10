@@ -81,7 +81,7 @@ public class Player extends MetaObject implements GameObserver {
 
     public boolean hasKey(final PlayerKey playerKey) {
 
-        return ObjectUtils.isEqual( key , playerKey);
+        return ObjectUtils.isEqual( key, playerKey );
     }
 
     public boolean isKeyLess() {
@@ -104,7 +104,7 @@ public class Player extends MetaObject implements GameObserver {
         return secondaryColor;
     }
 
-    public Collection<GameObject> getObjects() {
+    Collection<GameObject> getObjects() {
 
         return objects.values();
     }
@@ -124,7 +124,7 @@ public class Player extends MetaObject implements GameObserver {
         this.score = score;
     }
 
-    public int nextObjectID() {
+    int nextObjectID() {
 
         return nextObjectID++;
     }

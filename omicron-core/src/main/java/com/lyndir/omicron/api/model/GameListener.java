@@ -16,10 +16,6 @@
 
 package com.lyndir.omicron.api.model;
 
-import com.lyndir.omicron.api.model.Player;
-import com.lyndir.omicron.api.model.Turn;
-
-
 /**
  * @author lhunath, 2013-07-25
  */
