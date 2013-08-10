@@ -23,7 +23,8 @@ import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Constants;
 import com.lyndir.omicron.api.util.PathUtils;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -44,22 +45,22 @@ public class ConstructorModule extends Module {
         this.buildsModule = buildsModule;
     }
 
-    public static Builder0 createWithStandardResourceCost() {
+    static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ImmutableResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+    static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.CONSTRUCTOR.getStandardCost().add( resourceCost ) );
     }
 
     @Override
-    public void onReset() {
+    protected void onReset() {
         resourceConstrained = false;
         remainingSpeed = buildSpeed;
     }
 
     @Override
-    public void onNewTurn() {
+    protected void onNewTurn() {
     }
 
     // This method assumes a target link between this module and the site exists.
@@ -156,11 +157,11 @@ public class ConstructorModule extends Module {
         return remainingSpeed;
     }
 
-    public GameObject getTarget() {
+    GameObject getTarget() {
         return target;
     }
 
-    public void setTarget(final GameObject target) {
+    void setTarget(final GameObject target) {
         Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner(), target.getOwner() ),
                                      "Can only target units of the same player." );
         this.target = target;
@@ -171,7 +172,7 @@ public class ConstructorModule extends Module {
         return ModuleType.CONSTRUCTOR;
     }
 
-    public Set<? extends UnitType> blueprints() {
+    ImmutableSet<? extends UnitType> blueprints() {
         return ImmutableSet.copyOf( UnitTypes.values() );
     }
 
@@ -183,7 +184,7 @@ public class ConstructorModule extends Module {
      *
      * @return The job that will be created for the construction of the new unit.
      */
-    public ConstructionSite schedule(final UnitType unitType, final Tile location) {
+    ConstructionSite schedule(final UnitType unitType, final Tile location) {
         Preconditions.checkArgument( location.isAccessible() );
         Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ) );
         Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1 );
@@ -260,7 +261,7 @@ public class ConstructorModule extends Module {
             return new GameObjectController<GameObject>( this ) {
 
                 @Override
-                public void onNewTurn() {
+                protected void onNewTurn() {
                     super.onNewTurn();
 
                     // Initialize path finding functions.
@@ -341,7 +342,7 @@ public class ConstructorModule extends Module {
 
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-    public static class Builder0 {
+    static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -349,11 +350,11 @@ public class ConstructorModule extends Module {
             this.resourceCost = resourceCost;
         }
 
-        public Builder1 buildSpeed(final int buildSpeed) {
+        Builder1 buildSpeed(final int buildSpeed) {
             return new Builder1( buildSpeed );
         }
 
-        public class Builder1 {
+        class Builder1 {
 
             private final int buildSpeed;
 
@@ -361,7 +362,7 @@ public class ConstructorModule extends Module {
                 this.buildSpeed = buildSpeed;
             }
 
-            public ConstructorModule supportedLayers(final ModuleType<?> buildsModule) {
+            ConstructorModule supportedLayers(final ModuleType<?> buildsModule) {
                 return new ConstructorModule( resourceCost, buildSpeed, buildsModule );
             }
         }

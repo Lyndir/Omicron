@@ -2,10 +2,10 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class GameController {
@@ -13,7 +13,7 @@ public class GameController {
     private final Game game;
     private final Set<GameListener> gameListeners = new HashSet<>();
 
-    public GameController(final Game game) {
+    GameController(final Game game) {
 
         this.game = game;
 
@@ -46,15 +46,15 @@ public class GameController {
         return PlayerGameInfo.undiscovered( player );
     }
 
-    public Collection<PlayerGameInfo> listPlayerGameInfo(final Player currentPlayer) {
+    public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo(final Player currentPlayer) {
 
-        return Collections2.transform( game.getPlayers(), new Function<Player, PlayerGameInfo>() {
+        return ImmutableList.copyOf( Lists.transform( game.getPlayers(), new Function<Player, PlayerGameInfo>() {
             @Override
             public PlayerGameInfo apply(final Player input) {
 
                 return getPlayerGameInfo( currentPlayer, input );
             }
-        } );
+        } ) );
     }
 
     public Iterable<Player> listPlayers() {
@@ -69,7 +69,7 @@ public class GameController {
      *
      * @return true if this action has caused a new turn to begin.
      */
-    public boolean setReady(final Player currentPlayer) {
+    boolean setReady(final Player currentPlayer) {
 
         game.getReadyPlayers().add( currentPlayer );
         for (final GameListener gameListener : gameListeners)
@@ -84,7 +84,7 @@ public class GameController {
         return false;
     }
 
-    public void start() {
+    void start() {
 
         Preconditions.checkState( !game.isRunning(), "The game cannot be started: It is already running." );
 
@@ -92,7 +92,7 @@ public class GameController {
         onNewTurn();
     }
 
-    public void onNewTurn() {
+    protected void onNewTurn() {
 
         game.setCurrentTurn( new Turn( game.getCurrentTurn() ) );
         for (final GameListener gameListener : gameListeners)
@@ -109,8 +109,8 @@ public class GameController {
         return game.listLevels();
     }
 
-    public Set<Player> listReadyPlayers() {
+    public ImmutableSet<Player> listReadyPlayers() {
 
-        return game.getReadyPlayers();
+        return ImmutableSet.copyOf( game.getReadyPlayers() );
     }
 }

@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import java.util.Random;
 import java.util.Set;
@@ -33,11 +34,11 @@ public class WeaponModule extends Module {
         ammunition = ammunitionLoad;
     }
 
-    public static Builder0 createWithStandardResourceCost() {
+    static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+    static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.WEAPON.getStandardCost().add( resourceCost ) );
     }
 
@@ -66,12 +67,12 @@ public class WeaponModule extends Module {
         return ammunitionLoad;
     }
 
-    public Set<LevelType> getSupportedLayers() {
+    public ImmutableSet<LevelType> getSupportedLayers() {
 
-        return supportedLayers;
+        return ImmutableSet.copyOf( supportedLayers );
     }
 
-    public void fireAt(final Player currentPlayer, final Tile target) {
+    void fireAt(final Player currentPlayer, final Tile target) {
 
         Preconditions.checkArgument( ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ), //
                                      "Cannot fire: unit is not owned by player." );
@@ -93,12 +94,12 @@ public class WeaponModule extends Module {
     }
 
     @Override
-    public void onReset() {
+    protected void onReset() {
         repeated = 0;
     }
 
     @Override
-    public void onNewTurn() {
+    protected void onNewTurn() {
     }
 
     @Override
@@ -107,7 +108,7 @@ public class WeaponModule extends Module {
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-    public static class Builder0 {
+    static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -115,11 +116,11 @@ public class WeaponModule extends Module {
             this.resourceCost = resourceCost;
         }
 
-        public Builder1 firePower(final int firePower) {
+        Builder1 firePower(final int firePower) {
             return new Builder1( firePower );
         }
 
-        public class Builder1 {
+        class Builder1 {
 
             private final int firePower;
 
@@ -127,11 +128,11 @@ public class WeaponModule extends Module {
                 this.firePower = firePower;
             }
 
-            public Builder2 armor(final int variance) {
+            Builder2 armor(final int variance) {
                 return new Builder2( variance );
             }
 
-            public class Builder2 {
+            class Builder2 {
 
                 private final int variance;
 
@@ -139,11 +140,11 @@ public class WeaponModule extends Module {
                     this.variance = variance;
                 }
 
-                public Builder3 range(final int range) {
+                Builder3 range(final int range) {
                     return new Builder3( range );
                 }
 
-                public class Builder3 {
+                class Builder3 {
 
                     private final int range;
 
@@ -151,11 +152,11 @@ public class WeaponModule extends Module {
                         this.range = range;
                     }
 
-                    public Builder4 repeat(final int repeat) {
+                    Builder4 repeat(final int repeat) {
                         return new Builder4( repeat );
                     }
 
-                    public class Builder4 {
+                    class Builder4 {
 
                         private final int repeat;
 
@@ -163,11 +164,11 @@ public class WeaponModule extends Module {
                             this.repeat = repeat;
                         }
 
-                        public Builder5 ammunitionLoad(final int ammunitionLoad) {
+                        Builder5 ammunitionLoad(final int ammunitionLoad) {
                             return new Builder5( ammunitionLoad );
                         }
 
-                        public class Builder5 {
+                        class Builder5 {
 
                             private final int ammunitionLoad;
 
@@ -175,7 +176,7 @@ public class WeaponModule extends Module {
                                 this.ammunitionLoad = ammunitionLoad;
                             }
 
-                            public WeaponModule supportedLayers(final Set<LevelType> supportedLayers) {
+                            WeaponModule supportedLayers(final Set<LevelType> supportedLayers) {
                                 return new WeaponModule( resourceCost, firePower, variance, range, repeat, ammunitionLoad,
                                                          supportedLayers );
                             }

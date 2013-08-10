@@ -1,4 +1,4 @@
-package com.lyndir.omicron.api.util;
+package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -30,7 +30,7 @@ public abstract class AbstractTest {
                                    Color.Template.randomColor() ) {
             private final PlayerController playerController = new PlayerController( this ) {
                 @Override
-                public void onNewTurn() {
+                protected void onNewTurn() {
                     super.onNewTurn();
 
                     Size size = getGameController().getGame().getLevelSize();
@@ -98,8 +98,8 @@ public abstract class AbstractTest {
             }
 
             @Override
-            public List<? extends Module> createModules() {
-                return Lists.newArrayList( modules );
+            public ImmutableList<? extends Module> createModules() {
+                return ImmutableList.copyOf( modules );
             }
 
             @Override

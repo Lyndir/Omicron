@@ -2,8 +2,6 @@ package com.lyndir.omicron.api.model;
 
 import static org.testng.Assert.*;
 
-import com.lyndir.omicron.api.model.*;
-import com.lyndir.omicron.api.util.AbstractTest;
 import org.testng.annotations.Test;
 
 

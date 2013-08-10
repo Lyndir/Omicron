@@ -27,7 +27,7 @@ public class Game extends MetaObject {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final GameController gameController;
 
-    private final Size levelSize;
+    private final Size                  levelSize;
     private final ImmutableList<Level>  levels;
     private final ImmutableList<Player> players;
     private final Set<Player> readyPlayers = new HashSet<>();
@@ -131,7 +131,7 @@ public class Game extends MetaObject {
         return currentTurn;
     }
 
-    public void setCurrentTurn(final Turn currentTurn) {
+    void setCurrentTurn(final Turn currentTurn) {
 
         this.currentTurn = currentTurn;
     }
@@ -141,7 +141,7 @@ public class Game extends MetaObject {
         return levels;
     }
 
-    public Collection<Player> getPlayers() {
+    public ImmutableList<Player> getPlayers() {
 
         return players;
     }
@@ -151,7 +151,7 @@ public class Game extends MetaObject {
         return readyPlayers;
     }
 
-    public void setRunning(final boolean running) {
+    void setRunning(final boolean running) {
         this.running = running;
     }
 
@@ -171,6 +171,9 @@ public class Game extends MetaObject {
         private int                totalPlayers   = 4;
         private GameResourceConfig resourceConfig = GameResourceConfigs.PLENTY;
         private GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
+
+        private Builder() {
+        }
 
         public Game build() {
 

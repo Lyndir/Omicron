@@ -10,13 +10,13 @@ public class Turn {
     private final Turn previousTurn;
     private final int  number;
 
-    public Turn() {
+    Turn() {
 
         previousTurn = null;
         number = 0;
     }
 
-    public Turn(@Nonnull final Turn previousTurn) {
+    Turn(@Nonnull final Turn previousTurn) {
 
         this.previousTurn = previousTurn;
         number = previousTurn.getNumber() + 1;

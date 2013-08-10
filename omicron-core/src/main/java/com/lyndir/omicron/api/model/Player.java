@@ -119,7 +119,7 @@ public class Player extends MetaObject implements GameObserver {
         return score;
     }
 
-    public void setScore(final int score) {
+    void setScore(final int score) {
 
         this.score = score;
     }
@@ -129,10 +129,10 @@ public class Player extends MetaObject implements GameObserver {
         return nextObjectID++;
     }
 
-    @Nullable
-    public GameObject getObject(final int objectId) {
+    @Nonnull
+    Optional<GameObject> getObject(final int objectId) {
 
-        return objects.get( objectId );
+        return Optional.fromNullable( objects.get( objectId ) );
     }
 
     void addObject(final GameObject gameObject) {

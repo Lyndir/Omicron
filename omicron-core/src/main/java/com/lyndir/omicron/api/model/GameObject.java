@@ -27,12 +27,12 @@ public class GameObject extends MetaObject implements GameObserver {
     private       Player                              owner;
     private       Tile                                location;
 
-    public GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner,
+    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner,
                          @Nonnull final Tile location) {
         this( unitType, game, owner, owner.nextObjectID(), location );
     }
 
-    public GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final int objectID,
+    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final int objectID,
                          @Nonnull final Tile location) {
         this.unitType = unitType;
         this.game = game;

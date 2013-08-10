@@ -24,7 +24,7 @@ public class Level extends MetaObject {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final ImmutableMap<Coordinate, Tile> tileMap;
 
-    public Level(final Size size, final LevelType type, final Game game) {
+    Level(final Size size, final LevelType type, final Game game) {
 
         this.size = size;
         this.type = type;
@@ -54,7 +54,7 @@ public class Level extends MetaObject {
         return game;
     }
 
-    public Map<Coordinate, Tile> getTiles() {
+    Map<Coordinate, Tile> getTiles() {
 
         return tileMap;
     }
@@ -66,7 +66,7 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    public Optional<Tile> getTile(final Coordinate position) {
+    Optional<Tile> getTile(final Coordinate position) {
 
         if (!size.isInBounds( position ))
             return Optional.absent();
@@ -82,7 +82,7 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    public Optional<Tile> getTile(final int u, final int v) {
+    Optional<Tile> getTile(final int u, final int v) {
 
         return getTile( new Coordinate( u, v, getSize() ) );
     }

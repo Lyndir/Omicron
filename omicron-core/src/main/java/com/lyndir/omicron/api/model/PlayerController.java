@@ -12,7 +12,7 @@ public class PlayerController implements GameObserver {
     private final Player         player;
     private       GameController gameController;
 
-    public PlayerController(final Player player) {
+    PlayerController(final Player player) {
 
         this.player = player;
     }
@@ -24,7 +24,7 @@ public class PlayerController implements GameObserver {
         return Optional.of( player );
     }
 
-    public void setGameController(final GameController gameController) {
+    void setGameController(final GameController gameController) {
         Preconditions.checkState( this.gameController == null, "This player has already been added to a game!" );
         this.gameController = gameController;
     }
@@ -82,16 +82,16 @@ public class PlayerController implements GameObserver {
 
     public Optional<GameObject> getObject(final Player currentPlayer, final int objectId) {
 
-        GameObject object = player.getObject( objectId );
+        Optional<GameObject> object = player.getObject( objectId );
 
         // If the object cannot be observed by the current player, treat it as absent.
-        if (object != null && !currentPlayer.canObserve( currentPlayer, object.getLocation() ))
+        if (object.isPresent() && !currentPlayer.canObserve( currentPlayer, object.get().getLocation() ))
             return Optional.absent();
 
-        return Optional.fromNullable( object );
+        return object;
     }
 
-    public int newObjectID() {
+    int newObjectID() {
 
         return player.nextObjectID();
     }
@@ -103,13 +103,13 @@ public class PlayerController implements GameObserver {
         player.addObject( gameObject );
     }
 
-    public void onReset() {
+    protected void onReset() {
 
         for (final GameObject gameObject : ImmutableList.copyOf( player.getObjects() ))
             gameObject.getController().onReset();
     }
 
-    public void onNewTurn() {
+    protected void onNewTurn() {
 
         for (final GameObject gameObject : ImmutableList.copyOf( player.getObjects() ))
             gameObject.getController().onNewTurn();

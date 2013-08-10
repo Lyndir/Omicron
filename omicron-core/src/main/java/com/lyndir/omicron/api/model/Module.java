@@ -40,7 +40,7 @@ public abstract class Module extends MetaObject {
         return resourceCost;
     }
 
-    public void setGameObject(final GameObject gameObject) {
+    void setGameObject(final GameObject gameObject) {
 
         this.gameObject = gameObject;
     }
@@ -50,9 +50,9 @@ public abstract class Module extends MetaObject {
         return Preconditions.checkNotNull( gameObject, "This module has not yet been initialized by its game object." );
     }
 
-    public abstract void onReset();
+    protected abstract void onReset();
 
-    public abstract void onNewTurn();
+    protected abstract void onNewTurn();
 
     public abstract ModuleType<?> getType();
 }

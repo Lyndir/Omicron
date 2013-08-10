@@ -7,7 +7,7 @@ package com.lyndir.omicron.api.model;
  */
 public class SpaceLevel extends Level {
 
-    public SpaceLevel(final Size levelSize, final Game game) {
+    SpaceLevel(final Size levelSize, final Game game) {
 
         super( levelSize, LevelType.SPACE, game );
     }

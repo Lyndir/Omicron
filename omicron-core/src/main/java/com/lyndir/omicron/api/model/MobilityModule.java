@@ -27,11 +27,11 @@ public class MobilityModule extends Module {
         this.levelingCost.putAll( levelingCost );
     }
 
-    public static Builder0 createWithStandardResourceCost() {
+    static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+    static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.MOBILITY.getStandardCost().add( resourceCost ) );
     }
 
@@ -185,12 +185,12 @@ public class MobilityModule extends Module {
     }
 
     @Override
-    public void onReset() {
+    protected void onReset() {
         remainingSpeed = movementSpeed;
     }
 
     @Override
-    public void onNewTurn() {
+    protected void onNewTurn() {
     }
 
     @Override
@@ -328,7 +328,7 @@ public class MobilityModule extends Module {
 
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-    public static class Builder0 {
+    static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -337,11 +337,11 @@ public class MobilityModule extends Module {
             this.resourceCost = resourceCost;
         }
 
-        public Builder1 movementSpeed(final int movementSpeed) {
+        Builder1 movementSpeed(final int movementSpeed) {
             return new Builder1( movementSpeed );
         }
 
-        public class Builder1 {
+         class Builder1 {
 
             private final int movementSpeed;
 
@@ -349,11 +349,11 @@ public class MobilityModule extends Module {
                 this.movementSpeed = movementSpeed;
             }
 
-            public Builder2 movementCost(final Map<LevelType, Double> movementCost) {
+            Builder2 movementCost(final Map<LevelType, Double> movementCost) {
                 return new Builder2( movementCost );
             }
 
-            public class Builder2 {
+            class Builder2 {
 
                 private final Map<LevelType, Double> movementCost;
 
@@ -361,7 +361,7 @@ public class MobilityModule extends Module {
                     this.movementCost = movementCost;
                 }
 
-                public MobilityModule levelingCost(final Map<LevelType, Double> levelingCost) {
+                MobilityModule levelingCost(final Map<LevelType, Double> levelingCost) {
                     return new MobilityModule( resourceCost, movementSpeed, movementCost, levelingCost );
                 }
             }

@@ -7,7 +7,7 @@ package com.lyndir.omicron.api.model;
  */
 public class SkyLevel extends Level {
 
-    public SkyLevel(final Size levelSize, final Game game) {
+    SkyLevel(final Size levelSize, final Game game) {
 
         super( levelSize, LevelType.SKY, game );
     }

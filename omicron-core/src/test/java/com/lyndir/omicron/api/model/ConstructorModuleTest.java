@@ -21,7 +21,6 @@ import static org.testng.Assert.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.CollectionUtils;
-import com.lyndir.omicron.api.util.AbstractTest;
 import org.testng.annotations.Test;
 
 

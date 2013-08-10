@@ -57,7 +57,7 @@ public enum LevelType {
         return Optional.absent();
     }
 
-    public Iterable<ResourceType> getSupportedResources() {
+    public ImmutableCollection<ResourceType> getSupportedResources() {
 
         return supportedResources;
     }

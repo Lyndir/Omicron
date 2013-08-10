@@ -3,8 +3,8 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
-import java.util.Set;
 import javax.annotation.Nonnull;
 
 
@@ -12,14 +12,14 @@ import javax.annotation.Nonnull;
 // TODO: It uniquely describes a game object and can exist only once and lots of external code assumes there is one and only one...
 public class BaseModule extends Module implements GameObserver {
 
-    private final int            maxHealth;
-    private final int            armor;
-    private final int            viewRange;
-    private final Set<LevelType> supportedLayers;
-    private       int            damage;
+    private final int                     maxHealth;
+    private final int                     armor;
+    private final int                     viewRange;
+    private final ImmutableSet<LevelType> supportedLayers;
+    private       int                     damage;
 
     protected BaseModule(final ImmutableResourceCost resourceCost, final int maxHealth, final int armor, final int viewRange,
-                         final Set<LevelType> supportedLayers) {
+                         final ImmutableSet<LevelType> supportedLayers) {
         super( resourceCost );
 
         this.maxHealth = maxHealth;
@@ -28,11 +28,11 @@ public class BaseModule extends Module implements GameObserver {
         this.supportedLayers = supportedLayers;
     }
 
-    public static Builder0 createWithStandardResourceCost() {
+    static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+    static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.BASE.getStandardCost().add( resourceCost ) );
     }
 
@@ -85,17 +85,17 @@ public class BaseModule extends Module implements GameObserver {
         return viewRange;
     }
 
-    public Set<LevelType> getSupportedLayers() {
+    public ImmutableSet<LevelType> getSupportedLayers() {
 
         return supportedLayers;
     }
 
     @Override
-    public void onReset() {
+    protected void onReset() {
     }
 
     @Override
-    public void onNewTurn() {
+    protected void onNewTurn() {
     }
 
     @Override
@@ -103,7 +103,7 @@ public class BaseModule extends Module implements GameObserver {
         return ModuleType.BASE;
     }
 
-    public void addDamage(final int incomingDamage) {
+    void addDamage(final int incomingDamage) {
 
         damage += Math.max( 0, incomingDamage - armor );
 
@@ -112,7 +112,7 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-    public static class Builder0 {
+    static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -120,11 +120,11 @@ public class BaseModule extends Module implements GameObserver {
             this.resourceCost = resourceCost;
         }
 
-        public Builder1 maxHealth(final int maxHealth) {
+        Builder1 maxHealth(final int maxHealth) {
             return new Builder1( maxHealth );
         }
 
-        public class Builder1 {
+        class Builder1 {
 
             private final int maxHealth;
 
@@ -132,11 +132,11 @@ public class BaseModule extends Module implements GameObserver {
                 this.maxHealth = maxHealth;
             }
 
-            public Builder2 armor(final int armor) {
+            Builder2 armor(final int armor) {
                 return new Builder2( armor );
             }
 
-            public class Builder2 {
+            class Builder2 {
 
                 private final int armor;
 
@@ -144,11 +144,11 @@ public class BaseModule extends Module implements GameObserver {
                     this.armor = armor;
                 }
 
-                public Builder3 viewRange(final int viewRange) {
+                Builder3 viewRange(final int viewRange) {
                     return new Builder3( viewRange );
                 }
 
-                public class Builder3 {
+                class Builder3 {
 
                     private final int viewRange;
 
@@ -156,7 +156,7 @@ public class BaseModule extends Module implements GameObserver {
                         this.viewRange = viewRange;
                     }
 
-                    public BaseModule supportedLayers(final Set<LevelType> supportedLayers) {
+                    BaseModule supportedLayers(final ImmutableSet<LevelType> supportedLayers) {
                         return new BaseModule( resourceCost, maxHealth, armor, viewRange, supportedLayers );
                     }
                 }

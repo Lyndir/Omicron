@@ -22,11 +22,11 @@ public class ExtractorModule extends Module {
         this.speed = speed;
     }
 
-    public static Builder0 createWithStandardResourceCost() {
+    static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+    static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.EXTRACTOR.getStandardCost().add( resourceCost ) );
     }
 
@@ -41,11 +41,11 @@ public class ExtractorModule extends Module {
     }
 
     @Override
-    public void onReset() {
+    protected void onReset() {
     }
 
     @Override
-    public void onNewTurn() {
+    protected void onNewTurn() {
 
         // Mine some resources.
         Tile location = getGameObject().getLocation();
@@ -116,7 +116,7 @@ public class ExtractorModule extends Module {
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-    public static class Builder0 {
+    static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -124,11 +124,11 @@ public class ExtractorModule extends Module {
             this.resourceCost = resourceCost;
         }
 
-        public Builder1 resourceType(final ResourceType resourceType) {
+        Builder1 resourceType(final ResourceType resourceType) {
             return new Builder1( resourceType );
         }
 
-        public class Builder1 {
+        class Builder1 {
 
             private final ResourceType resourceType;
 
@@ -136,7 +136,7 @@ public class ExtractorModule extends Module {
                 this.resourceType = resourceType;
             }
 
-            public ExtractorModule speed(final int speed) {
+            ExtractorModule speed(final int speed) {
                 return new ExtractorModule( resourceCost, resourceType, speed );
             }
         }

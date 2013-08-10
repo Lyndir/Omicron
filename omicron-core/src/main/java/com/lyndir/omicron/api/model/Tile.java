@@ -28,24 +28,24 @@ public class Tile extends MetaObject {
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Map<ResourceType, Integer> resourceQuantities = new EnumMap<>( ResourceType.class );
 
-    public Tile(final Coordinate position, final Level level) {
+    Tile(final Coordinate position, final Level level) {
 
         this.position = position;
         this.level = level;
     }
 
-    public Tile(final int u, final int v, final Level level) {
+    Tile(final int u, final int v, final Level level) {
 
         this( new Coordinate( u, v, level.getSize() ), level );
     }
 
     @Nonnull
-    public Optional<GameObject> getContents() {
+    Optional<GameObject> getContents() {
 
         return Optional.fromNullable( contents );
     }
 
-    public void setContents(@Nullable final GameObject contents) {
+    void setContents(@Nullable final GameObject contents) {
 
         if (contents != null)
             Preconditions.checkState( !getContents().isPresent(), "Cannot put object on tile that is not empty: %s, holds: %s", //
@@ -64,29 +64,29 @@ public class Tile extends MetaObject {
         return level;
     }
 
-    public void setResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
+    void setResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
 
         Preconditions.checkArgument( resourceQuantity >= 0, "Resource quantity cannot be less than zero: %s", resourceQuantity );
         resourceQuantities.put( resourceType, resourceQuantity );
     }
 
-    public void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
+    void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
 
         setResourceQuantity( resourceType, getResourceQuantity( resourceType ) + resourceQuantity );
     }
 
-    public int getResourceQuantity(final ResourceType resourceType) {
+    int getResourceQuantity(final ResourceType resourceType) {
 
         return ifNotNullElse( resourceQuantities.get( resourceType ), 0 );
     }
 
     @Nonnull
-    public Tile neighbour(final Coordinate.Side side) {
+    Tile neighbour(final Coordinate.Side side) {
 
         return level.getTile( getPosition().neighbour( side ) ).get();
     }
 
-    public Iterable<Tile> neighbours() {
+    ImmutableList<Tile> neighbours() {
 
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         for (final Coordinate.Side side : Coordinate.Side.values())
@@ -95,7 +95,7 @@ public class Tile extends MetaObject {
         return neighbours.build();
     }
 
-    public boolean contains(@Nonnull final GameObserver target) {
+    boolean contains(@Nonnull final GameObserver target) {
 
         if (contents == null)
             return false;
@@ -126,7 +126,7 @@ public class Tile extends MetaObject {
         return ObjectUtils.isEqual( position, o.position ) && ObjectUtils.isEqual( level, o.level );
     }
 
-    public boolean isAccessible() {
+    boolean isAccessible() {
 
         return !getContents().isPresent();
     }

@@ -13,8 +13,4 @@ public class ObjectController<O extends GameObject> {
 
         return gameObject;
     }
-
-    public void newTurn() {
-
-    }
 }

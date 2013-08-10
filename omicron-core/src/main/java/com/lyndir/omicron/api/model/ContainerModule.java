@@ -15,11 +15,11 @@ public class ContainerModule extends Module {
         this.capacity = capacity;
     }
 
-    public static Builder0 createWithStandardResourceCost() {
+     static Builder0 createWithStandardResourceCost() {
         return createWithExtraResourceCost( ResourceCost.immutable() );
     }
 
-    public static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
+     static Builder0 createWithExtraResourceCost(final ImmutableResourceCost resourceCost) {
         return new Builder0( ModuleType.CONTAINER.getStandardCost().add( resourceCost ) );
     }
 
@@ -51,7 +51,7 @@ public class ContainerModule extends Module {
      * @return The amount of resources that has been added to the stock.  It will be a value between 0 and the given amount, depending on
      *         how much available stock this container has left.
      */
-    public int addStock(final int amount) {
+     int addStock(final int amount) {
         Preconditions.checkArgument( amount >= 0, "Amount of stock to add must be positive." );
 
         int newStock = Math.min( stock + amount, capacity );
@@ -69,7 +69,7 @@ public class ContainerModule extends Module {
      * @return The amount of resources that has been removed from the stock.  It will be a value between 0 and the given amount, depending
      *         on how much available stock this container had left.
      */
-    public int depleteStock(final int amount) {
+     int depleteStock(final int amount) {
         Preconditions.checkArgument( amount >= 0, "Amount of stock to deplete must be positive." );
 
         int newStock = Math.max( stock - amount, 0 );
@@ -80,11 +80,11 @@ public class ContainerModule extends Module {
     }
 
     @Override
-    public void onReset() {
+    protected void onReset() {
     }
 
     @Override
-    public void onNewTurn() {
+    protected void onNewTurn() {
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ContainerModule extends Module {
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })
-    public static class Builder0 {
+     static class Builder0 {
 
         private final ImmutableResourceCost resourceCost;
 
@@ -102,11 +102,11 @@ public class ContainerModule extends Module {
             this.resourceCost = resourceCost;
         }
 
-        public Builder1 resourceType(final ResourceType resourceType) {
+         Builder1 resourceType(final ResourceType resourceType) {
             return new Builder1( resourceType );
         }
 
-        public class Builder1 {
+         class Builder1 {
 
             private final ResourceType resourceType;
 
@@ -114,7 +114,7 @@ public class ContainerModule extends Module {
                 this.resourceType = resourceType;
             }
 
-            public ContainerModule capacity(final int capacity) {
+            ContainerModule capacity(final int capacity) {
                 return new ContainerModule( resourceCost, resourceType, capacity );
             }
         }

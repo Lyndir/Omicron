@@ -16,6 +16,7 @@
 
 package com.lyndir.omicron.api.model;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 
@@ -28,5 +29,5 @@ public interface UnitType {
 
     int getConstructionWork();
 
-    List<? extends Module> createModules();
+    ImmutableList<? extends Module> createModules();
 }

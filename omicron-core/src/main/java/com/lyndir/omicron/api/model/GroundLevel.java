@@ -7,7 +7,7 @@ package com.lyndir.omicron.api.model;
  */
 public class GroundLevel extends Level {
 
-    public GroundLevel(final Size levelSize, final Game game) {
+    GroundLevel(final Size levelSize, final Game game) {
 
         super( levelSize, LevelType.GROUND, game );
     }

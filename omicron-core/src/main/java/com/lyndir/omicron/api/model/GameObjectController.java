@@ -36,7 +36,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         return getGameObject().getOwner();
     }
 
-    public void setOwner(@Nullable final Player owner) {
+    void setOwner(@Nullable final Player owner) {
         Optional<Player> oldOwner = getOwner();
         if (oldOwner.isPresent())
             oldOwner.get().getObjects().remove( getGameObject() );
@@ -48,7 +48,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
             newOwner.get().getController().addObject( getGameObject() );
     }
 
-    public void setLocation(final Tile location) {
+    void setLocation(final Tile location) {
 
         Tile oldLocation = getGameObject().getLocation();
         if (oldLocation != null)
@@ -74,19 +74,19 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles( currentPlayer );
     }
 
-    public void onReset() {
+    void onReset() {
 
         for (final Module module : getGameObject().listModules())
             module.onReset();
     }
 
-    public void onNewTurn() {
+    void onNewTurn() {
 
         for (final Module module : getGameObject().listModules())
             module.onNewTurn();
     }
 
-    public void die() {
+    void die() {
 
         getGameObject().getLocation().setContents( null );
 
