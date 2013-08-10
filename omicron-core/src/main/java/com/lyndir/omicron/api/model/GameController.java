@@ -1,8 +1,9 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
+import com.google.common.base.*;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,26 +34,27 @@ public class GameController {
     /**
      * Retrieve information on a given player.
      *
-     * @param currentPlayer The player requesting the information.
      * @param player        The player whose information is being requested.
      *
      * @return Information visible to the current player about the given player.
      */
-    public PlayerGameInfo getPlayerGameInfo(final Player currentPlayer, final Player player) {
+    @Authenticated
+    public PlayerGameInfo getPlayerGameInfo(final Player player) {
 
-        if (player.listObservableTiles( currentPlayer ).iterator().hasNext())
+        if (player.listObservableTiles().iterator().hasNext())
             return PlayerGameInfo.discovered( player, player.getScore() );
 
         return PlayerGameInfo.undiscovered( player );
     }
 
-    public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo(final Player currentPlayer) {
+    @Authenticated
+    public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo() {
 
         return ImmutableList.copyOf( Lists.transform( game.getPlayers(), new Function<Player, PlayerGameInfo>() {
             @Override
             public PlayerGameInfo apply(final Player input) {
 
-                return getPlayerGameInfo( currentPlayer, input );
+                return getPlayerGameInfo( input );
             }
         } ) );
     }
@@ -65,15 +67,25 @@ public class GameController {
     /**
      * Indicate that the current player is ready with his turn.
      *
-     * @param currentPlayer The current player.
+     * @return true if this action has caused a new turn to begin.
+     */
+    @Authenticated
+    public boolean setReady() {
+        return setReady( Security.getCurrentPlayer() );
+    }
+
+    /**
+     * Indicate that the current player is ready with his turn.
      *
      * @return true if this action has caused a new turn to begin.
      */
-    boolean setReady(final Player currentPlayer) {
+    boolean setReady(final Player player) {
+        if (!player.isKeyLess() && ObjectUtils.isEqual( player, Security.getCurrentPlayer() ))
+            return false;
 
-        game.getReadyPlayers().add( currentPlayer );
+        game.getReadyPlayers().add( player );
         for (final GameListener gameListener : gameListeners)
-            gameListener.onPlayerReady( currentPlayer );
+            gameListener.onPlayerReady( player );
 
         if (game.getReadyPlayers().containsAll( game.getPlayers() )) {
             game.getReadyPlayers().clear();

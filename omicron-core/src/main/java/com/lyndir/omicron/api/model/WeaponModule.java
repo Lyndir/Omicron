@@ -72,18 +72,17 @@ public class WeaponModule extends Module {
         return ImmutableSet.copyOf( supportedLayers );
     }
 
-    void fireAt(final Player currentPlayer, final Tile target) {
-
-        Preconditions.checkArgument( ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ), //
-                                     "Cannot fire: unit is not owned by player." );
-        Preconditions.checkArgument( currentPlayer.canObserve( currentPlayer, target ), //
-                                     "Cannot fire: target not observed." );
-        Preconditions.checkArgument( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, //
-                                     "Cannot fire: target not in range." );
-        Preconditions.checkState( repeated < repeat, //
-                                  "Cannot fire: no repeats left." );
-        Preconditions.checkState( ammunition > 0, //
-                                  "Cannot fire: no ammunition left." );
+    boolean fireAt(final Tile target) {
+        if (!getGameObject().isOwnedByCurrentPlayer())
+            return false;
+        if (!Security.getCurrentPlayer().canObserve( target ))
+            return false;
+        if (getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) > range)
+            return false;
+        if (repeated >= repeat)
+            return false;
+        if (ammunition <= 0)
+            return false;
 
         Optional<GameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())
@@ -91,6 +90,8 @@ public class WeaponModule extends Module {
 
         ++repeated;
         --ammunition;
+
+        return true;
     }
 
     @Override

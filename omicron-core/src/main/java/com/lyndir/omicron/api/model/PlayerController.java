@@ -4,6 +4,7 @@ import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.omicron.api.Authenticated;
 import javax.annotation.Nonnull;
 
 
@@ -34,26 +35,26 @@ public class PlayerController implements GameObserver {
     }
 
     @Override
-    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
+    public boolean canObserve(@Nonnull final Tile location) {
 
         return FluentIterable.from( player.getObjects() ).anyMatch( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
 
-                return input.canObserve( currentPlayer, location );
+                return input.canObserve( location );
             }
         } );
     }
 
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles() {
 
         return FluentIterable.from( player.getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
             @Override
             public Iterable<? extends Tile> apply(final GameObject input) {
 
-                return input.listObservableTiles( currentPlayer );
+                return input.listObservableTiles();
             }
         } );
     }
@@ -61,31 +62,28 @@ public class PlayerController implements GameObserver {
     /**
      * Iterate the objects of this player that the given observer (and the current player) can observe.
      *
-     * @param currentPlayer The player that's making the request.
-     * @param observer      The observer that we want to observe the player's objects with.
+     * @param observer The observer that we want to observe the player's objects with.
      *
      * @return An iterable of game objects owned by this controller's player.
      */
-    public Iterable<GameObject> iterateObservableObjects(final Player currentPlayer, final GameObserver observer) {
+    @Authenticated
+    public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {
 
         return FluentIterable.from( player.getObjects() ).filter( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
-
-                if (!currentPlayer.canObserve( currentPlayer, input.getLocation() ))
-                    return false;
-
-                return observer.canObserve( currentPlayer, input.getLocation() );
+                return observer.canObserve( input.getLocation() );
             }
         } );
     }
 
-    public Optional<GameObject> getObject(final Player currentPlayer, final int objectId) {
-
+    public Optional<GameObject> getObject(final int objectId) {
         Optional<GameObject> object = player.getObject( objectId );
 
         // If the object cannot be observed by the current player, treat it as absent.
-        if (object.isPresent() && !currentPlayer.canObserve( currentPlayer, object.get().getLocation() ))
+        if (!object.isPresent() || !Security.isAuthenticated())
+            return Optional.absent();
+        if (!Security.getCurrentPlayer().canObserve( object.get().getLocation() ))
             return Optional.absent();
 
         return object;

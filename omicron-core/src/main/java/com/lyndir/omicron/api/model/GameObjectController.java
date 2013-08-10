@@ -62,16 +62,16 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     }
 
     @Override
-    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
+    public boolean canObserve(@Nonnull final Tile location) {
 
-        return getGameObject().onModuleElse( ModuleType.BASE, 0, false ).canObserve( currentPlayer, location );
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, false ).canObserve( location );
     }
 
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles() {
 
-        return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles( currentPlayer );
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles();
     }
 
     void onReset() {

@@ -63,7 +63,7 @@ public class MobilityModuleTest extends AbstractTest {
         staticGame.getController().start();
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 7d );
 
-        MobilityModule.Leveling leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( staticPlayer, LevelType.GROUND );
+        MobilityModule.Leveling leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.GROUND );
         assertTrue( leveling.isPossible() );
         assertEquals( leveling.getTarget().getLevel().getType(), LevelType.GROUND );
         assertEquals( leveling.getCost(), 0d );
@@ -72,7 +72,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 7d );
 
-        leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( staticPlayer, LevelType.SPACE );
+        leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.SPACE );
         assertTrue( leveling.isPossible() );
         assertEquals( leveling.getTarget().getLevel().getType(), LevelType.SPACE );
         assertEquals( leveling.getCost(), 5d );
@@ -81,7 +81,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 2d );
 
-        leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( staticPlayer, LevelType.SKY );
+        leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.SKY );
         assertTrue( leveling.isPossible() );
         assertEquals( leveling.getTarget().getLevel().getType(), LevelType.SKY );
         assertEquals( leveling.getCost(), 2d );
@@ -90,7 +90,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 0d );
 
-        leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( staticPlayer, LevelType.GROUND );
+        leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.GROUND );
         assertFalse( leveling.isPossible() );
         assertEquals( leveling.getTarget().getLevel().getType(), LevelType.GROUND );
         assertEquals( leveling.getCost(), 1d );
@@ -116,15 +116,14 @@ public class MobilityModuleTest extends AbstractTest {
 
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 17d );
         MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 )
-                                                .movement( staticPlayer, mover.getLocation().neighbour( Coordinate.Side.E ) );
+                                                .movement( mover.getLocation().neighbour( Coordinate.Side.E ) );
         assertTrue( movement.isPossible() );
         assertEquals( movement.getCost(), 1d );
         movement.execute();
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
         assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 0, staticGame.getLevelSize() ) );
 
-        movement = mover.onModule( ModuleType.MOBILITY, 0 )
-                        .movement( staticPlayer, staticGame.getLevel( LevelType.SPACE ).getTile( 1, 5 ).get() );
+        movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( staticGame.getLevel( LevelType.SPACE ).getTile( 1, 5 ).get() );
         assertTrue( movement.isPossible() );
         assertEquals( movement.getCost(), 15d );
         movement.execute();
@@ -132,8 +131,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 1d );
 
-        movement = mover.onModule( ModuleType.MOBILITY, 0 )
-                        .movement( staticPlayer, staticGame.getLevel( LevelType.GROUND ).getTile( 0, 5 ).get() );
+        movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( staticGame.getLevel( LevelType.GROUND ).getTile( 0, 5 ).get() );
         assertFalse( movement.isPossible() );
         movement.execute();
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.SPACE );

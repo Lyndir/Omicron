@@ -93,7 +93,7 @@ public class MapView extends View {
         Table<Integer, Integer, Tile> grid = HashBasedTable.create( levelSize.getHeight(), levelSize.getWidth() );
 
         // Iterate observable tiles and populate the grid.
-        for (final Tile tile : localPlayer.listObservableTiles( localPlayer )) {
+        for (final Tile tile : localPlayer.listObservableTiles()) {
             Coordinate coordinate = positionToMapCoordinate( tile.getPosition() );
             grid.put( coordinate.getY(), coordinate.getX(), tile );
         }

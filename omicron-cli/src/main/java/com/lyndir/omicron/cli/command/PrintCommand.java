@@ -54,7 +54,7 @@ public class PrintCommand extends Command {
                 grid.put( v, u, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
-        for (final Tile tile : localPlayer.listObservableTiles( localPlayer )) {
+        for (final Tile tile : localPlayer.listObservableTiles()) {
             Optional<GameObject> contents = tile.getContents();
             char contentsChar;
             if (contents.isPresent())

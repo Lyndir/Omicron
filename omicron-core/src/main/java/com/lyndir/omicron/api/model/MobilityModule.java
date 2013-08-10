@@ -113,11 +113,10 @@ public class MobilityModule extends Module {
     /**
      * Move the unit to the given level.
      *
-     * @param currentPlayer The player ordering the action.
      * @param levelType     The side of the adjacent tile relative to the current.
      */
-    public Leveling leveling(final Player currentPlayer, final LevelType levelType) {
-        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
+    public Leveling leveling(final LevelType levelType) {
+        if (!getGameObject().isOwnedByCurrentPlayer())
             // Cannot level object that doesn't belong to the current player.
             return new Leveling( 0 );
 
@@ -139,15 +138,14 @@ public class MobilityModule extends Module {
     /**
      * Move the unit to an adjacent tile.
      *
-     * @param currentPlayer The player ordering the action.
      * @param target        The side of the adjacent tile relative to the current.
      */
-    public Movement movement(final Player currentPlayer, final Tile target) {
-        if (!ObjectUtils.isEqual( currentPlayer, getGameObject().getOwner().orNull() ))
+    public Movement movement(final Tile target) {
+        if (!getGameObject().isOwnedByCurrentPlayer())
             // Cannot move object that doesn't belong to the current player.
             return new Movement( 0 );
 
-        Leveling leveling = leveling( currentPlayer, target.getLevel().getType() );
+        Leveling leveling = leveling( target.getLevel().getType() );
         if (!leveling.isPossible())
             // Cannot move because we can't level to the target's level.
             return new Movement( leveling.getCost() );

@@ -1,6 +1,7 @@
 package com.lyndir.omicron.cli.command;
 
-import com.lyndir.omicron.api.model.Game;
+import com.google.common.base.Optional;
+import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -31,9 +32,13 @@ public class CreateCommand extends Command {
         }
 
         Game game = gameBuilder.build();
-        getOmicron().setGameController( game.getController() );
         getOmicron().getBuilders().setGameBuilder( null );
-        game.getController().start();
+
+        GameController gameController = game.getController();
+        getOmicron().setGameController( gameController );
+        if (getOmicron().getLocalPlayer().isPresent())
+            gameController.setReady();
+
         inf( "Created game: %s", game );
     }
 }

@@ -5,6 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.omicron.api.Authenticated;
 import javax.annotation.Nonnull;
 
 
@@ -37,24 +38,25 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @Override
-    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
+    @Authenticated
+    public boolean canObserve(@Nonnull final Tile location) {
+        boolean canView = getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) <= viewRange;
+        if (!canView || getGameObject().isOwnedByCurrentPlayer())
+            return canView;
 
-        Optional<Player> owner = getGameObject().getOwner();
-        if (owner.isPresent() && !ObjectUtils.isEqual( owner.get(), currentPlayer ))
-            return false;
-
-        return getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) <= viewRange;
+        // Game object not owned by current player, check if player can see location.
+        return Security.isAuthenticated() && Security.getCurrentPlayer().canObserve( location );
     }
 
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
-
+    @Authenticated
+    public Iterable<Tile> listObservableTiles() {
         return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
             public boolean apply(final Tile input) {
 
-                return canObserve( currentPlayer, input );
+                return canObserve( input );
             }
         } );
     }

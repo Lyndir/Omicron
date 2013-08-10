@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
+import com.lyndir.omicron.api.Authenticated;
 import javax.annotation.Nonnull;
 
 
@@ -14,22 +15,22 @@ public interface GameObserver {
     /**
      * Check whether the current object can observe the tile at the given location.
      *
-     * @param currentPlayer The player that's making the request.
+     *
      * @param location      The tile that this observer is trying to see.
      *
      * @return true if the current player is allowed to know and the given tile is visible to this observer.
      */
-    boolean canObserve(@Nonnull Player currentPlayer, @Nonnull Tile location);
+    @Authenticated
+    boolean canObserve(@Nonnull Tile location);
 
     /**
      * Enumerate the tiles this observer can observe.
      *
-     * @param currentPlayer The player that's making the request.
-     *
      * @return All the tiles observable both by this observer and the current player.
      */
     @Nonnull
-    Iterable<Tile> listObservableTiles(@Nonnull Player currentPlayer);
+    @Authenticated
+    Iterable<Tile> listObservableTiles();
 
     @Nonnull
     Optional<Player> getOwner();

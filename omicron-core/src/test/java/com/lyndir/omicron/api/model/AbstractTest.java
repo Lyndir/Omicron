@@ -26,7 +26,8 @@ public abstract class AbstractTest {
 
     protected void init() {
         Game.Builder builder = Game.builder();
-        staticPlayer = new Player( builder.nextPlayerID(), new PlayerKey(), "testPlayer", Color.Template.randomColor(),
+        PlayerKey key = new PlayerKey();
+        staticPlayer = new Player( builder.nextPlayerID(), key, "testPlayer", Color.Template.randomColor(),
                                    Color.Template.randomColor() ) {
             private final PlayerController playerController = new PlayerController( this ) {
                 @Override
@@ -79,6 +80,8 @@ public abstract class AbstractTest {
         builder.setUnitConfig( Game.GameUnitConfigs.NONE );
         builder.getPlayers().add( staticPlayer );
         staticGame = builder.build();
+
+        Security.authenticate( staticPlayer, key );
     }
 
     protected UnitType testUnitType(final String typeName, final Module... modules) {

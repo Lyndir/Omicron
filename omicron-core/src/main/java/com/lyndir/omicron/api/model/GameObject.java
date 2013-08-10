@@ -61,22 +61,27 @@ public class GameObject extends MetaObject implements GameObserver {
         return Optional.fromNullable( owner );
     }
 
+    public boolean isOwnedByCurrentPlayer() {
+
+        return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.getCurrentPlayer() );
+    }
+
     void setOwner(final Player owner) {
         this.owner = owner;
     }
 
     @Override
     @SuppressWarnings("ParameterHidesMemberVariable")
-    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
+    public boolean canObserve(@Nonnull final Tile location) {
 
-        return getController().canObserve( currentPlayer, location );
+        return getController().canObserve( location );
     }
 
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles() {
 
-        return getController().listObservableTiles( currentPlayer );
+        return getController().listObservableTiles();
     }
 
     public int getObjectID() {

@@ -50,6 +50,8 @@ public class AddGameCommand extends Command {
                                        Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
         gameBuilder.getPlayers().add( newPlayer );
         getOmicron().setLocalPlayer( newPlayer );
+
+        Security.authenticate( newPlayer, getOmicron().getLocalKey() );
         inf( "Added player to game: %s", newPlayer );
     }
 }

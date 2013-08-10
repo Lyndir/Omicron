@@ -55,16 +55,16 @@ public class Player extends MetaObject implements GameObserver {
     }
 
     @Override
-    public boolean canObserve(@Nonnull final Player currentPlayer, @Nonnull final Tile location) {
+    public boolean canObserve(@Nonnull final Tile location) {
 
-        return getController().canObserve( currentPlayer, location );
+        return getController().canObserve( location );
     }
 
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles(@Nonnull final Player currentPlayer) {
+    public Iterable<Tile> listObservableTiles() {
 
-        return getController().listObservableTiles( currentPlayer );
+        return getController().listObservableTiles();
     }
 
     @Nonnull
