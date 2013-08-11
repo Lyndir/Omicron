@@ -364,7 +364,7 @@ public class ConstructorModule extends Module {
                 this.buildSpeed = buildSpeed;
             }
 
-            ConstructorModule supportedLayers(final ModuleType<?> buildsModule) {
+            ConstructorModule buildsModule(final ModuleType<?> buildsModule) {
                 return new ConstructorModule( resourceCost, buildSpeed, buildsModule );
             }
         }

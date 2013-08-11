@@ -37,9 +37,76 @@ public enum UnitTypes implements UnitType {
                                                MobilityModule.createWithStandardResourceCost()
                                                              .movementSpeed( 5 )
                                                              .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
-                                                             .levelingCost( ImmutableMap.<LevelType, Double>of() ) );
+                                                             .levelingCost( ImmutableMap.<LevelType, Double>of() ),
+                                               ConstructorModule.createWithStandardResourceCost()
+                                                                .buildSpeed( 3 )
+                                                                .buildsModule( ModuleType.BASE ),
+                                               ConstructorModule.createWithStandardResourceCost()
+                                                                .buildSpeed( 2 )
+                                                                .buildsModule( ModuleType.CONSTRUCTOR ),
+                                               ConstructorModule.createWithStandardResourceCost()
+                                                                .buildSpeed( 3 )
+                                                                .buildsModule( ModuleType.CONTAINER ),
+                                               ConstructorModule.createWithStandardResourceCost()
+                                                                .buildSpeed( 3 )
+                                                                .buildsModule( ModuleType.EXTRACTOR ),
+                                               ConstructorModule.createWithStandardResourceCost()
+                                                                .buildSpeed( 3 )
+                                                                .buildsModule( ModuleType.MOBILITY ),
+                                               ConstructorModule.createWithStandardResourceCost()
+                                                                .buildSpeed( 2 )
+                                                                .buildsModule( ModuleType.WEAPON ) );
                   }
               } ),
+    QUARRY( "Quarry", 5, //
+            new Supplier<ImmutableList<? extends Module>>() {
+                @Override
+                public ImmutableList<? extends Module> get() {
+                    return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                       .maxHealth( 20 )
+                                                       .armor( 5 )
+                                                       .viewRange( 2 )
+                                                       .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
+                                             ExtractorModule.createWithStandardResourceCost()
+                                                            .resourceType( ResourceType.METALS )
+                                                            .speed( 2 ) );
+                }
+            } ),
+    DRILL( "Drill Site", 5, //
+           new Supplier<ImmutableList<? extends Module>>() {
+               @Override
+               public ImmutableList<? extends Module> get() {
+                   return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                      .maxHealth( 20 )
+                                                      .armor( 2 )
+                                                      .viewRange( 2 )
+                                                      .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
+                                            ExtractorModule.createWithStandardResourceCost().resourceType( ResourceType.FUEL ).speed( 2 ) );
+               }
+           } ),
+    CONTAINER( "Container", 5, //
+               new Supplier<ImmutableList<? extends Module>>() {
+                   @Override
+                   public ImmutableList<? extends Module> get() {
+                       return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                          .maxHealth( 20 )
+                                                          .armor( 10 )
+                                                          .viewRange( 2 )
+                                                          .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
+                                                ContainerModule.createWithStandardResourceCost()
+                                                               .resourceType( ResourceType.METALS )
+                                                               .capacity( 20 ), //
+                                                ContainerModule.createWithStandardResourceCost()
+                                                               .resourceType( ResourceType.FUEL )
+                                                               .capacity( 20 ), //
+                                                ContainerModule.createWithStandardResourceCost()
+                                                               .resourceType( ResourceType.RARE_ELEMENTS )
+                                                               .capacity( 20 ), //
+                                                ContainerModule.createWithStandardResourceCost()
+                                                               .resourceType( ResourceType.SILICON )
+                                                               .capacity( 20 ) );
+                   }
+               } ),
     SCOUT( "Scout", 5, //
            new Supplier<ImmutableList<? extends Module>>() {
                @Override

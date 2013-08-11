@@ -36,10 +36,10 @@ public class ConstructorModuleTest extends AbstractTest {
         // Create a unit that can build BASE & MOBILITY.
         ConstructorModule initBaseConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                                        .buildSpeed( 3 )
-                                                                       .supportedLayers( ModuleType.BASE );
+                                                                       .buildsModule( ModuleType.BASE );
         ConstructorModule initMobilityConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                                            .buildSpeed( 2 )
-                                                                           .supportedLayers( ModuleType.MOBILITY );
+                                                                           .buildsModule( ModuleType.MOBILITY );
         GameObject baseMobilityConstructorUnit = createUnit( testUnitType( "Base Mobility Constructor",
                                                                            BaseModule.createWithStandardResourceCost()
                                                                                      .maxHealth( 1 )
@@ -175,7 +175,7 @@ public class ConstructorModuleTest extends AbstractTest {
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(), ImmutableSet.of() ) );
 
         // Build a BASE & MOBILITY unit, using a constructor that can do only BASE, then help out with one that can do only MOBILITY.
-        initBaseConstructorModule = ConstructorModule.createWithStandardResourceCost().buildSpeed( 3 ).supportedLayers( ModuleType.BASE );
+        initBaseConstructorModule = ConstructorModule.createWithStandardResourceCost().buildSpeed( 3 ).buildsModule( ModuleType.BASE );
         GameObject baseConstructorUnit = createUnit( testUnitType( "Base Constructor", BaseModule.createWithStandardResourceCost()
                                                                                                  .maxHealth( 1 )
                                                                                                  .armor( 1 )
@@ -234,7 +234,7 @@ public class ConstructorModuleTest extends AbstractTest {
         // Send help.
         initMobilityConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                          .buildSpeed( 2 )
-                                                         .supportedLayers( ModuleType.MOBILITY );
+                                                         .buildsModule( ModuleType.MOBILITY );
         GameObject mobilityConstructorUnit = createUnit( testUnitType( "Mobility Constructor", initMobilityConstructorModule ), 5, 6 );
         mobilityConstructorModule = mobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         staticGame.getController().setReady();
