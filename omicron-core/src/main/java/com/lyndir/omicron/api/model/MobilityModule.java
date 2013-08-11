@@ -4,6 +4,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 import static com.lyndir.omicron.api.util.PathUtils.*;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.EnumMap;
 import java.util.Map;
@@ -113,7 +114,7 @@ public class MobilityModule extends Module {
     /**
      * Move the unit to the given level.
      *
-     * @param levelType     The side of the adjacent tile relative to the current.
+     * @param levelType The side of the adjacent tile relative to the current.
      */
     public Leveling leveling(final LevelType levelType) {
         if (!getGameObject().isOwnedByCurrentPlayer())
@@ -130,15 +131,13 @@ public class MobilityModule extends Module {
             // Cannot move: insufficient speed remaining this turn.
             return new Leveling( cost );
 
-        // TODO: Decide whether we want to give access to arbitrary Tile objects.
-        // TODO: If so, Tile's accessors need to do permission checks, if not we should remove Tile from Leveling or make it package-private.
         return new Leveling( cost, getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get() );
     }
 
     /**
      * Move the unit to an adjacent tile.
      *
-     * @param target        The side of the adjacent tile relative to the current.
+     * @param target The side of the adjacent tile relative to the current.
      */
     public Movement movement(final Tile target) {
         if (!getGameObject().isOwnedByCurrentPlayer())
@@ -180,9 +179,7 @@ public class MobilityModule extends Module {
         };
 
         // Find the path!
-        // TODO: Decide whether we want to give access to arbitrary Tile objects.
-        // TODO: If so, Tile's accessors need to do permission checks, if not we should remove Tile from Movement's Path or make it package-private.
-        Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, Double.MAX_VALUE, neighboursFunction );
+        Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction );
         return new Movement( leveling.getCost() + (path.isPresent()? path.get().getCost(): 0), leveling, path );
     }
 
@@ -238,24 +235,15 @@ public class MobilityModule extends Module {
             return target.get();
         }
 
-        public boolean execute() {
-            // Check that this movement was deemed possible.
-            if (!isPossible())
-                return false;
-
-            // Check that we still have sufficient remaining speed.
-            if (cost > remainingSpeed)
-                return false;
-
-            // Check that the path can still be walked.
-            if (!target.get().isAccessible())
-                return false;
+        public void execute() {
+            Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
+            Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
+            // TODO: No target.isAccessible check: Most units that level cannot see other levels before they go there.
+            // TODO: Should we disallow leveling until you can see the level above you like we do with movement and the tile you move to?
 
             // Execute the leveling.
             getGameObject().getController().setLocation( target.get() );
             remainingSpeed -= cost;
-
-            return true;
         }
     }
 
@@ -301,21 +289,17 @@ public class MobilityModule extends Module {
             return path.isPresent();
         }
 
-        public boolean execute() {
-            // Check that this movement was deemed possible.
-            if (!isPossible())
-                return false;
-
-            // Check that we still have sufficient remaining speed.
-            if (cost > remainingSpeed)
-                return false;
+        public void execute() {
+            Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
+            Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
 
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
             do {
-                if (!tracePath.getTarget().isAccessible() && !ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ))
-                    // Path can no longer be walked.
-                    return false;
+                Preconditions.checkState(
+                        tracePath.getTarget().isAccessible() || ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ),
+                        "Cannot execute: path no longer accessible." );
+
                 Optional<Path<Tile>> parent = tracePath.getParent();
                 if (!parent.isPresent())
                     break;
@@ -325,14 +309,11 @@ public class MobilityModule extends Module {
             while (true);
 
             // Execute the leveling.
-            if (!leveling.execute())
-                return false;
+            leveling.execute();
 
             // Execute the path.
             getGameObject().getController().setLocation( path.get().getTarget() );
             remainingSpeed -= path.get().getCost();
-
-            return true;
         }
     }
 

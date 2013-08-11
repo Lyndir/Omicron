@@ -92,9 +92,12 @@ public class MobilityModuleTest extends AbstractTest {
 
         leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.GROUND );
         assertFalse( leveling.isPossible() );
-        assertEquals( leveling.getTarget().getLevel().getType(), LevelType.GROUND );
         assertEquals( leveling.getCost(), 1d );
-        leveling.execute();
+        try {
+            leveling.execute();
+            assertFalse( true );
+        } catch (IllegalStateException ignored) {
+        }
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.SKY );
         assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 0d );
@@ -104,14 +107,17 @@ public class MobilityModuleTest extends AbstractTest {
     public void testMovement()
             throws Exception {
 
-        GameObject mover = createUnit( testUnitType( "Mover", MobilityModule.createWithStandardResourceCost()
-                                                                            .movementSpeed( 17 )
-                                                                            .movementCost(
-                                                                                    ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SPACE,
-                                                                                                     2d ) )
-                                                                            .levelingCost(
-                                                                                    ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY,
-                                                                                                     2d, LevelType.SPACE, 3d ) ) ) );
+        GameObject mover = createUnit( testUnitType( "Mover", BaseModule.createWithStandardResourceCost()
+                                                                        .maxHealth( 1 )
+                                                                        .armor( 1 )
+                                                                        .viewRange( 10 )
+                                                                        .supportedLayers( LevelType.values() ),
+                                                     MobilityModule.createWithStandardResourceCost()
+                                                                   .movementSpeed( 17 )
+                                                                   .movementCost(
+                                                                           ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SPACE, 2d ) )
+                                                                   .levelingCost( ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY, 2d,
+                                                                                                   LevelType.SPACE, 3d ) ) ) );
         staticGame.getController().start();
 
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 17d );
@@ -133,7 +139,11 @@ public class MobilityModuleTest extends AbstractTest {
 
         movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( staticGame.getLevel( LevelType.GROUND ).getTile( 0, 5 ).get() );
         assertFalse( movement.isPossible() );
-        movement.execute();
+        try {
+            movement.execute();
+            assertFalse( true );
+        } catch (IllegalStateException ignored) {
+        }
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.SPACE );
         assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 1d );

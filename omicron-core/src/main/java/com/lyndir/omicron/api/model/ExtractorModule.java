@@ -5,6 +5,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Constants;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.PathUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,12 +50,15 @@ public class ExtractorModule extends Module {
 
         // Mine some resources.
         Tile location = getGameObject().getLocation();
-        int availableResources = location.getResourceQuantity( resourceType );
-        int newAvailableResources = Math.max( 0, availableResources - speed );
-        int minedResources = availableResources - newAvailableResources;
-        logger.trc( "mined: %d %s", minedResources, resourceType );
-        if (minedResources == 0)
+        Optional<Integer> availableResources = location.getResourceQuantity( resourceType );
+        if (!availableResources.isPresent())
             // No resources left to mine.
+            return;
+
+        int newAvailableResources = Math.max( 0, availableResources.get() - speed );
+        int minedResources = availableResources.get() - newAvailableResources;
+        if (!availableResources.isPresent())
+            // No speed left for mining.
             return;
 
         // Initialize path finding functions.
@@ -83,7 +87,6 @@ public class ExtractorModule extends Module {
                     @Nullable
                     @Override
                     public GameObject apply(@Nonnull final Tile input) {
-
                         return input.getContents().orNull();
                     }
                 } ).filter( Predicates.notNull() );

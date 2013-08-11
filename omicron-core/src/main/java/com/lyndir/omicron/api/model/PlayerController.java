@@ -1,8 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.*;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.Authenticated;
 import javax.annotation.Nonnull;
@@ -57,6 +56,21 @@ public class PlayerController implements GameObserver {
                 return input.listObservableTiles();
             }
         } );
+    }
+
+    /**
+     * List the objects of this player.
+     *
+     * NOTE: The controller must be of the currently authenticated player.
+     *
+     * @return A list of game objects owned by this controller's player.
+     */
+    @Authenticated
+    public ImmutableCollection<GameObject> listObjects() {
+        if (!ObjectUtils.isEqual( player, Security.getCurrentPlayer() ))
+            return ImmutableSet.of();
+
+        return ImmutableSet.copyOf( player.getObjects() );
     }
 
     /**

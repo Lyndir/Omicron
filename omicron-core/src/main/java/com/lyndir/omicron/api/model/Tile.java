@@ -5,6 +5,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 import com.google.common.base.*;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.util.Maybe;
 import java.util.EnumMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -40,16 +41,22 @@ public class Tile extends MetaObject {
     }
 
     @Nonnull
-    Optional<GameObject> getContents() {
-
+    public Optional<GameObject> getContents() {
         return Optional.fromNullable( contents );
+    }
+
+    @Nonnull
+    public Maybe<GameObject> checkContents() {
+        if (!Security.isAuthenticated() || !Security.getCurrentPlayer().canObserve( this ))
+            return Maybe.unknown();
+
+        return Maybe.fromNullable( contents );
     }
 
     void setContents(@Nullable final GameObject contents) {
 
         if (contents != null)
-            Preconditions.checkState( !getContents().isPresent(), "Cannot put object on tile that is not empty: %s, holds: %s", //
-                                      this, getContents().orNull() );
+            Preconditions.checkState( this.contents == null, "Cannot put object on tile that is not empty: %s", this );
 
         this.contents = contents;
     }
@@ -65,19 +72,26 @@ public class Tile extends MetaObject {
     }
 
     void setResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
-
         Preconditions.checkArgument( resourceQuantity >= 0, "Resource quantity cannot be less than zero: %s", resourceQuantity );
-        resourceQuantities.put( resourceType, resourceQuantity );
+        if (resourceQuantity > 0)
+            resourceQuantities.put( resourceType, resourceQuantity );
+        else
+            resourceQuantities.remove( resourceType );
     }
 
     void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
-
-        setResourceQuantity( resourceType, getResourceQuantity( resourceType ) + resourceQuantity );
+        setResourceQuantity( resourceType, ifNotNullElse( resourceQuantities.get( resourceType ), 0 ) + resourceQuantity );
     }
 
-    int getResourceQuantity(final ResourceType resourceType) {
+    Optional<Integer> getResourceQuantity(final ResourceType resourceType) {
+        return Optional.fromNullable( resourceQuantities.get( resourceType ) );
+    }
 
-        return ifNotNullElse( resourceQuantities.get( resourceType ), 0 );
+    public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType) {
+        if (!Security.isAuthenticated() || !Security.getCurrentPlayer().canObserve( this ))
+            return Maybe.unknown();
+
+        return Maybe.fromNullable( resourceQuantities.get( resourceType ) );
     }
 
     @Nonnull
@@ -128,6 +142,6 @@ public class Tile extends MetaObject {
 
     boolean isAccessible() {
 
-        return !getContents().isPresent();
+        return checkContents().presence() == Maybe.Presence.ABSENT;
     }
 }

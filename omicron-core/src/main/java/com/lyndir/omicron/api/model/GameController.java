@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.*;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.Authenticated;
@@ -34,7 +35,7 @@ public class GameController {
     /**
      * Retrieve information on a given player.
      *
-     * @param player        The player whose information is being requested.
+     * @param player The player whose information is being requested.
      *
      * @return Information visible to the current player about the given player.
      */
@@ -75,11 +76,13 @@ public class GameController {
     }
 
     /**
-     * Indicate that the current player is ready with his turn.
+     * Indicate that the given player is ready with his turn.
+     *
+     * NOTE: The player must be key-less or be the currently authenticated player.
      *
      * @return true if this action has caused a new turn to begin.
      */
-    boolean setReady(final Player player) {
+    boolean setReady(Player player) {
         if (!player.isKeyLess() && ObjectUtils.isEqual( player, Security.getCurrentPlayer() ))
             return false;
 

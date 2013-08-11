@@ -1,7 +1,8 @@
 package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.lyndir.omicron.api.model.GameController;
 import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.cli.OmicronCLI;
@@ -36,7 +37,7 @@ public class EndCommand extends Command {
         }
 
         Player localPlayer = localPlayerOptional.get();
-        if (gameController.get().setReady( localPlayer ))
+        if (gameController.get().setReady())
             inf( "%s ready.  New turn started.", localPlayer.getName() );
         else
             inf( "%s ready.  Not yet ready: %s", localPlayer.getName(),

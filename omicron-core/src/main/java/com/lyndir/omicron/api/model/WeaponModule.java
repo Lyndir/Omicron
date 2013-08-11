@@ -1,9 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import java.util.Random;
 import java.util.Set;
 
@@ -72,7 +70,7 @@ public class WeaponModule extends Module {
         return ImmutableSet.copyOf( supportedLayers );
     }
 
-    boolean fireAt(final Tile target) {
+    public boolean fireAt(final Tile target) {
         if (!getGameObject().isOwnedByCurrentPlayer())
             return false;
         if (!Security.getCurrentPlayer().canObserve( target ))

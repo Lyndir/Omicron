@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.StringUtils;
-import com.lyndir.omicron.api.model.*;
 import java.util.*;
 import javax.annotation.Nonnull;
 import org.testng.annotations.BeforeMethod;

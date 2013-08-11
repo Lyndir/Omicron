@@ -57,12 +57,10 @@ public class GameObject extends MetaObject implements GameObserver {
     @Nonnull
     @Override
     public Optional<Player> getOwner() {
-
         return Optional.fromNullable( owner );
     }
 
     public boolean isOwnedByCurrentPlayer() {
-
         return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.getCurrentPlayer() );
     }
 

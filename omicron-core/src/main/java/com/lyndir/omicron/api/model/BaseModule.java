@@ -158,6 +158,10 @@ public class BaseModule extends Module implements GameObserver {
                         this.viewRange = viewRange;
                     }
 
+                    BaseModule supportedLayers(final LevelType... supportedLayers) {
+                        return supportedLayers( ImmutableSet.<LevelType>copyOf( supportedLayers ) );
+                    }
+
                     BaseModule supportedLayers(final ImmutableSet<LevelType> supportedLayers) {
                         return new BaseModule( resourceCost, maxHealth, armor, viewRange, supportedLayers );
                     }

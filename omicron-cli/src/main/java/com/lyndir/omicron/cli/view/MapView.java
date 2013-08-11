@@ -33,9 +33,9 @@ import com.lyndir.omicron.api.model.GameController;
 import com.lyndir.omicron.api.model.GameListener;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.model.Size;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nonnull;
 
 
@@ -108,20 +108,23 @@ public class MapView extends View {
                 if (!levelSize.isInBounds( new com.lyndir.omicron.api.model.Coordinate( u, v, levelSize ) ))
                     continue;
 
-                Optional<GameObject> contents = Optional.absent();
-                Terminal.Color bgColor = getBackgroundColor();
-
                 Tile tile = grid.get( v, u );
-                if (tile != null) {
-                    contents = tile.getContents();
+                Maybe<GameObject> contents;
+                Terminal.Color bgColor = getBackgroundColor();
+                if (tile == null)
+                contents = Maybe.absent();
+                else {
+                    contents = tile.checkContents();
                     bgColor = levelTypeColors.get( tile.getLevel().getType() );
 
-                    for (final ResourceType resourceType : ResourceType.values())
-                        if (tile.getResourceQuantity( resourceType ) > 0)
+                    for (final ResourceType resourceType : ResourceType.values()) {
+                        Maybe<Integer> resourceQuantity = tile.checkResourceQuantity( resourceType );
+                        if (resourceQuantity.presence() == Maybe.Presence.PRESENT)
                             bgColor = resourceTypeColors.get( resourceType );
+                    }
                 }
 
-                screen.putString( x + (y % 2 == 0? 0: 1), y, contents.isPresent()? contents.get().getType().getTypeName().substring( 0, 1 ): " ",
+                screen.putString( x + (y % 2 == 0? 0: 1), y, contents.presence() == Maybe.Presence.PRESENT? contents.get().getType().getTypeName().substring( 0, 1 ): " ",
                                   getMapColor(), bgColor, ScreenCharacterStyle.Bold );
             }
 
@@ -179,9 +182,9 @@ public class MapView extends View {
 
     private void setHomeOffset() {
         Optional<Player> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
-        Collection<GameObject> gameObjects = ImmutableSet.of();
+        ImmutableCollection<GameObject> gameObjects = ImmutableSet.of();
         if (localPlayerOptional.isPresent())
-            gameObjects = localPlayerOptional.get().getObjects();
+            gameObjects = localPlayerOptional.get().getController().listObjects();
 
         setOffset( FluentIterable.from( gameObjects ).filter( new PredicateNN<GameObject>() {
             @Override

@@ -3,8 +3,8 @@ package com.lyndir.omicron.cli.command;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
-import com.lyndir.omicron.api.model.GameController;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
 
@@ -17,11 +17,10 @@ import java.util.*;
 @CommandGroup(name = "print", abbr = "p", desc = "Print various information on the current state of the omicron game.")
 public class PrintCommand extends Command {
 
-    private static final List<Class<? extends Level>>           levelIndexes    = ImmutableList.of( GroundLevel.class, SkyLevel.class,
-                                                                                                    SpaceLevel.class );
-    private static final Map<Class<? extends Level>, Character> levelCharacters = ImmutableMap.of( GroundLevel.class, '_', //
-                                                                                                   SkyLevel.class, '~', //
-                                                                                                   SpaceLevel.class, '^' );
+    private static final List<LevelType>           levelIndexes    = ImmutableList.of( LevelType.GROUND, LevelType.SKY, LevelType.SPACE );
+    private static final Map<LevelType, Character> levelCharacters = ImmutableMap.of( LevelType.GROUND, '_', //
+                                                                                      LevelType.SKY, '~', //
+                                                                                      LevelType.SPACE, '^' );
 
     public PrintCommand(final OmicronCLI omicron) {
         super( omicron );
@@ -55,14 +54,14 @@ public class PrintCommand extends Command {
 
         // Iterate observable tiles and populate the grid.
         for (final Tile tile : localPlayer.listObservableTiles()) {
-            Optional<GameObject> contents = tile.getContents();
+            Maybe<GameObject> contents = tile.checkContents();
             char contentsChar;
-            if (contents.isPresent())
+            if (contents.presence() == Maybe.Presence.PRESENT)
                 contentsChar = contents.get().getType().getTypeName().charAt( 0 );
             else
-                contentsChar = levelCharacters.get( tile.getLevel().getClass() );
+                contentsChar = levelCharacters.get( tile.getLevel().getType() );
 
-            int levelIndex = levelIndexes.indexOf( tile.getLevel().getClass() );
+            int levelIndex = levelIndexes.indexOf( tile.getLevel().getType() );
             int v = tile.getPosition().getV();
             int u = (tile.getPosition().getU() + v / 2) % maxSize.getWidth();
             grid.get( v, u ).setCharAt( levelIndex, contentsChar );

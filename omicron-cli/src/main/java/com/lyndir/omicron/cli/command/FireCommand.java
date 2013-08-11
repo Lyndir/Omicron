@@ -10,6 +10,7 @@ import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.model.GameController;
 import com.lyndir.omicron.api.model.WeaponModule;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -73,7 +74,7 @@ public class FireCommand extends Command {
         int dv = ConversionUtils.toIntegerNN( dvArgument );
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = localPlayer.getController().getObject( localPlayer, objectId );
+        Optional<GameObject> optionalObject = localPlayer.getController().getObject( objectId );
         if (!optionalObject.isPresent()) {
             err( "No observable object with ID: %s", objectId );
             return;
@@ -121,8 +122,8 @@ public class FireCommand extends Command {
         }
 
         // Fire at the target.
-        weaponModule.fireAt( localPlayer, target.get() );
-        Optional<GameObject> targetContents = target.get().getContents();
-        inf( "Fired at: %s", targetContents.isPresent()? targetContents.get(): target );
+        weaponModule.fireAt( target.get() );
+        Maybe<GameObject> targetContents = target.get().checkContents();
+        inf( "Fired at: %s", targetContents );
     }
 }

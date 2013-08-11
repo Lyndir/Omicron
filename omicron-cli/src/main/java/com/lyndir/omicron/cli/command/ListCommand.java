@@ -31,14 +31,7 @@ public class ListCommand extends Command {
             return;
         }
 
-        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
-        if (!localPlayerOptional.isPresent()) {
-            err( "No local player in the game." );
-            return;
-        }
-        final Player localPlayer = localPlayerOptional.get();
-
-        List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.get().listPlayerGameInfo( localPlayer ) );
+        List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.get().listPlayerGameInfo() );
         Collections.sort( playerGameInfos, new Comparator<PlayerGameInfo>() {
             @Override
             public int compare(final PlayerGameInfo o1, final PlayerGameInfo o2) {

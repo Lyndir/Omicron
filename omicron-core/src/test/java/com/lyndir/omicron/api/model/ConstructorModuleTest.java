@@ -40,8 +40,14 @@ public class ConstructorModuleTest extends AbstractTest {
         ConstructorModule initMobilityConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                                            .buildSpeed( 2 )
                                                                            .supportedLayers( ModuleType.MOBILITY );
-        GameObject baseMobilityConstructorUnit = createUnit(
-                testUnitType( "Base Mobility Constructor", initBaseConstructorModule, initMobilityConstructorModule ), 0, 0 );
+        GameObject baseMobilityConstructorUnit = createUnit( testUnitType( "Base Mobility Constructor",
+                                                                           BaseModule.createWithStandardResourceCost()
+                                                                                     .maxHealth( 1 )
+                                                                                     .armor( 1 )
+                                                                                     .viewRange( 1 )
+                                                                                     .supportedLayers( LevelType.values() ),
+                                                                           initBaseConstructorModule, initMobilityConstructorModule ), 0,
+                                                             0 );
         staticGame.getController().start();
 
         // Create a BASE unit type and a BASE & MOBILITY unit type.
@@ -69,39 +75,39 @@ public class ConstructorModuleTest extends AbstractTest {
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site1.getRemainingWork( ModuleType.BASE ), 5 );
         assertEquals( site1.getRemainingWork( ModuleType.MOBILITY ), 0 );
-        assertEquals( site1.getLocation().getContents().get(), site1 );
+        assertEquals( site1.getLocation().checkContents().get(), site1 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(), ImmutableSet.of( baseMobilityConstructorUnit, site1 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site1.getRemainingWork( ModuleType.BASE ), 5 );
         assertEquals( site1.getRemainingWork( ModuleType.MOBILITY ), 0 );
-        assertEquals( site1.getLocation().getContents().get(), site1 );
+        assertEquals( site1.getLocation().checkContents().get(), site1 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(), ImmutableSet.of( baseMobilityConstructorUnit, site1 ) ) );
 
         // Now provide resources, work = 5 so should take 2 turns at a speed of 3.
         GameObject containerUnit = createUnit( testUnitType( "Metal Container", ContainerModule.createWithStandardResourceCost()
-                                                                                                 .resourceType( ResourceType.METALS )
-                                                                                                 .capacity( 100 ) ), 0, 1 );
+                                                                                               .resourceType( ResourceType.METALS )
+                                                                                               .capacity( 100 ) ), 0, 1 );
         int metals = baseUnit.getConstructionWork() * ModuleType.BASE.getStandardCost().get( ResourceType.METALS );
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site1.getRemainingWork( ModuleType.BASE ), 2 );
         assertEquals( site1.getRemainingWork( ModuleType.MOBILITY ), 0 );
-        assertEquals( site1.getLocation().getContents().get(), site1 );
+        assertEquals( site1.getLocation().checkContents().get(), site1 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, site1, containerUnit ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 1 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site1.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site1.getRemainingWork( ModuleType.MOBILITY ), 0 );
-        assertNotEquals( site1.getLocation().getContents().get(), site1 );
-        GameObject newUnit1 = site1.getLocation().getContents().get();
+        assertNotEquals( site1.getLocation().checkContents().get(), site1 );
+        GameObject newUnit1 = site1.getLocation().checkContents().get();
         assertEquals( newUnit1.getType(), baseUnit );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, newUnit1, containerUnit ) ) );
@@ -114,51 +120,51 @@ public class ConstructorModuleTest extends AbstractTest {
         metals = baseMobilityUnit.getConstructionWork() * (ModuleType.BASE.getStandardCost().get( ResourceType.METALS ) + //
                                                            ModuleType.MOBILITY.getStandardCost().get( ResourceType.METALS ));
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         Tile location2 = baseMobilityConstructorUnit.getLocation().neighbour( Coordinate.Side.W );
         ConstructorModule.ConstructionSite site2 = baseConstructorModule.schedule( baseMobilityUnit, location2 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site2.getRemainingWork( ModuleType.BASE ), 7 );
         assertEquals( site2.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site2.getLocation().getContents().get(), site2 );
+        assertEquals( site2.getLocation().checkContents().get(), site2 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, containerUnit, site2 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site2.getRemainingWork( ModuleType.BASE ), 4 );
         assertEquals( site2.getRemainingWork( ModuleType.MOBILITY ), 5 );
-        assertEquals( site2.getLocation().getContents().get(), site2 );
+        assertEquals( site2.getLocation().checkContents().get(), site2 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, containerUnit, site2 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site2.getRemainingWork( ModuleType.BASE ), 1 );
         assertEquals( site2.getRemainingWork( ModuleType.MOBILITY ), 3 );
-        assertEquals( site2.getLocation().getContents().get(), site2 );
+        assertEquals( site2.getLocation().checkContents().get(), site2 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, containerUnit, site2 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site2.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site2.getRemainingWork( ModuleType.MOBILITY ), 1 );
-        assertEquals( site2.getLocation().getContents().get(), site2 );
+        assertEquals( site2.getLocation().checkContents().get(), site2 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, containerUnit, site2 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 1 );
         assertEquals( site2.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site2.getRemainingWork( ModuleType.MOBILITY ), 0 );
-        assertNotEquals( site2.getLocation().getContents().get(), site2 );
-        GameObject newUnit2 = site2.getLocation().getContents().get();
+        assertNotEquals( site2.getLocation().checkContents().get(), site2 );
+        GameObject newUnit2 = site2.getLocation().checkContents().get();
         assertEquals( newUnit2.getType(), baseMobilityUnit );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseMobilityConstructorUnit, containerUnit, newUnit2 ) ) );
@@ -170,7 +176,12 @@ public class ConstructorModuleTest extends AbstractTest {
 
         // Build a BASE & MOBILITY unit, using a constructor that can do only BASE, then help out with one that can do only MOBILITY.
         initBaseConstructorModule = ConstructorModule.createWithStandardResourceCost().buildSpeed( 3 ).supportedLayers( ModuleType.BASE );
-        GameObject baseConstructorUnit = createUnit( testUnitType( "Base Constructor", initBaseConstructorModule ), 5, 5 );
+        GameObject baseConstructorUnit = createUnit( testUnitType( "Base Constructor", BaseModule.createWithStandardResourceCost()
+                                                                                                 .maxHealth( 1 )
+                                                                                                 .armor( 1 )
+                                                                                                 .viewRange( 1 )
+                                                                                                 .supportedLayers( LevelType.values() ),
+                                                                   initBaseConstructorModule ), 5, 5 );
         baseConstructorModule = baseConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         containerUnit = createUnit( testUnitType( "Metal Container", ContainerModule.createWithStandardResourceCost()
                                                                                     .resourceType( ResourceType.METALS )
@@ -178,45 +189,45 @@ public class ConstructorModuleTest extends AbstractTest {
         metals = baseMobilityUnit.getConstructionWork() * (ModuleType.BASE.getStandardCost().get( ResourceType.METALS ) + //
                                                            ModuleType.MOBILITY.getStandardCost().get( ResourceType.METALS ));
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         Tile location3 = baseConstructorUnit.getLocation().neighbour( Coordinate.Side.E );
         ConstructorModule.ConstructionSite site3 = baseConstructorModule.schedule( baseMobilityUnit, location3 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 7 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 4 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 1 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, site3 ) ) );
 
@@ -226,54 +237,54 @@ public class ConstructorModuleTest extends AbstractTest {
                                                          .supportedLayers( ModuleType.MOBILITY );
         GameObject mobilityConstructorUnit = createUnit( testUnitType( "Mobility Constructor", initMobilityConstructorModule ), 5, 6 );
         mobilityConstructorModule = mobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 7 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, mobilityConstructorUnit,
                                                                       site3 ) ) );
 
         mobilityConstructorModule.setTarget( baseConstructorUnit );
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 5 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, mobilityConstructorUnit,
                                                                       site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 3 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, mobilityConstructorUnit,
                                                                       site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 1 );
-        assertEquals( site3.getLocation().getContents().get(), site3 );
+        assertEquals( site3.getLocation().checkContents().get(), site3 );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, mobilityConstructorUnit,
                                                                       site3 ) ) );
 
-        staticGame.getController().setReady( staticPlayer );
+        staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 1 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 0 );
         assertEquals( site3.getRemainingWork( ModuleType.MOBILITY ), 0 );
-        assertNotEquals( site3.getLocation().getContents().get(), site3 );
-        GameObject newUnit3 = site3.getLocation().getContents().get();
+        assertNotEquals( site3.getLocation().checkContents().get(), site3 );
+        GameObject newUnit3 = site3.getLocation().checkContents().get();
         assertEquals( newUnit3.getType(), baseMobilityUnit );
         assertTrue( CollectionUtils.isEqualElements( staticPlayer.getObjects(),
                                                      ImmutableSet.of( baseConstructorUnit, containerUnit, mobilityConstructorUnit,

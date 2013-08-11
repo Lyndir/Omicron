@@ -66,7 +66,7 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    Optional<Tile> getTile(final Coordinate position) {
+    public Optional<Tile> getTile(final Coordinate position) {
 
         if (!size.isInBounds( position ))
             return Optional.absent();

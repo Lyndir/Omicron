@@ -185,9 +185,11 @@ public class ConstructorModule extends Module {
      * @return The job that will be created for the construction of the new unit.
      */
     ConstructionSite schedule(final UnitType unitType, final Tile location) {
-        Preconditions.checkArgument( location.isAccessible() );
-        Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ) );
-        Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1 );
+        Preconditions.checkArgument( location.isAccessible(), "Cannot schedule build: location not accessible." );
+        Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ),
+                                     "Cannot schedule build: location not on the constructor's level." );
+        Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1,
+                                     "Cannot schedule build: location not adjacent to constructor." );
 
         ConstructionSite site = new ConstructionSite( unitType, getGameObject().getGame(), getGameObject().getOwner().get(), location );
         setTarget( site );

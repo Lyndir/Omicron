@@ -73,7 +73,7 @@ public class MoveCommand extends Command {
         }
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = localPlayer.getController().getObject( localPlayer, objectId );
+        Optional<GameObject> optionalObject = localPlayer.getController().getObject( objectId );
         if (!optionalObject.isPresent()) {
             err( "No observable object with ID: %s", objectId );
             return;
@@ -96,7 +96,7 @@ public class MoveCommand extends Command {
         }
 
         // Move the object.
-        mobilityModule.movement( localPlayer, targetLocation.get() );
+        mobilityModule.movement( targetLocation.get() );
         inf( "Object is now at: %s", gameObject.getLocation() );
     }
 }
