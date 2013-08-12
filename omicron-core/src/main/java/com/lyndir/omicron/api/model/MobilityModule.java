@@ -1,14 +1,17 @@
 package com.lyndir.omicron.api.model;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-import static com.lyndir.omicron.api.util.PathUtils.*;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
+
+import javax.annotation.Nonnull;
 import java.util.EnumMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
+
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
+import static com.lyndir.omicron.api.util.PathUtils.*;
 
 
 public class MobilityModule extends Module {
@@ -162,7 +165,7 @@ public class MobilityModule extends Module {
             @Nonnull
             @Override
             public Double apply(@Nonnull final Step<Tile> input) {
-                if (!input.getTo().isAccessible())
+                if (!input.getTo().checkAccessible())
                     return Double.MAX_VALUE;
 
                 return stepCost;
@@ -302,7 +305,8 @@ public class MobilityModule extends Module {
             Path<Tile> tracePath = path.get();
             do {
                 Preconditions.checkState(
-                        tracePath.getTarget().isAccessible() || ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ),
+                        tracePath.getTarget().checkAccessible() || //
+                        ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ),
                         "Cannot execute: path no longer accessible." );
 
                 Optional<Path<Tile>> parent = tracePath.getParent();
