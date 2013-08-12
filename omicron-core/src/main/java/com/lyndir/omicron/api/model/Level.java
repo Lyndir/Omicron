@@ -50,7 +50,7 @@ public class Level extends MetaObject {
         return game;
     }
 
-    Map<Coordinate, Tile> getTiles() {
+    public Map<Coordinate, Tile> getTiles() {
         return tileMap;
     }
 
@@ -76,7 +76,7 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    Optional<Tile> getTile(final int u, final int v) {
+    public Optional<Tile> getTile(final int u, final int v) {
         return getTile( new Coordinate( u, v, getSize() ) );
     }
 
