@@ -5,6 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.Authenticated;
 import javax.annotation.Nonnull;
 
@@ -55,7 +56,6 @@ public class BaseModule extends Module implements GameObserver {
         return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
             public boolean apply(final Tile input) {
-
                 return canObserve( input );
             }
         } );
@@ -68,27 +68,22 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     public int getMaxHealth() {
-
         return maxHealth;
     }
 
     public int getRemainingHealth() {
-
         return Math.max( 0, maxHealth - damage );
     }
 
     public int getArmor() {
-
         return armor;
     }
 
     public int getViewRange() {
-
         return viewRange;
     }
 
     public ImmutableSet<LevelType> getSupportedLayers() {
-
         return supportedLayers;
     }
 
@@ -106,11 +101,17 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     void addDamage(final int incomingDamage) {
-
         damage += Math.max( 0, incomingDamage - armor );
 
         if (getRemainingHealth() <= 0)
             getGameObject().getController().die();
+
+        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getGameObject().getLocation() );
+            }
+        } ).onChange( this );
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })

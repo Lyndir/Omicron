@@ -35,7 +35,6 @@ public class Game extends MetaObject {
 
     private Game(final Size levelSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig,
                  final GameUnitConfig unitConfig) {
-
         this.levelSize = levelSize;
         levels = ImmutableList.of( new Level( levelSize, LevelType.GROUND, this ), new Level( levelSize, LevelType.SKY, this ),
                                    new Level( levelSize, LevelType.SPACE, this ) );
@@ -53,13 +52,11 @@ public class Game extends MetaObject {
         remainingResources.putAll( FluentIterable.from( levels ).transformAndConcat( new Function<Level, Iterable<ResourceType>>() {
             @Override
             public Iterable<ResourceType> apply(final Level input) {
-
                 return input.getType().getSupportedResources();
             }
         } ).toMap( new Function<ResourceType, Integer>() {
             @Override
             public Integer apply(final ResourceType input) {
-
                 return resourceConfig.quantity( input );
             }
         } ) );
@@ -107,17 +104,14 @@ public class Game extends MetaObject {
     }
 
     public static Builder builder() {
-
         return new Builder();
     }
 
     public GameController getController() {
-
         return gameController;
     }
 
     public Level getLevel(final LevelType levelType) {
-
         return FluentIterable.from( levels ).firstMatch( new Predicate<Level>() {
             @Override
             public boolean apply(final Level input) {
@@ -128,27 +122,22 @@ public class Game extends MetaObject {
     }
 
     public Turn getCurrentTurn() {
-
         return currentTurn;
     }
 
     void setCurrentTurn(final Turn currentTurn) {
-
         this.currentTurn = currentTurn;
     }
 
     public ImmutableList<Level> listLevels() {
-
         return levels;
     }
 
     public ImmutableList<Player> getPlayers() {
-
         return players;
     }
 
     Set<Player> getReadyPlayers() {
-
         return readyPlayers;
     }
 
@@ -177,7 +166,6 @@ public class Game extends MetaObject {
         }
 
         public Game build() {
-
             // Add random players until totalPlayers count is satisfied.
             int playerID = nextPlayerID;
             while (players.size() < totalPlayers) {
@@ -191,36 +179,30 @@ public class Game extends MetaObject {
         }
 
         public Size getLevelSize() {
-
             return levelSize;
         }
 
         public Builder setLevelSize(final Size levelSize) {
-
             this.levelSize = levelSize;
 
             return this;
         }
 
         public List<Player> getPlayers() {
-
             return players;
         }
 
         public Builder setPlayers(final List<Player> players) {
-
             this.players = players;
 
             return this;
         }
 
         public Integer getTotalPlayers() {
-
             return totalPlayers;
         }
 
         public void setTotalPlayers(final Integer totalPlayers) {
-
             this.totalPlayers = totalPlayers;
         }
 
@@ -241,7 +223,6 @@ public class Game extends MetaObject {
         }
 
         public int nextPlayerID() {
-
             return nextPlayerID++;
         }
     }
@@ -275,7 +256,6 @@ public class Game extends MetaObject {
         private final int puddleSize;
 
         GameResourceConfigs(final int quantity, final int quantityPerTile, final int puddleSize) {
-
             this.quantity = quantity;
             this.quantityPerTile = quantityPerTile;
             this.puddleSize = puddleSize;
@@ -283,7 +263,6 @@ public class Game extends MetaObject {
 
         @Override
         public int quantity(final ResourceType resourceType) {
-
             return quantity;
         }
 
@@ -294,10 +273,8 @@ public class Game extends MetaObject {
 
         @Override
         public int puddleSize(final ResourceType resourceType) {
-
             return puddleSize;
         }
-
     }
 
 

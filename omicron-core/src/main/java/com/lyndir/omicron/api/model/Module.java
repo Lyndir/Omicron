@@ -41,12 +41,10 @@ public abstract class Module extends MetaObject {
     }
 
     void setGameObject(final GameObject gameObject) {
-
         this.gameObject = gameObject;
     }
 
     public GameObject getGameObject() {
-
         return Preconditions.checkNotNull( gameObject, "This module has not yet been initialized by its game object." );
     }
 

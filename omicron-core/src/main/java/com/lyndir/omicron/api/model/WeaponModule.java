@@ -2,8 +2,10 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import java.util.Random;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 
 public class WeaponModule extends Module {
@@ -41,32 +43,26 @@ public class WeaponModule extends Module {
     }
 
     public int getFirePower() {
-
         return firePower;
     }
 
     public int getVariance() {
-
         return variance;
     }
 
     public int getRange() {
-
         return range;
     }
 
     public int getRepeat() {
-
         return repeat;
     }
 
     public int getAmmunitionLoad() {
-
         return ammunitionLoad;
     }
 
     public ImmutableSet<LevelType> getSupportedLayers() {
-
         return ImmutableSet.copyOf( supportedLayers );
     }
 
@@ -82,12 +78,19 @@ public class WeaponModule extends Module {
         if (ammunition <= 0)
             return false;
 
+        ++repeated;
+        --ammunition;
+
+        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getGameObject().getLocation() );
+            }
+        } ).onChange( getGameObject() );
+
         Optional<GameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())
             targetGameObject.get().onModule( ModuleType.BASE, 0 ).addDamage( firePower + RANDOM.nextInt( variance ) );
-
-        ++repeated;
-        --ammunition;
 
         return true;
     }

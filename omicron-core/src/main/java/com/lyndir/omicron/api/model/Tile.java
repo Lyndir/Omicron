@@ -30,13 +30,11 @@ public class Tile extends MetaObject {
     private final Map<ResourceType, Integer> resourceQuantities = new EnumMap<>( ResourceType.class );
 
     Tile(final Coordinate position, final Level level) {
-
         this.position = position;
         this.level = level;
     }
 
     Tile(final int u, final int v, final Level level) {
-
         this( new Coordinate( u, v, level.getSize() ), level );
     }
 
@@ -54,20 +52,24 @@ public class Tile extends MetaObject {
     }
 
     void setContents(@Nullable final GameObject contents) {
-
         if (contents != null)
             Preconditions.checkState( this.contents == null, "Cannot put object on tile that is not empty: %s", this );
 
         this.contents = contents;
+
+        getLevel().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( Tile.this );
+            }
+        } ).onChange( this );
     }
 
     public Coordinate getPosition() {
-
         return position;
     }
 
     public Level getLevel() {
-
         return level;
     }
 
@@ -77,6 +79,13 @@ public class Tile extends MetaObject {
             resourceQuantities.put( resourceType, resourceQuantity );
         else
             resourceQuantities.remove( resourceType );
+
+        getLevel().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( Tile.this );
+            }
+        } ).onChange( this );
     }
 
     void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
@@ -96,12 +105,10 @@ public class Tile extends MetaObject {
 
     @Nonnull
     Tile neighbour(final Coordinate.Side side) {
-
         return level.getTile( getPosition().neighbour( side ) ).get();
     }
 
     ImmutableList<Tile> neighbours() {
-
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         for (final Coordinate.Side side : Coordinate.Side.values())
             neighbours.add( neighbour( side ) );
@@ -110,7 +117,6 @@ public class Tile extends MetaObject {
     }
 
     boolean contains(@Nonnull final GameObserver target) {
-
         if (contents == null)
             return false;
 
@@ -126,13 +132,11 @@ public class Tile extends MetaObject {
 
     @Override
     public int hashCode() {
-
         return Objects.hashCode( position, level );
     }
 
     @Override
     public boolean equals(final Object obj) {
-
         if (!(obj instanceof Tile))
             return false;
 
@@ -141,7 +145,6 @@ public class Tile extends MetaObject {
     }
 
     boolean isAccessible() {
-
         return checkContents().presence() == Maybe.Presence.ABSENT;
     }
 }

@@ -8,17 +8,14 @@ public enum ResourceType {
     private final String abbreviation;
 
     ResourceType(final String abbreviation) {
-
         this.abbreviation = abbreviation;
     }
 
     public String getAbbreviation() {
-
         return abbreviation;
     }
 
     public static Optional<ResourceType> forAbbreviation(final String abbreviation) {
-
         for (final ResourceType resourceType : values())
             if (resourceType.getAbbreviation().equalsIgnoreCase( abbreviation ))
                 return Optional.of( resourceType );

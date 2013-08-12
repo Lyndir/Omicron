@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.Authenticated;
 import javax.annotation.Nonnull;
 
@@ -13,15 +14,17 @@ public class PlayerController implements GameObserver {
     private       GameController gameController;
 
     PlayerController(@Nonnull final Player player) {
-
         this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     @Nonnull
     @Override
     public Optional<Player> getOwner() {
-
-        return Optional.of( player );
+        return Optional.of( getPlayer() );
     }
 
     void setGameController(final GameController gameController) {
@@ -35,11 +38,9 @@ public class PlayerController implements GameObserver {
 
     @Override
     public boolean canObserve(@Nonnull final Tile location) {
-
-        return FluentIterable.from( player.getObjects() ).anyMatch( new Predicate<GameObject>() {
+        return FluentIterable.from( getPlayer().getObjects() ).anyMatch( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
-
                 return input.canObserve( location );
             }
         } );
@@ -48,11 +49,9 @@ public class PlayerController implements GameObserver {
     @Nonnull
     @Override
     public Iterable<Tile> listObservableTiles() {
-
-        return FluentIterable.from( player.getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
+        return FluentIterable.from( getPlayer().getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
             @Override
             public Iterable<? extends Tile> apply(final GameObject input) {
-
                 return input.listObservableTiles();
             }
         } );
@@ -67,10 +66,10 @@ public class PlayerController implements GameObserver {
      */
     @Authenticated
     public ImmutableCollection<GameObject> listObjects() {
-        if (!ObjectUtils.isEqual( player, Security.getCurrentPlayer() ))
+        if (!ObjectUtils.isEqual( getPlayer(), Security.getCurrentPlayer() ))
             return ImmutableSet.of();
 
-        return ImmutableSet.copyOf( player.getObjects() );
+        return ImmutableSet.copyOf( getPlayer().getObjects() );
     }
 
     /**
@@ -82,8 +81,7 @@ public class PlayerController implements GameObserver {
      */
     @Authenticated
     public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {
-
-        return FluentIterable.from( player.getObjects() ).filter( new Predicate<GameObject>() {
+        return FluentIterable.from( getPlayer().getObjects() ).filter( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
                 return observer.canObserve( input.getLocation() );
@@ -92,7 +90,7 @@ public class PlayerController implements GameObserver {
     }
 
     public Optional<GameObject> getObject(final int objectId) {
-        Optional<GameObject> object = player.getObject( objectId );
+        Optional<GameObject> object = getPlayer().getObject( objectId );
 
         // If the object cannot be observed by the current player, treat it as absent.
         if (!object.isPresent() || !Security.isAuthenticated())
@@ -104,29 +102,33 @@ public class PlayerController implements GameObserver {
     }
 
     int newObjectID() {
-
-        return player.nextObjectID();
+        return getPlayer().nextObjectID();
     }
 
     void addObject(final GameObject gameObject) {
-
-        Preconditions.checkState( ObjectUtils.isEqual( player, gameObject.getOwner().orNull() ),
+        Preconditions.checkState( ObjectUtils.isEqual( getPlayer(), gameObject.getOwner().orNull() ),
                                   "Cannot add object to this player: belongs to another player." );
-        player.addObject( gameObject );
+        getPlayer().addObject( gameObject );
     }
 
     protected void onReset() {
-
-        for (final GameObject gameObject : ImmutableList.copyOf( player.getObjects() ))
+        for (final GameObject gameObject : ImmutableList.copyOf( getPlayer().getObjects() ))
             gameObject.getController().onReset();
     }
 
     protected void onNewTurn() {
-
-        for (final GameObject gameObject : ImmutableList.copyOf( player.getObjects() ))
+        for (final GameObject gameObject : ImmutableList.copyOf( getPlayer().getObjects() ))
             gameObject.getController().onNewTurn();
 
-        if (player.isKeyLess())
-            gameController.setReady( player );
+        if (getPlayer().isKeyLess())
+            gameController.setReady( getPlayer() );
+    }
+
+    void fireReset() {
+        onReset();
+    }
+
+    void fireNewTurn() {
+        onNewTurn();
     }
 }

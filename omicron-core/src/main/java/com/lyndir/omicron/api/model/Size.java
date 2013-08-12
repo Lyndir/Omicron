@@ -17,28 +17,23 @@ public class Size extends MetaObject {
     private final int height;
 
     public Size(final int width, final int height) {
-
         this.width = width;
         this.height = height;
     }
 
     public int getWidth() {
-
         return width;
     }
 
     public int getHeight() {
-
         return height;
     }
 
     public boolean isInBounds(final Coordinate coordinate) {
-
         return coordinate.getU() >= 0 && coordinate.getV() >= 0 && coordinate.getU() < width && coordinate.getV() < height;
     }
 
     public static Size max(@Nullable final Size size1, @Nonnull final Size size2) {
-
         if (size1 == null)
             return size2;
 
@@ -47,13 +42,11 @@ public class Size extends MetaObject {
 
     @Override
     public int hashCode() {
-
         return Objects.hash( width, height );
     }
 
     @Override
     public boolean equals(@Nullable final Object obj) {
-
         if (!(obj instanceof Size))
             return false;
 

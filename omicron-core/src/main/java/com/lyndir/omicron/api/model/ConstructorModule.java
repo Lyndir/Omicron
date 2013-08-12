@@ -65,7 +65,7 @@ public class ConstructorModule extends Module {
 
     // This method assumes a target link between this module and the site exists.
     private void construct(final ConstructionSite site) {
-        if (isResourceConstrained())
+        if (isResourceConstrained() || remainingSpeed <= 0)
             return;
 
         for (; remainingSpeed > 0; --remainingSpeed) {
@@ -139,6 +139,13 @@ public class ConstructorModule extends Module {
                 for (final Map.Entry<ContainerModule, Integer> borrowEntry : borrowedResources.build().entrySet())
                     borrowEntry.getKey().addStock( borrowEntry.getValue() );
         }
+
+        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getGameObject().getLocation() );
+            }
+        } ).onChange( this );
     }
 
     public ModuleType<?> getBuildsModule() {
@@ -165,6 +172,13 @@ public class ConstructorModule extends Module {
         Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner(), target.getOwner() ),
                                      "Can only target units of the same player." );
         this.target = target;
+
+        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getGameObject().getLocation() );
+            }
+        } ).onChange( this );
     }
 
     @Override
@@ -251,6 +265,14 @@ public class ConstructorModule extends Module {
             int remaining = getRemainingWork( moduleType );
             if (remaining > 0) {
                 remainingWork.put( moduleType, --remaining );
+
+                getGame().getController().fireFor( new PredicateNN<Player>() {
+                    @Override
+                    public boolean apply(@Nonnull final Player input) {
+                        return input.canObserve( getLocation() );
+                    }
+                } ).onChange( this );
+
                 return true;
             }
 

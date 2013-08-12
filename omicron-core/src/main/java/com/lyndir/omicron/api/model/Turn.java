@@ -11,25 +11,21 @@ public class Turn {
     private final int  number;
 
     Turn() {
-
         previousTurn = null;
         number = 0;
     }
 
     Turn(@Nonnull final Turn previousTurn) {
-
         this.previousTurn = previousTurn;
         number = previousTurn.getNumber() + 1;
     }
 
     @Nullable
     public Turn getPreviousTurn() {
-
         return previousTurn;
     }
 
     public int getNumber() {
-
         return number;
     }
 }

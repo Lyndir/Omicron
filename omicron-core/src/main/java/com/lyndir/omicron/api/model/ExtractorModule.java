@@ -32,12 +32,10 @@ public class ExtractorModule extends Module {
     }
 
     public ResourceType getResourceType() {
-
         return resourceType;
     }
 
     public int getSpeed() {
-
         return speed;
     }
 
@@ -47,7 +45,6 @@ public class ExtractorModule extends Module {
 
     @Override
     protected void onNewTurn() {
-
         // Mine some resources.
         Tile location = getGameObject().getLocation();
         Optional<Integer> availableResources = location.getResourceQuantity( resourceType );

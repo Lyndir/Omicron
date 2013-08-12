@@ -20,18 +20,15 @@ public enum LevelType {
     private final ImmutableCollection<ResourceType> supportedResources;
 
     LevelType(final String name, final ResourceType... supportedResources) {
-
         this.name = name;
         this.supportedResources = ImmutableSet.copyOf( supportedResources );
     }
 
     public String getName() {
-
         return name;
     }
 
     public Optional<LevelType> down() {
-
         int downOrdinal = ordinal() - 1;
         if (downOrdinal < 0)
             return Optional.absent();
@@ -40,7 +37,6 @@ public enum LevelType {
     }
 
     public Optional<LevelType> up() {
-
         int upOrdinal = ordinal() + 1;
         if (upOrdinal >= values().length)
             return Optional.absent();
@@ -49,7 +45,6 @@ public enum LevelType {
     }
 
     public static Optional<LevelType> forName(final String name) {
-
         for (final LevelType levelType : values())
             if (levelType.getName().equalsIgnoreCase( name ))
                 return Optional.of( levelType );
@@ -58,7 +53,6 @@ public enum LevelType {
     }
 
     public ImmutableCollection<ResourceType> getSupportedResources() {
-
         return supportedResources;
     }
 }

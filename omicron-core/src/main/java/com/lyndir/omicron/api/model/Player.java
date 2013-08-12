@@ -40,7 +40,6 @@ public class Player extends MetaObject implements GameObserver {
 
     public Player(final int playerID, @Nullable final PlayerKey key, final String name, final Color primaryColor,
                   final Color secondaryColor) {
-
         this.playerID = playerID;
         this.key = key;
         this.name = name;
@@ -50,93 +49,90 @@ public class Player extends MetaObject implements GameObserver {
 
     @Nonnull
     public PlayerController getController() {
-
         return controller;
     }
 
     @Override
     public boolean canObserve(@Nonnull final Tile location) {
-
         return getController().canObserve( location );
     }
 
     @Nonnull
     @Override
     public Iterable<Tile> listObservableTiles() {
-
         return getController().listObservableTiles();
     }
 
     @Nonnull
     @Override
     public Optional<Player> getOwner() {
-
         return Optional.of( this );
     }
 
     public int getPlayerID() {
-
         return playerID;
     }
 
     public boolean hasKey(final PlayerKey playerKey) {
-
         return ObjectUtils.isEqual( key, playerKey );
     }
 
     public boolean isKeyLess() {
-
         return key == null;
     }
 
     public String getName() {
-
         return name;
     }
 
     public Color getPrimaryColor() {
-
         return primaryColor;
     }
 
     public Color getSecondaryColor() {
-
         return secondaryColor;
     }
 
     Collection<GameObject> getObjects() {
-
         return objects.values();
     }
 
     public static String randomName() {
-
         return Joiner.on( ' ' ).join( firstNames[random.nextInt( firstNames.length )], lastNames[random.nextInt( lastNames.length )] );
     }
 
     public int getScore() {
-
         return score;
     }
 
     void setScore(final int score) {
-
         this.score = score;
+
+        getController().getGameController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return true;
+            }
+        } ).onChange( this );
     }
 
     int nextObjectID() {
-
         return nextObjectID++;
     }
 
     @Nonnull
     Optional<GameObject> getObject(final int objectId) {
-
         return Optional.fromNullable( objects.get( objectId ) );
     }
 
     void addObject(final GameObject gameObject) {
-
         objects.put( gameObject.getObjectID(), gameObject );
+
+        getController().getGameController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return ObjectUtils.isEqual( input, Player.this );
+            }
+        } ).onChange( this );
     }
 }

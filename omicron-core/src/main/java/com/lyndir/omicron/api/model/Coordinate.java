@@ -46,7 +46,6 @@ public class Coordinate extends MetaObject {
         private final int du, dv;
 
         Side(final int du, final int dv) {
-
             this.du = du;
             this.dv = dv;
         }
@@ -59,22 +58,18 @@ public class Coordinate extends MetaObject {
          * @return The destination coordinate.  This is the coordinate to the side of the source coordinate expressed by this instance.
          */
         public Coordinate delta(final Coordinate source) {
-
             return source.delta( du, dv );
         }
 
         public int getDu() {
-
             return du;
         }
 
         public int getDv() {
-
             return dv;
         }
 
         public static Optional<Side> forName(final String name) {
-
             for (final Side side : values())
                 if (side.name().equalsIgnoreCase( name ))
                     return Optional.of( side );
@@ -84,19 +79,16 @@ public class Coordinate extends MetaObject {
     }
 
     public Coordinate(final int u, final int v, final Size wrapSize) {
-
         this.u = u;
         this.v = v;
         this.wrapSize = wrapSize;
     }
 
     public int getU() {
-
         return u;
     }
 
     public int getV() {
-
         return v;
     }
 
@@ -105,7 +97,6 @@ public class Coordinate extends MetaObject {
     }
 
     private int getDU(final Coordinate other) {
-
         int du = other.getU() - u;
 
         // Take wrapping into account.
@@ -119,7 +110,6 @@ public class Coordinate extends MetaObject {
     }
 
     private int getDV(final Coordinate other) {
-
         int dv = other.getV() - v;
 
         // Take wrapping into account.
@@ -133,18 +123,15 @@ public class Coordinate extends MetaObject {
     }
 
     public Coordinate delta(final int du, final int dv) {
-
         return new Coordinate( (wrapSize.getWidth() + u + du) % wrapSize.getWidth(), //
                                (wrapSize.getHeight() + v + dv) % wrapSize.getHeight(), wrapSize );
     }
 
     public Coordinate neighbour(final Side side) {
-
         return side.delta( this );
     }
 
     public int distanceTo(final Coordinate other) {
-
         int du = getDU( other );
         int dv = getDV( other );
 
@@ -153,7 +140,6 @@ public class Coordinate extends MetaObject {
 
     @Override
     public boolean equals(final Object obj) {
-
         if (!(obj instanceof Coordinate))
             return false;
 
@@ -163,7 +149,6 @@ public class Coordinate extends MetaObject {
 
     @Override
     public int hashCode() {
-
         return Objects.hash( u, v, wrapSize );
     }
 }

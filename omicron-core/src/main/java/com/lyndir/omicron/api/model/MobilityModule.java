@@ -48,7 +48,6 @@ public class MobilityModule extends Module {
      * @return The speed cost.
      */
     public double costForMovingInLevel(final LevelType levelType) {
-
         return ifNotNullElse( movementCost.get( levelType ), Double.MAX_VALUE );
     }
 
@@ -60,7 +59,6 @@ public class MobilityModule extends Module {
      * @return The speed cost.
      */
     public double costForLevelingToLevel(final LevelType levelType) {
-
         // Level up until we reach the target level.
         double cost = 0;
         LevelType currentLevel = getGameObject().getLocation().getLevel().getType();
@@ -244,6 +242,13 @@ public class MobilityModule extends Module {
             // Execute the leveling.
             getGameObject().getController().setLocation( target.get() );
             remainingSpeed -= cost;
+
+            getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+                @Override
+                public boolean apply(@Nonnull final Player input) {
+                    return input.canObserve( getGameObject().getLocation() );
+                }
+            } ).onChange( MobilityModule.this );
         }
     }
 
@@ -314,6 +319,13 @@ public class MobilityModule extends Module {
             // Execute the path.
             getGameObject().getController().setLocation( path.get().getTarget() );
             remainingSpeed -= path.get().getCost();
+
+            getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+                @Override
+                public boolean apply(@Nonnull final Player input) {
+                    return input.canObserve( getGameObject().getLocation() );
+                }
+            } ).onChange( MobilityModule.this );
         }
     }
 
@@ -324,7 +336,6 @@ public class MobilityModule extends Module {
         private final ImmutableResourceCost resourceCost;
 
         private Builder0(final ImmutableResourceCost resourceCost) {
-
             this.resourceCost = resourceCost;
         }
 

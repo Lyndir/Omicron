@@ -64,26 +64,31 @@ public class GameObject extends MetaObject implements GameObserver {
         return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.getCurrentPlayer() );
     }
 
-    void setOwner(final Player owner) {
+    void setOwner(@Nullable final Player owner) {
         this.owner = owner;
+
+        getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                // TODO: Should we check "couldObserve" to inform the player losing the object in case he can now no longer see the tile?
+                return input.canObserve( getLocation() );
+            }
+        } ).onChange( this );
     }
 
     @Override
     @SuppressWarnings("ParameterHidesMemberVariable")
     public boolean canObserve(@Nonnull final Tile location) {
-
         return getController().canObserve( location );
     }
 
     @Nonnull
     @Override
     public Iterable<Tile> listObservableTiles() {
-
         return getController().listObservableTiles();
     }
 
     public int getObjectID() {
-
         return objectID;
     }
 
@@ -92,17 +97,22 @@ public class GameObject extends MetaObject implements GameObserver {
     }
 
     public Tile getLocation() {
-
         return location;
     }
 
-    void setLocation(final Tile location) {
-
+    void setLocation(@Nonnull final Tile location) {
+        final Tile oldLocation = this.location;
         this.location = location;
+
+        getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getLocation() ) || input.canObserve( oldLocation );
+            }
+        } ).onChange( this );
     }
 
     public UnitType getType() {
-
         return unitType;
     }
 
@@ -116,7 +126,6 @@ public class GameObject extends MetaObject implements GameObserver {
      * @return The module of the given type at the given index.
      */
     public <M extends Module> Optional<M> getModule(final ModuleType<M> moduleType, final int index) {
-
         return Optional.fromNullable( Iterables.get( getModules( moduleType ), index, null ) );
     }
 
@@ -130,7 +139,6 @@ public class GameObject extends MetaObject implements GameObserver {
      */
     @SuppressWarnings("unchecked")
     public <M extends Module> List<M> getModules(final ModuleType<M> moduleType) {
-
         // Checked by Module's constructor.
         return (List<M>) modules.get( moduleType );
     }
@@ -145,7 +153,6 @@ public class GameObject extends MetaObject implements GameObserver {
      * @return A proxy object that you can run your method on.
      */
     public <M extends Module> M onModuleElse(final ModuleType<M> moduleType, final int index, @Nullable final Object elseValue) {
-
         return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orNull(), elseValue );
     }
 
@@ -159,12 +166,10 @@ public class GameObject extends MetaObject implements GameObserver {
      * @return A proxy object that you can run your method on.
      */
     public <M extends Module> M onModule(final ModuleType<M> moduleType, final int index) {
-
         return onModuleElse( moduleType, index, null );
     }
 
     public ImmutableCollection<? extends Module> listModules() {
-
         return ImmutableList.copyOf( modules.values() );
     }
 }

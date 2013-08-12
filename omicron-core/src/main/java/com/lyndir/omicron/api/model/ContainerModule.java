@@ -1,6 +1,8 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Preconditions;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
+import javax.annotation.Nonnull;
 
 
 public class ContainerModule extends Module {
@@ -24,22 +26,18 @@ public class ContainerModule extends Module {
     }
 
     public ResourceType getResourceType() {
-
         return resourceType;
     }
 
     public int getCapacity() {
-
         return capacity;
     }
 
     public int getStock() {
-
         return stock;
     }
 
     public int getAvailable() {
-
         return capacity - stock;
     }
 
@@ -58,6 +56,13 @@ public class ContainerModule extends Module {
         int stocked = newStock - stock;
         stock = newStock;
 
+        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getGameObject().getLocation() );
+            }
+        } ).onChange( this );
+
         return stocked;
     }
 
@@ -75,6 +80,13 @@ public class ContainerModule extends Module {
         int newStock = Math.max( stock - amount, 0 );
         int depleted = stock - newStock;
         stock = newStock;
+
+        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( getGameObject().getLocation() );
+            }
+        } ).onChange( this );
 
         return depleted;
     }
@@ -98,7 +110,6 @@ public class ContainerModule extends Module {
         private final ImmutableResourceCost resourceCost;
 
         private Builder0(final ImmutableResourceCost resourceCost) {
-
             this.resourceCost = resourceCost;
         }
 

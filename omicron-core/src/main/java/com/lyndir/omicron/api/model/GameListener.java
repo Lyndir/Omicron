@@ -36,4 +36,27 @@ public abstract class GameListener {
      */
     public void onNewTurn(final Turn currentTurn) {
     }
+
+    /**
+     * Called when a module's parameters have changed.
+     *
+     * @param module The module whose parameters have changed.
+     */
+    public void onChange(final Module module) {
+    }
+
+    public void onChange(final GameObject object) {
+        // TODO
+
+    }
+
+    public void onChange(final Tile tile) {
+        // TODO
+
+    }
+
+    public void onChange(final Player player) {
+        // TODO
+
+    }
 }

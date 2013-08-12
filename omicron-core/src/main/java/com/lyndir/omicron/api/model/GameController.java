@@ -3,20 +3,22 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 
 public class GameController {
 
     private final Game game;
-    private final Set<GameListener> gameListeners = new HashSet<>();
+    private final Map<GameListener, Player> gameListeners = new HashMap<>();
 
     GameController(final Game game) {
-
         this.game = game;
 
         for (final Player player : game.getPlayers())
@@ -24,12 +26,12 @@ public class GameController {
     }
 
     public Game getGame() {
-
         return game;
     }
 
+    @Authenticated
     public void addGameListener(final GameListener gameListener) {
-        gameListeners.add( gameListener );
+        gameListeners.put( gameListener, Security.getCurrentPlayer() );
     }
 
     /**
@@ -41,7 +43,6 @@ public class GameController {
      */
     @Authenticated
     public PlayerGameInfo getPlayerGameInfo(final Player player) {
-
         if (player.listObservableTiles().iterator().hasNext())
             return PlayerGameInfo.discovered( player, player.getScore() );
 
@@ -50,7 +51,6 @@ public class GameController {
 
     @Authenticated
     public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo() {
-
         return ImmutableList.copyOf( Lists.transform( game.getPlayers(), new Function<Player, PlayerGameInfo>() {
             @Override
             public PlayerGameInfo apply(final Player input) {
@@ -61,7 +61,6 @@ public class GameController {
     }
 
     public Iterable<Player> listPlayers() {
-
         return game.getPlayers();
     }
 
@@ -82,17 +81,17 @@ public class GameController {
      *
      * @return true if this action has caused a new turn to begin.
      */
-    boolean setReady(Player player) {
+    boolean setReady(final Player player) {
         if (!player.isKeyLess() && ObjectUtils.isEqual( player, Security.getCurrentPlayer() ))
             return false;
 
         game.getReadyPlayers().add( player );
-        for (final GameListener gameListener : gameListeners)
+        for (final GameListener gameListener : gameListeners.keySet())
             gameListener.onPlayerReady( player );
 
         if (game.getReadyPlayers().containsAll( game.getPlayers() )) {
             game.getReadyPlayers().clear();
-            onNewTurn();
+            fireNewTurn();
             return true;
         }
 
@@ -100,32 +99,49 @@ public class GameController {
     }
 
     void start() {
-
         Preconditions.checkState( !game.isRunning(), "The game cannot be started: It is already running." );
 
         game.setRunning( true );
+        fireNewTurn();
+    }
+
+    void fireNewTurn() {
         onNewTurn();
+
+        for (final GameListener gameListener : gameListeners.keySet())
+            gameListener.onNewTurn( game.getCurrentTurn() );
     }
 
     protected void onNewTurn() {
-
         game.setCurrentTurn( new Turn( game.getCurrentTurn() ) );
-        for (final GameListener gameListener : gameListeners)
-            gameListener.onNewTurn( game.getCurrentTurn() );
 
         for (final Player player : ImmutableList.copyOf( game.getPlayers() )) {
-            player.getController().onReset();
-            player.getController().onNewTurn();
+            player.getController().fireReset();
+            player.getController().fireNewTurn();
         }
     }
 
     public ImmutableList<Level> listLevels() {
-
         return game.listLevels();
     }
 
     public ImmutableSet<Player> listReadyPlayers() {
-
         return ImmutableSet.copyOf( game.getReadyPlayers() );
+    }
+
+    GameListener fireFor(final PredicateNN<Player> playerCondition) {
+        return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
+            @Override
+            @Nullable
+            @SuppressWarnings("ProhibitedExceptionDeclared")
+            public Object invoke(final Object proxy, final Method method, final Object[] args)
+                    throws Throwable {
+                for (final Map.Entry<GameListener, Player> gameListenerEntry : gameListeners.entrySet())
+                    if (playerCondition.apply( gameListenerEntry.getValue() ))
+                        method.invoke( gameListenerEntry.getKey(), args );
+
+                return null;
+            }
+        } );
     }
 }
