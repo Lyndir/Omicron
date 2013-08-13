@@ -1,2 +1,17 @@
-*.iml
+# Compiled objects.
 target
+
+# OS-Specific junk.
+.DS_Store
+
+# Environment projects
+!/.idea
+/.idea/workspace.xml
+/.idea/libraries
+/.idea/compiler.xml
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/runConfigurations
+/.idea/vcs.xml
+*.iml

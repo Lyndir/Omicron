@@ -82,8 +82,9 @@ public class GameController {
      * @return true if this action has caused a new turn to begin.
      */
     boolean setReady(final Player player) {
-        if (!player.isKeyLess() && ObjectUtils.isEqual( player, Security.getCurrentPlayer() ))
-            return false;
+        if (!player.isKeyLess())
+            Preconditions.checkState( ObjectUtils.isEqual( player, Security.getCurrentPlayer() ),
+                                      "Cannot set protected player ready: not authenticated.  First authenticate using Security.authenticate()." );
 
         game.getReadyPlayers().add( player );
         for (final GameListener gameListener : gameListeners.keySet())

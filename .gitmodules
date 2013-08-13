@@ -1,0 +1,3 @@
+[submodule "omicron-wiki"]
+	path = omicron-wiki
+	url = git@github.com:Lyndir/Omicron.wiki.git

@@ -19,6 +19,7 @@ package com.lyndir.omicron.api.model;
 /**
  * @author lhunath, 2013-07-25
  */
+@SuppressWarnings("UnusedParameters")
 public abstract class GameListener {
 
     /**
@@ -45,18 +46,27 @@ public abstract class GameListener {
     public void onChange(final Module module) {
     }
 
+    /**
+     * Called when an object's parameters have changed.
+     *
+     * @param object The object whose parameters have changed.
+     */
     public void onChange(final GameObject object) {
-        // TODO
-
     }
 
+    /**
+     * Called when a tile's parameters have changed.
+     *
+     * @param tile The tile whose parameters have changed.
+     */
     public void onChange(final Tile tile) {
-        // TODO
-
     }
 
+    /**
+     * Called when a player's parameters have changed.
+     *
+     * @param player The player whose parameters have changed.
+     */
     public void onChange(final Player player) {
-        // TODO
-
     }
 }
