@@ -1,15 +1,22 @@
 package com.lyndir.omicron.api.model;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-
-import com.google.common.base.*;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.lhunath.opal.system.util.MetaObject;
+import com.lyndir.lhunath.opal.system.util.ObjectMeta;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
+import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
-import java.util.EnumMap;
-import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.EnumMap;
+import java.util.Map;
+
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 
 
 /**
@@ -39,15 +46,16 @@ public class Tile extends MetaObject {
     }
 
     @Nonnull
-    public Optional<GameObject> getContents() {
+    Optional<GameObject> getContents() {
         return Optional.fromNullable( contents );
     }
 
     @Nonnull
+    @Authenticated
     public Maybe<GameObject> checkContents() {
-        if (!Security.isAuthenticated() || !Security.getCurrentPlayer().canObserve( this ))
+        if (!Security.getCurrentPlayer().canObserve( this )) {
             return Maybe.unknown();
-
+        }
         return Maybe.fromNullable( contents );
     }
 
@@ -96,19 +104,20 @@ public class Tile extends MetaObject {
         return Optional.fromNullable( resourceQuantities.get( resourceType ) );
     }
 
+    @Authenticated
     public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType) {
-        if (!Security.isAuthenticated() || !Security.getCurrentPlayer().canObserve( this ))
+        if (!Security.getCurrentPlayer().canObserve( this ))
             return Maybe.unknown();
 
         return Maybe.fromNullable( resourceQuantities.get( resourceType ) );
     }
 
     @Nonnull
-    Tile neighbour(final Coordinate.Side side) {
+    public Tile neighbour(final Coordinate.Side side) {
         return level.getTile( getPosition().neighbour( side ) ).get();
     }
 
-    ImmutableList<Tile> neighbours() {
+    public ImmutableList<Tile> neighbours() {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         for (final Coordinate.Side side : Coordinate.Side.values())
             neighbours.add( neighbour( side ) );
@@ -116,18 +125,15 @@ public class Tile extends MetaObject {
         return neighbours.build();
     }
 
-    boolean contains(@Nonnull final GameObserver target) {
-        if (contents == null)
-            return false;
+    @Authenticated
+    public Maybe<Boolean> checkContains(@Nonnull final GameObject target) {
+        Maybe<GameObject> contents = checkContents();
+        if (contents.presence() == Maybe.Presence.ABSENT)
+            return Maybe.of(false);
+        if (contents.presence() == Maybe.Presence.UNKNOWN)
+            return Maybe.unknown();
 
-        if (ObjectUtils.isEqual( contents, target ))
-            return true;
-
-        Optional<Player> owner = contents.getOwner();
-        if (owner.isPresent())
-            return ObjectUtils.isEqual( owner.get(), target ) || ObjectUtils.isEqual( owner.get().getController(), target );
-
-        return false;
+        return Maybe.of( ObjectUtils.isEqual( contents.get(), target ) );
     }
 
     @Override
@@ -144,7 +150,18 @@ public class Tile extends MetaObject {
         return ObjectUtils.isEqual( position, o.position ) && ObjectUtils.isEqual( level, o.level );
     }
 
+    /**
+     * @return true if this tile has no contents.
+     */
     boolean isAccessible() {
+        return !getContents().isPresent();
+    }
+
+    /**
+     * @return true if this tile is visible to the current player and has no contents.
+     */
+    @Authenticated
+    public boolean checkAccessible() {
         return checkContents().presence() == Maybe.Presence.ABSENT;
     }
 }
