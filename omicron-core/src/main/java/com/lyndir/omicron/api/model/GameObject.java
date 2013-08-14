@@ -46,8 +46,11 @@ public class GameObject extends MetaObject implements GameObserver {
             module.setGameObject( this );
         }
         modules = modulesBuilder.build();
-
         controller = new GameObjectController<>( this );
+
+        // Register ourselves into the game.
+        getController().setOwner( getOwner().orNull() );
+        getController().setLocation( getLocation() );
     }
 
     @Nonnull

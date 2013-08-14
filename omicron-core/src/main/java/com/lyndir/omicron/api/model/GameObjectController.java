@@ -17,10 +17,6 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     protected GameObjectController(final O gameObject) {
         this.gameObject = gameObject;
-
-        // Register ourselves into the game.
-        setOwner( getGameObject().getOwner().orNull() );
-        setLocation( getGameObject().getLocation() );
     }
 
     public O getGameObject() {
