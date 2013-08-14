@@ -1,10 +1,11 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.base.*;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.util.PathUtils;
 import java.util.*;
 import javax.annotation.Nonnull;
@@ -33,14 +34,16 @@ public class Game extends MetaObject {
     private final Set<Player> readyPlayers = new HashSet<>();
     private boolean running;
 
-    private Game(final Size levelSize, final ImmutableList<Player> players, final GameResourceConfig resourceConfig,
-                 final GameUnitConfig unitConfig) {
+    private Game(final Size levelSize, final ImmutableList<Player> players, final ImmutableList<GameListener> gameListeners,
+                 final GameResourceConfig resourceConfig, final GameUnitConfig unitConfig) {
         this.levelSize = levelSize;
         levels = ImmutableList.of( new Level( levelSize, LevelType.GROUND, this ), new Level( levelSize, LevelType.SKY, this ),
                                    new Level( levelSize, LevelType.SPACE, this ) );
         this.players = players;
         currentTurn = new Turn();
         gameController = new GameController( this );
+        for (final GameListener gameListener : gameListeners)
+            gameController.addGameListener( gameListener );
 
         // Give each player some units.
         for (final Player player : players)
@@ -155,9 +158,12 @@ public class Game extends MetaObject {
 
     public static class Builder {
 
+        private final ImmutableList.Builder<GameListener> gameListeners = ImmutableList.builder();
+        private final ImmutableList.Builder<Player>       players       = ImmutableList.builder();
+
         private Size               levelSize      = new Size( 200, 200 );
-        private List<Player>       players        = Lists.newLinkedList();
         private int                nextPlayerID   = 1;
+        private int                addedPlayers;
         private int                totalPlayers   = 4;
         private GameResourceConfig resourceConfig = GameResourceConfigs.PLENTY;
         private GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
@@ -167,15 +173,11 @@ public class Game extends MetaObject {
 
         public Game build() {
             // Add random players until totalPlayers count is satisfied.
-            int playerID = nextPlayerID;
-            while (players.size() < totalPlayers) {
-                Player randomPlayer = new Player( playerID++, null, Player.randomName(), Color.Template.randomColor(),
-                                                  Color.Template.randomColor() );
-                if (!players.contains( randomPlayer ))
-                    players.add( randomPlayer );
-            }
+            while (addedPlayers < totalPlayers)
+                addPlayer( new Player( nextPlayerID(), null, Player.randomName(), Color.Template.randomColor(),
+                                       Color.Template.randomColor() ) );
 
-            return new Game( levelSize, ImmutableList.copyOf( players ), resourceConfig, unitConfig );
+            return new Game( levelSize, players.build(), gameListeners.build(), resourceConfig, unitConfig );
         }
 
         public Size getLevelSize() {
@@ -188,12 +190,9 @@ public class Game extends MetaObject {
             return this;
         }
 
-        public List<Player> getPlayers() {
-            return players;
-        }
-
-        public Builder setPlayers(final List<Player> players) {
-            this.players = players;
+        public Builder addPlayer(final Player player) {
+            players.add( player );
+            ++addedPlayers;
 
             return this;
         }
@@ -204,6 +203,10 @@ public class Game extends MetaObject {
 
         public void setTotalPlayers(final Integer totalPlayers) {
             this.totalPlayers = totalPlayers;
+        }
+
+        public void addGameListener(final GameListener gameListener) {
+            gameListeners.add( gameListener );
         }
 
         public GameResourceConfig getResourceConfig() {

@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api;
 
+import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 
 /**
  * @author lhunath, 2013-08-13
@@ -26,6 +27,10 @@ public class ChangeDbl {
         return getTo() - getFrom();
     }
 
+    public static From from(final Double from) {
+        return from( ConversionUtils.toDoubleNN( from ) );
+    }
+
     public static From from(final double from) {
         return new From( from );
     }
@@ -36,6 +41,10 @@ public class ChangeDbl {
 
         From(final double from) {
             this.from = from;
+        }
+
+        public ChangeDbl to(final Double to) {
+            return to( ConversionUtils.toDoubleNN( to ) );
         }
 
         public ChangeDbl to(final double to) {
