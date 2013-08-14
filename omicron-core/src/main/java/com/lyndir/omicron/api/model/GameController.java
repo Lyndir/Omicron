@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

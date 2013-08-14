@@ -4,9 +4,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.*;
 import javax.annotation.Nonnull;
 
 
@@ -101,6 +100,8 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     void addDamage(final int incomingDamage) {
+        ChangeInt.From damageChange = ChangeInt.from( damage );
+
         damage += Math.max( 0, incomingDamage - armor );
 
         if (getRemainingHealth() <= 0)
@@ -111,7 +112,7 @@ public class BaseModule extends Module implements GameObserver {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( this );
+        } ).onBaseDamaged( this, damageChange.to( damage ) );
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })

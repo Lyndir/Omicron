@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 
+import com.lyndir.omicron.api.ChangeDbl;
 import javax.annotation.Nonnull;
 import java.util.EnumMap;
 import java.util.Map;
@@ -241,6 +242,7 @@ public class MobilityModule extends Module {
             Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
             // TODO: No target.isAccessible check: Most units that level cannot see other levels before they go there.
             // TODO: Should we disallow leveling until you can see the level above you like we do with movement and the tile you move to?
+            ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Execute the leveling.
             getGameObject().getController().setLocation( target.get() );
@@ -251,7 +253,7 @@ public class MobilityModule extends Module {
                 public boolean apply(@Nonnull final Player input) {
                     return input.canObserve( getGameObject().getLocation() );
                 }
-            } ).onChange( MobilityModule.this );
+            } ).onMobilityLeveled( MobilityModule.this, getGameObject().getLocation(), remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 
@@ -300,6 +302,7 @@ public class MobilityModule extends Module {
         public void execute() {
             Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
             Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
+            ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
@@ -329,7 +332,7 @@ public class MobilityModule extends Module {
                 public boolean apply(@Nonnull final Player input) {
                     return input.canObserve( getGameObject().getLocation() );
                 }
-            } ).onChange( MobilityModule.this );
+            } ).onMobilityMoved( MobilityModule.this, getGameObject().getLocation(), remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 

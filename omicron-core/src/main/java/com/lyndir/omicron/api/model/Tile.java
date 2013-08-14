@@ -1,22 +1,17 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.Authenticated;
-import com.lyndir.omicron.api.util.Maybe;
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.google.common.base.*;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.*;
+import com.lyndir.omicron.api.util.Maybe;
 import java.util.EnumMap;
 import java.util.Map;
-
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -62,6 +57,7 @@ public class Tile extends MetaObject {
     void setContents(@Nullable final GameObject contents) {
         if (contents != null)
             Preconditions.checkState( this.contents == null, "Cannot put object on tile that is not empty: %s", this );
+        Change.From<GameObject> contentsChange = Change.from( this.contents );
 
         this.contents = contents;
 
@@ -70,7 +66,7 @@ public class Tile extends MetaObject {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( Tile.this );
             }
-        } ).onChange( this );
+        } ).onTileContents( this, contentsChange.to( this.contents ) );
     }
 
     public Coordinate getPosition() {
@@ -83,17 +79,18 @@ public class Tile extends MetaObject {
 
     void setResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
         Preconditions.checkArgument( resourceQuantity >= 0, "Resource quantity cannot be less than zero: %s", resourceQuantity );
+        ChangeInt.From quantityChange;
         if (resourceQuantity > 0)
-            resourceQuantities.put( resourceType, resourceQuantity );
+            quantityChange = ChangeInt.from( resourceQuantities.put( resourceType, resourceQuantity ) );
         else
-            resourceQuantities.remove( resourceType );
+            quantityChange = ChangeInt.from( resourceQuantities.remove( resourceType ) );
 
         getLevel().getGame().getController().fireFor( new PredicateNN<Player>() {
             @Override
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( Tile.this );
             }
-        } ).onChange( this );
+        } ).onTileResources( this, resourceType, quantityChange.to( resourceQuantity ) );
     }
 
     void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
@@ -117,10 +114,19 @@ public class Tile extends MetaObject {
         return level.getTile( getPosition().neighbour( side ) ).get();
     }
 
-    public ImmutableList<Tile> neighbours() {
+    public ImmutableCollection<Tile> neighbours() {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         for (final Coordinate.Side side : Coordinate.Side.values())
             neighbours.add( neighbour( side ) );
+
+        return neighbours.build();
+    }
+
+    public ImmutableCollection<Tile> neighbours(final int distance) {
+        ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
+        for (int du = -distance; du <= distance; ++du)
+            for (int dv = Math.max( -distance, -du - distance ); dv <= Math.min( distance, -du + distance ); ++dv)
+                neighbours.add( level.getTile( getPosition().delta( du, dv ) ).get() );
 
         return neighbours.build();
     }
@@ -129,7 +135,7 @@ public class Tile extends MetaObject {
     public Maybe<Boolean> checkContains(@Nonnull final GameObject target) {
         Maybe<GameObject> contents = checkContents();
         if (contents.presence() == Maybe.Presence.ABSENT)
-            return Maybe.of(false);
+            return Maybe.of( false );
         if (contents.presence() == Maybe.Presence.UNKNOWN)
             return Maybe.unknown();
 

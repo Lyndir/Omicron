@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
+import com.lyndir.omicron.api.ChangeInt;
 import java.util.Random;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -78,6 +79,9 @@ public class WeaponModule extends Module {
         if (ammunition <= 0)
             return false;
 
+        ChangeInt.From repeatedChange = ChangeInt.from( repeated );
+        ChangeInt.From ammunitionChange = ChangeInt.from( ammunition );
+
         ++repeated;
         --ammunition;
 
@@ -86,7 +90,7 @@ public class WeaponModule extends Module {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( getGameObject() );
+        } ).onWeaponFired( getGameObject(), target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
 
         Optional<GameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())

@@ -29,13 +29,12 @@ import com.lyndir.lanterna.view.*;
 import com.lyndir.lanterna.view.Coordinate;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.model.GameController;
-import com.lyndir.omicron.api.model.GameListener;
+import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.model.Size;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
-import java.util.*;
+import java.util.Map;
 import javax.annotation.Nonnull;
 
 
@@ -62,10 +61,10 @@ public class MapView extends View {
         this.levelType = levelType;
     }
 
+
     @Override
     protected void onReady() {
         super.onReady();
-
         OmicronCLI.get().addGameListener( new GameListener() {
             @Override
             public void onNewTurn(final Turn currentTurn) {
@@ -112,7 +111,7 @@ public class MapView extends View {
                 Maybe<GameObject> contents;
                 Terminal.Color bgColor = getBackgroundColor();
                 if (tile == null)
-                contents = Maybe.absent();
+                    contents = Maybe.absent();
                 else {
                     contents = tile.checkContents();
                     bgColor = levelTypeColors.get( tile.getLevel().getType() );
@@ -124,12 +123,13 @@ public class MapView extends View {
                     }
                 }
 
-                screen.putString( x + (y % 2 == 0? 0: 1), y, contents.presence() == Maybe.Presence.PRESENT? contents.get().getType().getTypeName().substring( 0, 1 ): " ",
-                                  getMapColor(), bgColor, ScreenCharacterStyle.Bold );
-            }
-
+                screen.putString( x + (y % 2 == 0? 0: 1), y,
+                                  contents.presence() == Maybe.Presence.PRESENT? contents.get().getType().getTypeName().substring( 0, 1 )
+                                          : " ", getMapColor(), bgColor, ScreenCharacterStyle.Bold );
         // Draw off-screen warning labels.
-        Inset offScreen = new Inset( Math.max( 0, getOffset().getY() ),
+    }
+
+    Inset offScreen = new Inset( Math.max( 0, getOffset().getY() ),
                                      Math.max( 0, levelSize.getWidth() - contentSize.getWidth() - getOffset().getX() + 1 ),
                                      Math.max( 0, levelSize.getHeight() - contentSize.getHeight() - getOffset().getY() - 1 ),
                                      Math.max( 0, getOffset().getX() ) );

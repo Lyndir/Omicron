@@ -105,10 +105,8 @@ public class PlayerController implements GameObserver {
         return getPlayer().nextObjectID();
     }
 
-    void addObject(final GameObject gameObject) {
-        Preconditions.checkState( ObjectUtils.isEqual( getPlayer(), gameObject.getOwner().orNull() ),
-                                  "Cannot add object to this player: belongs to another player." );
-        getPlayer().addObject( gameObject );
+    void removeObject(final GameObject gameObject) {
+        getPlayer().removeObject( gameObject );
     }
 
     protected void onReset() {

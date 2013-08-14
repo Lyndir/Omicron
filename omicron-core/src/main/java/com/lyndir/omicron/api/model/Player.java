@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.ChangeInt;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -106,6 +107,8 @@ public class Player extends MetaObject implements GameObserver {
     }
 
     void setScore(final int score) {
+        ChangeInt.From scoreChange = ChangeInt.from( this.score );
+
         this.score = score;
 
         getController().getGameController().fireFor( new PredicateNN<Player>() {
@@ -113,7 +116,7 @@ public class Player extends MetaObject implements GameObserver {
             public boolean apply(@Nonnull final Player input) {
                 return true;
             }
-        } ).onChange( this );
+        } ).onPlayerScore( this, scoreChange.to( this.score ) );
     }
 
     int nextObjectID() {
@@ -125,6 +128,17 @@ public class Player extends MetaObject implements GameObserver {
         return Optional.fromNullable( objects.get( objectId ) );
     }
 
+    void removeObject(final GameObject gameObject) {
+        objects.remove( gameObject.getObjectID() );
+
+        getController().getGameController().fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return ObjectUtils.isEqual( input, Player.this );
+            }
+        } ).onPlayerLostObject( this, gameObject );
+    }
+
     void addObject(final GameObject gameObject) {
         objects.put( gameObject.getObjectID(), gameObject );
 
@@ -133,6 +147,6 @@ public class Player extends MetaObject implements GameObserver {
             public boolean apply(@Nonnull final Player input) {
                 return ObjectUtils.isEqual( input, Player.this );
             }
-        } ).onChange( this );
+        } ).onPlayerGainedObject( this, gameObject );
     }
 }

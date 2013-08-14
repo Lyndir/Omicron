@@ -36,13 +36,13 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     void setOwner(@Nullable final Player owner) {
         Optional<Player> oldOwner = getOwner();
         if (oldOwner.isPresent())
-            oldOwner.get().getObjects().remove( getGameObject() );
+            oldOwner.get().getController().removeObject( getGameObject() );
 
         getGameObject().setOwner( owner );
 
         Optional<Player> newOwner = getOwner();
         if (newOwner.isPresent())
-            newOwner.get().getController().addObject( getGameObject() );
+            newOwner.get().addObject( getGameObject() );
     }
 
     void setLocation(@Nonnull final Tile location) {
@@ -83,13 +83,13 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
         Optional<Player> owner = getOwner();
         if (owner.isPresent())
-            owner.get().getObjects().remove( getGameObject() );
+            owner.get().removeObject( getGameObject() );
 
         getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
             @Override
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( getGameObject() );
+        } ).onUnitDied( getGameObject() );
     }
 }

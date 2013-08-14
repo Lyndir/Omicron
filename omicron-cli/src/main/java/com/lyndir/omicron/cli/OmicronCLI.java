@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lanterna.view.OmicronWindow;
 import com.lyndir.omicron.api.model.GameController;
-import com.lyndir.omicron.api.model.GameListener;
+import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.model.Player;
 import com.lyndir.omicron.api.model.PlayerKey;
 import java.util.*;

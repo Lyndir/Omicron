@@ -21,7 +21,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
-import com.lyndir.omicron.api.Constants;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.PathUtils;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +68,14 @@ public class ConstructorModule extends Module {
         if (isResourceConstrained() || remainingSpeed <= 0)
             return;
 
-        for (; remainingSpeed > 0; --remainingSpeed) {
+        ChangeInt.From remainingSpeedChange = ChangeInt.from( remainingSpeed );
+
+        construction: for (; remainingSpeed > 0; --remainingSpeed) {
             /* Find resource cost */
             Optional<ImmutableResourceCost> resourceCostOptional = site.getResourceCostToPerformWork( getBuildsModule() );
             if (!resourceCostOptional.isPresent())
                 // No work left to do.
-                return;
+                break;
             final MutableResourceCost resourceCost = ResourceCost.mutable( resourceCostOptional.get() );
 
             /* Find resource stock to cover cost */
@@ -121,7 +123,7 @@ public class ConstructorModule extends Module {
                     for (final Map.Entry<ContainerModule, Integer> borrowEntry : borrowedResources.build().entrySet())
                         borrowEntry.getKey().addStock( borrowEntry.getValue() );
 
-                    return;
+                    break construction;
                 }
 
                 for (final ContainerModule containerModule : path.get().getTarget().getModules( ModuleType.CONTAINER )) {
@@ -145,7 +147,7 @@ public class ConstructorModule extends Module {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( this );
+        } ).onConstructorWorked( this, remainingSpeedChange.to( remainingSpeed ) );
     }
 
     public ModuleType<?> getBuildsModule() {
@@ -171,6 +173,8 @@ public class ConstructorModule extends Module {
     void setTarget(final GameObject target) {
         Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner(), target.getOwner() ),
                                      "Can only target units of the same player." );
+        Change.From<GameObject> targetChange = Change.from( this.target );
+
         this.target = target;
 
         getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
@@ -178,7 +182,7 @@ public class ConstructorModule extends Module {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( this );
+        } ).onConstructorTargeted( this, targetChange.to( this.target ) );
     }
 
     @Override
@@ -264,14 +268,14 @@ public class ConstructorModule extends Module {
         private boolean performWork(final ModuleType<?> moduleType) {
             int remaining = getRemainingWork( moduleType );
             if (remaining > 0) {
-                remainingWork.put( moduleType, --remaining );
+                ChangeInt.From remainingWorkChange = ChangeInt.from( remainingWork.put( moduleType, --remaining ) );
 
                 getGame().getController().fireFor( new PredicateNN<Player>() {
                     @Override
                     public boolean apply(@Nonnull final Player input) {
                         return input.canObserve( getLocation() );
                     }
-                } ).onChange( this );
+                } ).onConstructionSiteWorked( this, moduleType, remainingWorkChange.to( remaining ) );
 
                 return true;
             }

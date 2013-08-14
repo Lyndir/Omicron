@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.Change;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,6 +66,8 @@ public class GameObject extends MetaObject implements GameObserver {
     }
 
     void setOwner(@Nullable final Player owner) {
+        Change.From<Player> ownerChange = Change.from( this.owner );
+
         this.owner = owner;
 
         getGame().getController().fireFor( new PredicateNN<Player>() {
@@ -73,7 +76,7 @@ public class GameObject extends MetaObject implements GameObserver {
                 // TODO: Should we check "couldObserve" to inform the player losing the object in case he can now no longer see the tile?
                 return input.canObserve( getLocation() );
             }
-        } ).onChange( this );
+        } ).onUnitCaptured( this, ownerChange.to( this.owner ) );
     }
 
     @Override
@@ -101,15 +104,16 @@ public class GameObject extends MetaObject implements GameObserver {
     }
 
     void setLocation(@Nonnull final Tile location) {
-        final Tile oldLocation = this.location;
+        final Change.From<Tile> locationChange = Change.from( this.location );
         this.location = location;
 
         getGame().getController().fireFor( new PredicateNN<Player>() {
             @Override
             public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getLocation() ) || input.canObserve( oldLocation );
+                Tile from = locationChange.getFrom();
+                return input.canObserve( getLocation() ) || (from != null && input.canObserve( from ));
             }
-        } ).onChange( this );
+        } ).onUnitMoved( this, locationChange.to( this.location ) );
     }
 
     public UnitType getType() {

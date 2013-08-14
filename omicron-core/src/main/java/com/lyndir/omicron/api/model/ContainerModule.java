@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
+import com.lyndir.omicron.api.ChangeInt;
 import javax.annotation.Nonnull;
 
 
@@ -51,6 +52,7 @@ public class ContainerModule extends Module {
      */
     int addStock(final int amount) {
         Preconditions.checkArgument( amount >= 0, "Amount of stock to add must be positive." );
+        ChangeInt.From stockChange = ChangeInt.from( stock );
 
         int newStock = Math.min( stock + amount, capacity );
         int stocked = newStock - stock;
@@ -61,7 +63,7 @@ public class ContainerModule extends Module {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( this );
+        } ).onContainerStockChanged( this, stockChange.to( stock ) );
 
         return stocked;
     }
@@ -76,6 +78,7 @@ public class ContainerModule extends Module {
      */
     int depleteStock(final int amount) {
         Preconditions.checkArgument( amount >= 0, "Amount of stock to deplete must be positive." );
+        ChangeInt.From stockChange = ChangeInt.from( stock );
 
         int newStock = Math.max( stock - amount, 0 );
         int depleted = stock - newStock;
@@ -86,7 +89,7 @@ public class ContainerModule extends Module {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onChange( this );
+        } ).onContainerStockChanged( this, stockChange.to( stock ) );
 
         return depleted;
     }
