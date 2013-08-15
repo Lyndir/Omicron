@@ -12,9 +12,12 @@ public enum VictoryConditionType {
     SUPREMACY {
         @Override
         void install(final Game game) {
-            game.getController().addGameListener( new GameListener() {
+            game.getController().addInternalGameListener( new GameListener() {
                 @Override
                 public void onPlayerLostObject(final Player player, final GameObject gameObject) {
+                    if (!game.isRunning())
+                        return;
+
                     Player supremePlayer = null;
                     for (final Player aPlayer : game.getPlayers())
                         if (!aPlayer.getObjects().isEmpty())
@@ -23,7 +26,7 @@ public enum VictoryConditionType {
                             else
                                 return;
 
-                    game.getController().end( supremePlayer );
+                    game.getController().end( SUPREMACY, supremePlayer );
                 }
             } );
         }
@@ -39,15 +42,18 @@ public enum VictoryConditionType {
 
         @Override
         void install(final Game game) {
-            game.getController().addGameListener( new GameListener() {
+            game.getController().addInternalGameListener( new GameListener() {
                 private Player mightyPlayer;
                 private Turn mightySince;
 
                 @Override
                 public void onNewTurn(final Turn currentTurn) {
+                    if (!game.isRunning())
+                        return;
+
                     if (mightyPlayer != null)
                         if (currentTurn.getNumber() - mightySince.getNumber() >= 10)
-                            game.getController().end( mightyPlayer );
+                            game.getController().end( MIGHT, mightyPlayer );
                 }
 
                 @Override

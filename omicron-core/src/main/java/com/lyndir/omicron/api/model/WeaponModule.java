@@ -90,7 +90,7 @@ public class WeaponModule extends Module {
             public boolean apply(@Nonnull final Player input) {
                 return input.canObserve( getGameObject().getLocation() );
             }
-        } ).onWeaponFired( getGameObject(), target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
+        } ).onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
 
         Optional<GameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())

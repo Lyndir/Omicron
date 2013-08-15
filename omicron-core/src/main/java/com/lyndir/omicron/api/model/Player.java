@@ -111,12 +111,7 @@ public class Player extends MetaObject implements GameObserver {
 
         this.score = score;
 
-        getController().getGameController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return true;
-            }
-        } ).onPlayerScore( this, scoreChange.to( this.score ) );
+        getController().getGameController().fireFor( null ).onPlayerScore( this, scoreChange.to( this.score ) );
     }
 
     int nextObjectID() {

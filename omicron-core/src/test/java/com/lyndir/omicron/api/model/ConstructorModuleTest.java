@@ -48,7 +48,7 @@ public class ConstructorModuleTest extends AbstractTest {
                                                                                      .supportedLayers( LevelType.values() ),
                                                                            initBaseConstructorModule, initMobilityConstructorModule ), 0,
                                                              0 );
-        staticGame.getController().start();
+        staticGame.getController().setReady();
 
         // Create a BASE unit type and a BASE & MOBILITY unit type.
         UnitType baseUnit = testUnitType( "Base Unit", 5, BaseModule.createWithStandardResourceCost()

@@ -76,10 +76,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     void die() {
         getGameObject().getLocation().setContents( null );
-
-        Optional<Player> owner = getOwner();
-        if (owner.isPresent())
-            owner.get().removeObject( getGameObject() );
+        setOwner( null );
 
         getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
             @Override

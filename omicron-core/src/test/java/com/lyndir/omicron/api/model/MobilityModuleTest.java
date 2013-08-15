@@ -60,7 +60,7 @@ public class MobilityModuleTest extends AbstractTest {
                                                                                 .levelingCost( ImmutableMap.of( LevelType.GROUND, 1d,
                                                                                                                 LevelType.SKY, 2d,
                                                                                                                 LevelType.SPACE, 3d ) ) ) );
-        staticGame.getController().start();
+        staticGame.getController().setReady();
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 7d );
 
         MobilityModule.Leveling leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.GROUND );
@@ -118,7 +118,7 @@ public class MobilityModuleTest extends AbstractTest {
                                                                            ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SPACE, 2d ) )
                                                                    .levelingCost( ImmutableMap.of( LevelType.GROUND, 1d, LevelType.SKY, 2d,
                                                                                                    LevelType.SPACE, 3d ) ) ) );
-        staticGame.getController().start();
+        staticGame.getController().setReady();
 
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 17d );
         MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 )

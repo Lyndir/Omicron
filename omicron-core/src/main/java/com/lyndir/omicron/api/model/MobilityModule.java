@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 
+import com.lyndir.omicron.api.Change;
 import com.lyndir.omicron.api.ChangeDbl;
 import javax.annotation.Nonnull;
 import java.util.EnumMap;
@@ -242,6 +243,7 @@ public class MobilityModule extends Module {
             Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
             // TODO: No target.isAccessible check: Most units that level cannot see other levels before they go there.
             // TODO: Should we disallow leveling until you can see the level above you like we do with movement and the tile you move to?
+            Change.From<Tile> locationChange = Change.from( getGameObject().getLocation() );
             ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Execute the leveling.
@@ -253,7 +255,7 @@ public class MobilityModule extends Module {
                 public boolean apply(@Nonnull final Player input) {
                     return input.canObserve( getGameObject().getLocation() );
                 }
-            } ).onMobilityLeveled( MobilityModule.this, getGameObject().getLocation(), remainingSpeedChange.to( remainingSpeed ) );
+            } ).onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ), remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 
@@ -302,6 +304,7 @@ public class MobilityModule extends Module {
         public void execute() {
             Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
             Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
+            Change.From<Tile> locationChange = Change.from( getGameObject().getLocation() );
             ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Check that the path can still be walked.
@@ -332,7 +335,7 @@ public class MobilityModule extends Module {
                 public boolean apply(@Nonnull final Player input) {
                     return input.canObserve( getGameObject().getLocation() );
                 }
-            } ).onMobilityMoved( MobilityModule.this, getGameObject().getLocation(), remainingSpeedChange.to( remainingSpeed ) );
+            } ).onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ), remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 
