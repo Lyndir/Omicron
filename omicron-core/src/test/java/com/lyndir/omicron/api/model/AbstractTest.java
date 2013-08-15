@@ -77,7 +77,7 @@ public abstract class AbstractTest {
         builder.setLevelSize( new Size( 10, 10 ) );
         builder.setResourceConfig( Game.GameResourceConfigs.NONE );
         builder.setUnitConfig( Game.GameUnitConfigs.NONE );
-        builder.getPlayers().add( staticPlayer );
+        builder.addPlayer( staticPlayer );
         staticGame = builder.build();
 
         Security.authenticate( staticPlayer, key );
