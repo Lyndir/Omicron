@@ -30,6 +30,10 @@ public class PlayerController implements GameObserver {
     void setGameController(final GameController gameController) {
         Preconditions.checkState( this.gameController == null, "This player has already been added to a game!" );
         this.gameController = gameController;
+
+        // Key-less players immediately set themselves ready to start the game.
+        if (player.isKeyLess())
+            gameController.setReady( getPlayer() );
     }
 
     public GameController getGameController() {

@@ -360,8 +360,9 @@ public class ConstructorModule extends Module {
                         }
                     } ).isEmpty()) {
                         // No more work remaining; create the constructed unit.
+                        Player owner = getOwner().get();
                         die();
-                        new GameObject( constructionUnitType, getGame(), getOwner().get(), getLocation() );
+                        new GameObject( constructionUnitType, getGame(), owner, getLocation() );
                     }
                 }
             };
