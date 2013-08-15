@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
@@ -100,11 +101,28 @@ public class GameController {
         return false;
     }
 
-    void start() {
+    private void start() {
         Preconditions.checkState( !game.isRunning(), "The game cannot be started: It is already running." );
 
         game.setRunning( true );
-        fireNewTurn();
+        fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return true;
+            }
+        } ).onGameStarted( game );
+    }
+
+    void end(@Nullable final Player victor) {
+        Preconditions.checkState( game.isRunning(), "The game cannot end: It isn't running yet." );
+
+        game.setRunning( false );
+        fireFor( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return true;
+            }
+        } ).onGameEnded( game, victor );
     }
 
     void fireNewTurn() {
@@ -116,6 +134,8 @@ public class GameController {
 
     protected void onNewTurn() {
         game.setCurrentTurn( new Turn( game.getCurrentTurn() ) );
+        if (!game.isRunning())
+            start();
 
         for (final Player player : ImmutableList.copyOf( game.getPlayers() )) {
             player.getController().fireReset();

@@ -17,6 +17,7 @@
 package com.lyndir.omicron.api;
 
 import com.lyndir.omicron.api.model.*;
+import javax.annotation.Nullable;
 
 
 /**
@@ -88,5 +89,11 @@ public abstract class GameListener {
     }
 
     public void onWeaponFired(final GameObject gameObject, final Tile target, final ChangeInt repeated, final ChangeInt ammunition) {
+    }
+
+    public void onGameStarted(final Game game) {
+    }
+
+    public void onGameEnded(final Game game, @Nullable final Player victor) {
     }
 }
