@@ -3,8 +3,8 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.util.Maybe;
 import javax.annotation.Nonnull;
 
 
@@ -41,6 +41,7 @@ public class PlayerController implements GameObserver {
     }
 
     @Override
+    @Authenticated
     public boolean canObserve(@Nonnull final Tile location) {
         return FluentIterable.from( getPlayer().getObjects() ).anyMatch( new Predicate<GameObject>() {
             @Override
@@ -52,6 +53,7 @@ public class PlayerController implements GameObserver {
 
     @Nonnull
     @Override
+    @Authenticated
     public Iterable<Tile> listObservableTiles() {
         return FluentIterable.from( getPlayer().getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
             @Override
@@ -93,16 +95,17 @@ public class PlayerController implements GameObserver {
         } );
     }
 
-    public Optional<GameObject> getObject(final int objectId) {
+    @Authenticated
+    public Maybe<GameObject> getObject(final int objectId) {
         Optional<GameObject> object = getPlayer().getObject( objectId );
 
         // If the object cannot be observed by the current player, treat it as absent.
-        if (!object.isPresent() || !Security.isAuthenticated())
-            return Optional.absent();
         if (!Security.getCurrentPlayer().canObserve( object.get().getLocation() ))
-            return Optional.absent();
+            return Maybe.unknown();
+        if (!object.isPresent())
+            return Maybe.absent();
 
-        return object;
+        return Maybe.of( object.get() );
     }
 
     int newObjectID() {

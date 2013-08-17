@@ -2,6 +2,7 @@ package com.lyndir.omicron.api;
 
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 
+
 /**
  * @author lhunath, 2013-08-13
  */

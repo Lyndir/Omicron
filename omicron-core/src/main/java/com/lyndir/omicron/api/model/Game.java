@@ -121,7 +121,6 @@ public class Game extends MetaObject {
         return FluentIterable.from( levels ).firstMatch( new Predicate<Level>() {
             @Override
             public boolean apply(final Level input) {
-
                 return input.getType() == levelType;
             }
         } ).get();

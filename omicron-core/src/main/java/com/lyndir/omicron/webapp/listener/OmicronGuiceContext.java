@@ -50,7 +50,7 @@ public class OmicronGuiceContext extends GuiceServletContextListener {
     @Override
     public void contextDestroyed(final ServletContextEvent servletContextEvent) {
 
-//        ifNotNull( Injector.class, get( servletContextEvent.getServletContext() ) ).getInstance( ObjectContainer.class ).close();
+        //        ifNotNull( Injector.class, get( servletContextEvent.getServletContext() ) ).getInstance( ObjectContainer.class ).close();
 
         super.contextDestroyed( servletContextEvent );
     }

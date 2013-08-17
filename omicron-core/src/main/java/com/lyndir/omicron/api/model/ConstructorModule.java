@@ -70,7 +70,8 @@ public class ConstructorModule extends Module {
 
         ChangeInt.From remainingSpeedChange = ChangeInt.from( remainingSpeed );
 
-        construction: for (; remainingSpeed > 0; --remainingSpeed) {
+        construction:
+        for (; remainingSpeed > 0; --remainingSpeed) {
             /* Find resource cost */
             Optional<ImmutableResourceCost> resourceCostOptional = site.getResourceCostToPerformWork( getBuildsModule() );
             if (!resourceCostOptional.isPresent())
@@ -170,8 +171,11 @@ public class ConstructorModule extends Module {
         return target;
     }
 
-    void setTarget(final GameObject target) {
-        Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner(), target.getOwner() ),
+    @Authenticated
+    public void setTarget(final GameObject target) {
+        Preconditions.checkArgument( getGameObject().isOwnedByCurrentPlayer(),
+                                     "Cannot control the target of a module that is not owned by the current player." );
+        Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner().get(), target.getOwner().get() ),
                                      "Can only target units of the same player." );
         Change.From<GameObject> targetChange = Change.from( this.target );
 
@@ -202,7 +206,10 @@ public class ConstructorModule extends Module {
      *
      * @return The job that will be created for the construction of the new unit.
      */
-    ConstructionSite schedule(final UnitType unitType, final Tile location) {
+    @Authenticated
+    public ConstructionSite schedule(final UnitType unitType, final Tile location) {
+        Preconditions.checkArgument( getGameObject().isOwnedByCurrentPlayer(),
+                                     "Cannot schedule build: module is not owned by the current player." );
         Preconditions.checkArgument( location.isAccessible(), "Cannot schedule build: location not accessible." );
         Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ),
                                      "Cannot schedule build: location not on the constructor's level." );

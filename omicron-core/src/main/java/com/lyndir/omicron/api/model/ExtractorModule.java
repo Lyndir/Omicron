@@ -5,7 +5,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Constants;
-import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.PathUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

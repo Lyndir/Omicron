@@ -27,4 +27,9 @@ public class PlayerKey {
     public int hashCode() {
         return Arrays.hashCode( key );
     }
+
+    @Override
+    public String toString() {
+        return String.format( "{PlayerKey: %d}", hashCode() );
+    }
 }

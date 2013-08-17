@@ -15,8 +15,7 @@ public interface GameObserver {
     /**
      * Check whether the current object can observe the tile at the given location.
      *
-     *
-     * @param location      The tile that this observer is trying to see.
+     * @param location The tile that this observer is trying to see.
      *
      * @return true if the current player is allowed to know and the given tile is visible to this observer.
      */

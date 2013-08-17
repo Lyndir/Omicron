@@ -1,19 +1,15 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.omicron.api.util.PathUtils.*;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
-
-import com.lyndir.omicron.api.Change;
-import com.lyndir.omicron.api.ChangeDbl;
-import javax.annotation.Nonnull;
+import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.*;
 import java.util.EnumMap;
 import java.util.Map;
-
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
-import static com.lyndir.omicron.api.util.PathUtils.*;
+import javax.annotation.Nonnull;
 
 
 public class MobilityModule extends Module {
@@ -119,6 +115,7 @@ public class MobilityModule extends Module {
      *
      * @param levelType The side of the adjacent tile relative to the current.
      */
+    @Authenticated
     public Leveling leveling(final LevelType levelType) {
         if (!getGameObject().isOwnedByCurrentPlayer())
             // Cannot level object that doesn't belong to the current player.
@@ -142,6 +139,7 @@ public class MobilityModule extends Module {
      *
      * @param target The side of the adjacent tile relative to the current.
      */
+    @Authenticated
     public Movement movement(final Tile target) {
         if (!getGameObject().isOwnedByCurrentPlayer())
             // Cannot move object that doesn't belong to the current player.
@@ -238,6 +236,7 @@ public class MobilityModule extends Module {
             return target.get();
         }
 
+        @Authenticated
         public void execute() {
             Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
             Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
@@ -250,12 +249,16 @@ public class MobilityModule extends Module {
             getGameObject().getController().setLocation( target.get() );
             remainingSpeed -= cost;
 
-            getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-                @Override
-                public boolean apply(@Nonnull final Player input) {
-                    return input.canObserve( getGameObject().getLocation() );
-                }
-            } ).onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ), remainingSpeedChange.to( remainingSpeed ) );
+            getGameObject().getGame()
+                    .getController()
+                    .fireFor( new PredicateNN<Player>() {
+                        @Override
+                        public boolean apply(@Nonnull final Player input) {
+                            return input.canObserve( getGameObject().getLocation() );
+                        }
+                    } )
+                    .onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
+                                        remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 
@@ -301,6 +304,7 @@ public class MobilityModule extends Module {
             return path.isPresent();
         }
 
+        @Authenticated
         public void execute() {
             Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
             Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
@@ -310,10 +314,9 @@ public class MobilityModule extends Module {
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
             do {
-                Preconditions.checkState(
-                        tracePath.getTarget().checkAccessible() || //
-                        ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ),
-                        "Cannot execute: path no longer accessible." );
+                Preconditions.checkState( tracePath.getTarget().checkAccessible() || //
+                                          ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ),
+                                          "Cannot execute: path no longer accessible." );
 
                 Optional<Path<Tile>> parent = tracePath.getParent();
                 if (!parent.isPresent())
@@ -330,12 +333,16 @@ public class MobilityModule extends Module {
             getGameObject().getController().setLocation( path.get().getTarget() );
             remainingSpeed -= path.get().getCost();
 
-            getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-                @Override
-                public boolean apply(@Nonnull final Player input) {
-                    return input.canObserve( getGameObject().getLocation() );
-                }
-            } ).onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ), remainingSpeedChange.to( remainingSpeed ) );
+            getGameObject().getGame()
+                    .getController()
+                    .fireFor( new PredicateNN<Player>() {
+                        @Override
+                        public boolean apply(@Nonnull final Player input) {
+                            return input.canObserve( getGameObject().getLocation() );
+                        }
+                    } )
+                    .onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
+                                      remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 

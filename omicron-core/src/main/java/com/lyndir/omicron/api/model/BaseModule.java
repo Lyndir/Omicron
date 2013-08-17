@@ -5,7 +5,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.*;
+import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.ChangeInt;
 import javax.annotation.Nonnull;
 
 

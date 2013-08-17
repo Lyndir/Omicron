@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
+import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.Change;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -64,6 +65,7 @@ public class GameObject extends MetaObject implements GameObserver {
         return Optional.fromNullable( owner );
     }
 
+    @Authenticated
     public boolean isOwnedByCurrentPlayer() {
         return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.getCurrentPlayer() );
     }
@@ -82,12 +84,14 @@ public class GameObject extends MetaObject implements GameObserver {
         } ).onUnitCaptured( this, ownerChange.to( this.owner ) );
     }
 
+    @Authenticated
     @Override
     @SuppressWarnings("ParameterHidesMemberVariable")
     public boolean canObserve(@Nonnull final Tile location) {
         return getController().canObserve( location );
     }
 
+    @Authenticated
     @Nonnull
     @Override
     public Iterable<Tile> listObservableTiles() {

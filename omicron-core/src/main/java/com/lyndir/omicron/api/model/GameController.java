@@ -11,7 +11,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
@@ -119,7 +118,7 @@ public class GameController {
         fireFor( null ).onGameEnded( game, victoryCondition, victor );
     }
 
-    void fireNewTurn() {
+    private void fireNewTurn() {
         onNewTurn();
 
         for (final GameListener gameListener : gameListeners.keySet())

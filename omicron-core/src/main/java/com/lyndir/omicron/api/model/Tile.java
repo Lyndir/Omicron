@@ -124,6 +124,7 @@ public class Tile extends MetaObject {
 
     public ImmutableCollection<Tile> neighbours(final int distance) {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
+        // FIXME: Not correct.
         for (int du = -distance; du <= distance; ++du)
             for (int dv = Math.max( -distance, -du - distance ); dv <= Math.min( distance, -du + distance ); ++dv)
                 neighbours.add( level.getTile( getPosition().delta( du, dv ) ).get() );
