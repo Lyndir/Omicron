@@ -1,10 +1,11 @@
 package com.lyndir.omicron.api.model;
 
+import com.lyndir.lhunath.opal.system.util.MetaObject;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class Turn {
+public class Turn extends MetaObject {
 
     @Nullable
     private final Turn previousTurn;
