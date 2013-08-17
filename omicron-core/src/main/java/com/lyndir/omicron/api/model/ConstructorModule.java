@@ -143,12 +143,8 @@ public class ConstructorModule extends Module {
                     borrowEntry.getKey().addStock( borrowEntry.getValue() );
         }
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onConstructorWorked( this, remainingSpeedChange.to( remainingSpeed ) );
+        getGameController().fireIfObservable( getGameObject().getLocation() ) //
+                .onConstructorWorked( this, remainingSpeedChange.to( remainingSpeed ) );
     }
 
     public ModuleType<?> getBuildsModule() {
@@ -181,12 +177,8 @@ public class ConstructorModule extends Module {
 
         this.target = target;
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onConstructorTargeted( this, targetChange.to( this.target ) );
+        getGameController().fireIfObservable( getGameObject().getLocation() ) //
+                .onConstructorTargeted( this, targetChange.to( this.target ) );
     }
 
     @Override
@@ -277,12 +269,8 @@ public class ConstructorModule extends Module {
             if (remaining > 0) {
                 ChangeInt.From remainingWorkChange = ChangeInt.from( remainingWork.put( moduleType, --remaining ) );
 
-                getGame().getController().fireFor( new PredicateNN<Player>() {
-                    @Override
-                    public boolean apply(@Nonnull final Player input) {
-                        return input.canObserve( getLocation() );
-                    }
-                } ).onConstructionSiteWorked( this, moduleType, remainingWorkChange.to( remaining ) );
+                getGame().getController().fireIfObservable( getLocation() ) //
+                        .onConstructionSiteWorked( this, moduleType, remainingWorkChange.to( remaining ) );
 
                 return true;
             }

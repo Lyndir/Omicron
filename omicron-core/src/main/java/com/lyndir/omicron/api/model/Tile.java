@@ -48,9 +48,10 @@ public class Tile extends MetaObject {
     @Nonnull
     @Authenticated
     public Maybe<GameObject> checkContents() {
-        if (!Security.getCurrentPlayer().canObserve( this )) {
+        if (!Security.currentPlayer().canObserve( this ).isTrue())
+            // Cannot observe tile.
             return Maybe.unknown();
-        }
+
         return Maybe.fromNullable( contents );
     }
 
@@ -61,12 +62,8 @@ public class Tile extends MetaObject {
 
         this.contents = contents;
 
-        getLevel().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( Tile.this );
-            }
-        } ).onTileContents( this, contentsChange.to( this.contents ) );
+        getLevel().getGame().getController().fireIfObservable( this ) //
+                .onTileContents( this, contentsChange.to( this.contents ) );
     }
 
     public Coordinate getPosition() {
@@ -85,12 +82,8 @@ public class Tile extends MetaObject {
         else
             quantityChange = ChangeInt.from( resourceQuantities.remove( resourceType ) );
 
-        getLevel().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( Tile.this );
-            }
-        } ).onTileResources( this, resourceType, quantityChange.to( resourceQuantity ) );
+        getLevel().getGame().getController().fireIfObservable( this ) //
+                .onTileResources( this, resourceType, quantityChange.to( resourceQuantity ) );
     }
 
     void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
@@ -103,7 +96,8 @@ public class Tile extends MetaObject {
 
     @Authenticated
     public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType) {
-        if (!Security.getCurrentPlayer().canObserve( this ))
+        if (!Security.currentPlayer().canObserve( this ).isTrue())
+            // Cannot observe location.
             return Maybe.unknown();
 
         return Maybe.fromNullable( resourceQuantities.get( resourceType ) );

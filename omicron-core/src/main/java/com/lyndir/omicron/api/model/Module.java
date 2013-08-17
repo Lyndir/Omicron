@@ -48,6 +48,10 @@ public abstract class Module extends MetaObject {
         return Preconditions.checkNotNull( gameObject, "This module has not yet been initialized by its game object." );
     }
 
+    protected GameController getGameController() {
+        return getGameObject().getGame().getController();
+    }
+
     protected abstract void onReset();
 
     protected abstract void onNewTurn();

@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
 
@@ -20,7 +21,7 @@ public interface GameObserver {
      * @return true if the current player is allowed to know and the given tile is visible to this observer.
      */
     @Authenticated
-    boolean canObserve(@Nonnull Tile location);
+    Maybool canObserve(@Nonnull Tile location);
 
     /**
      * Enumerate the tiles this observer can observe.

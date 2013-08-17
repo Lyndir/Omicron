@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
@@ -36,7 +37,7 @@ public class GameController {
 
     @Authenticated
     public void addGameListener(final GameListener gameListener) {
-        gameListeners.put( gameListener, Security.getCurrentPlayer() );
+        gameListeners.put( gameListener, Security.currentPlayer() );
     }
 
     /**
@@ -76,7 +77,7 @@ public class GameController {
      */
     @Authenticated
     public boolean setReady() {
-        return setReady( Security.getCurrentPlayer() );
+        return setReady( Security.currentPlayer() );
     }
 
     /**
@@ -88,7 +89,7 @@ public class GameController {
      */
     boolean setReady(final Player player) {
         if (!player.isKeyLess())
-            Preconditions.checkState( ObjectUtils.isEqual( player, Security.getCurrentPlayer() ),
+            Preconditions.checkState( ObjectUtils.isEqual( player, Security.currentPlayer() ),
                                       "Cannot set protected player ready: not authenticated.  First authenticate using Security.authenticate()." );
 
         game.getReadyPlayers().add( player );
@@ -108,14 +109,14 @@ public class GameController {
         Preconditions.checkState( !game.isRunning(), "The game cannot be started: It is already running." );
 
         game.setRunning( true );
-        fireFor( null ).onGameStarted( game );
+        fire().onGameStarted( game );
     }
 
     void end(final VictoryConditionType victoryCondition, @Nullable final Player victor) {
         Preconditions.checkState( game.isRunning(), "The game cannot end: It isn't running yet." );
 
         game.setRunning( false );
-        fireFor( null ).onGameEnded( game, victoryCondition, victor );
+        fire().onGameEnded( game, victoryCondition, victor );
     }
 
     private void fireNewTurn() {
@@ -145,12 +146,30 @@ public class GameController {
     }
 
     /**
-     * Get a game listener proxy to call an event on that should be fired.
-     *
-     * @param playerCondition If not null, the event is only broadcast to internal game listeners and game listeners that pass the
-     *                        predicate.
+     * Get a game listener proxy to call an event on that should be fired for all game listeners.
      */
-    GameListener fireFor(@Nullable final PredicateNN<Player> playerCondition) {
+    GameListener fire() {
+        return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
+            @Override
+            @Nullable
+            @SuppressWarnings("ProhibitedExceptionDeclared")
+            public Object invoke(final Object proxy, final Method method, final Object[] args)
+                    throws Throwable {
+                for (final Map.Entry<GameListener, Player> gameListenerEntry : gameListeners.entrySet())
+                    method.invoke( gameListenerEntry.getKey(), args );
+
+                return null;
+            }
+        } );
+    }
+
+    /**
+     * Get a game listener proxy to call an event on that should be fired for all game listeners that are either internal or registered by
+     * players that pass the playerCondition.
+     *
+     * @param playerCondition The predicate that should hold true for all players eligible to receive the notification.
+     */
+    GameListener fireIfPlayer(@Nonnull final PredicateNN<Player> playerCondition) {
         return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
             @Override
             @Nullable
@@ -159,11 +178,26 @@ public class GameController {
                     throws Throwable {
                 for (final Map.Entry<GameListener, Player> gameListenerEntry : gameListeners.entrySet()) {
                     Player gameListenerOwner = gameListenerEntry.getValue();
-                    if (gameListenerOwner == null || playerCondition == null || playerCondition.apply( gameListenerOwner ))
+                    if (gameListenerOwner == null || playerCondition.apply( gameListenerOwner ))
                         method.invoke( gameListenerEntry.getKey(), args );
                 }
 
                 return null;
+            }
+        } );
+    }
+
+    /**
+     * Get a game listener proxy to call an event on that should be fired for all game listeners that are either internal or registered by
+     * players that can observe the given location.
+     *
+     * @param location The location that should be observable.
+     */
+    GameListener fireIfObservable(@Nonnull final Tile location) {
+        return fireIfPlayer( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return input.canObserve( location ).isTrue();
             }
         } );
     }

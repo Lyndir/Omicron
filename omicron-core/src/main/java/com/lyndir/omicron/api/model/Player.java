@@ -1,10 +1,10 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
+import com.google.common.base.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
+import com.lyndir.omicron.api.util.Maybool;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,7 +56,7 @@ public class Player extends MetaObject implements GameObserver {
 
     @Authenticated
     @Override
-    public boolean canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final Tile location) {
         return getController().canObserve( location );
     }
 
@@ -114,7 +114,7 @@ public class Player extends MetaObject implements GameObserver {
 
         this.score = score;
 
-        getController().getGameController().fireFor( null ).onPlayerScore( this, scoreChange.to( this.score ) );
+        getController().getGameController().fire().onPlayerScore( this, scoreChange.to( this.score ) );
     }
 
     int nextObjectID() {
@@ -127,24 +127,29 @@ public class Player extends MetaObject implements GameObserver {
     }
 
     void removeObject(final GameObject gameObject) {
-        objects.remove( gameObject.getObjectID() );
+        GameObject lostObject = objects.remove( gameObject.getObjectID() );
+        Preconditions.checkState( lostObject == null || lostObject == gameObject );
 
-        getController().getGameController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return ObjectUtils.isEqual( input, Player.this );
-            }
-        } ).onPlayerLostObject( this, gameObject );
+        if (lostObject != null)
+            getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
+                @Override
+                public boolean apply(@Nonnull final Player input) {
+                    return ObjectUtils.isEqual( input, Player.this );
+                }
+            } ).onPlayerLostObject( this, gameObject );
     }
 
     void addObject(final GameObject gameObject) {
-        objects.put( gameObject.getObjectID(), gameObject );
+        GameObject previousObject = objects.put( gameObject.getObjectID(), gameObject );
+        Preconditions.checkState( previousObject == null || previousObject == gameObject );
 
-        getController().getGameController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return ObjectUtils.isEqual( input, Player.this );
-            }
-        } ).onPlayerGainedObject( this, gameObject );
+        //noinspection VariableNotUsedInsideIf
+        if (previousObject == null)
+            getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
+                @Override
+                public boolean apply(@Nonnull final Player input) {
+                    return ObjectUtils.isEqual( input, Player.this );
+                }
+            } ).onPlayerGainedObject( this, gameObject );
     }
 }

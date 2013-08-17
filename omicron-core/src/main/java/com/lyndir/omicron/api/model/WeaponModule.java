@@ -1,13 +1,14 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.IncompatibleStateException.*;
+import static com.lyndir.omicron.api.model.Security.*;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
 import java.util.Random;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 
 public class WeaponModule extends Module {
@@ -69,17 +70,13 @@ public class WeaponModule extends Module {
     }
 
     @Authenticated
-    public boolean fireAt(final Tile target) {
-        if (!getGameObject().isOwnedByCurrentPlayer())
-            return false;
-        if (!Security.getCurrentPlayer().canObserve( target ))
-            return false;
-        if (getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) > range)
-            return false;
-        if (repeated >= repeat)
-            return false;
-        if (ammunition <= 0)
-            return false;
+    public boolean fireAt(final Tile target)
+            throws IncompatibleStateException {
+        assertOwned( getGameObject() );
+        assertObservable( target );
+        assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, OutOfRangeException.class );
+        assertState( repeated < repeat, OutOfRepeatsException.class );
+        assertState( ammunition > 0, OutOfAmmunitionException.class );
 
         ChangeInt.From repeatedChange = ChangeInt.from( repeated );
         ChangeInt.From ammunitionChange = ChangeInt.from( ammunition );
@@ -87,12 +84,8 @@ public class WeaponModule extends Module {
         ++repeated;
         --ammunition;
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
+        getGameController().fireIfObservable( getGameObject().getLocation() )
+                .onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
 
         Optional<GameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())
@@ -192,6 +185,30 @@ public class WeaponModule extends Module {
                     }
                 }
             }
+        }
+    }
+
+
+    public static class OutOfRangeException extends IncompatibleStateException {
+
+        private OutOfRangeException() {
+            super( "The target is out of range for this weapon." );
+        }
+    }
+
+
+    public static class OutOfRepeatsException extends IncompatibleStateException {
+
+        private OutOfRepeatsException() {
+            super( "The weapon cannot repeat anymore." );
+        }
+    }
+
+
+    public static class OutOfAmmunitionException extends IncompatibleStateException {
+
+        private OutOfAmmunitionException() {
+            super( "The weapon is out of ammunition." );
         }
     }
 }

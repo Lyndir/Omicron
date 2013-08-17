@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.Change;
+import com.lyndir.omicron.api.util.Maybool;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,8 +51,9 @@ public class GameObject extends MetaObject implements GameObserver {
         controller = new GameObjectController<>( this );
 
         // Register ourselves into the game.
-        getController().setOwner( getOwner().orNull() );
-        getController().setLocation( getLocation() );
+        if (owner != null)
+            owner.addObject( this );
+        location.setContents( this );
     }
 
     @Nonnull
@@ -67,7 +69,7 @@ public class GameObject extends MetaObject implements GameObserver {
 
     @Authenticated
     public boolean isOwnedByCurrentPlayer() {
-        return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.getCurrentPlayer() );
+        return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.currentPlayer() );
     }
 
     void setOwner(@Nullable final Player owner) {
@@ -75,19 +77,14 @@ public class GameObject extends MetaObject implements GameObserver {
 
         this.owner = owner;
 
-        getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                // TODO: Should we check "couldObserve" to inform the player losing the object in case he can now no longer see the tile?
-                return input.canObserve( getLocation() );
-            }
-        } ).onUnitCaptured( this, ownerChange.to( this.owner ) );
+        getGame().getController().fireIfObservable( getLocation() ) //
+                .onUnitCaptured( this, ownerChange.to( this.owner ) );
     }
 
     @Authenticated
     @Override
     @SuppressWarnings("ParameterHidesMemberVariable")
-    public boolean canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final Tile location) {
         return getController().canObserve( location );
     }
 
@@ -114,13 +111,8 @@ public class GameObject extends MetaObject implements GameObserver {
         final Change.From<Tile> locationChange = Change.from( this.location );
         this.location = location;
 
-        getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                Tile from = locationChange.getFrom();
-                return input.canObserve( getLocation() ) || (from != null && input.canObserve( from ));
-            }
-        } ).onUnitMoved( this, locationChange.to( this.location ) );
+        getGame().getController().fireIfObservable( location ) //
+                .onUnitMoved( this, locationChange.to( this.location ) );
     }
 
     public UnitType getType() {

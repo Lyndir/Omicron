@@ -1,9 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Preconditions;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.ChangeInt;
-import javax.annotation.Nonnull;
 
 
 public class ContainerModule extends Module {
@@ -58,12 +56,8 @@ public class ContainerModule extends Module {
         int stocked = newStock - stock;
         stock = newStock;
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onContainerStockChanged( this, stockChange.to( stock ) );
+        getGameObject().getGame().getController().fireIfObservable( getGameObject().getLocation() ) //
+                .onContainerStockChanged( this, stockChange.to( stock ) );
 
         return stocked;
     }
@@ -84,12 +78,8 @@ public class ContainerModule extends Module {
         int depleted = stock - newStock;
         stock = newStock;
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onContainerStockChanged( this, stockChange.to( stock ) );
+        getGameObject().getGame().getController().fireIfObservable( getGameObject().getLocation() ) //
+                .onContainerStockChanged( this, stockChange.to( stock ) );
 
         return depleted;
     }

@@ -249,14 +249,7 @@ public class MobilityModule extends Module {
             getGameObject().getController().setLocation( target.get() );
             remainingSpeed -= cost;
 
-            getGameObject().getGame()
-                    .getController()
-                    .fireFor( new PredicateNN<Player>() {
-                        @Override
-                        public boolean apply(@Nonnull final Player input) {
-                            return input.canObserve( getGameObject().getLocation() );
-                        }
-                    } )
+            getGameController().fireIfObservable( getGameObject().getLocation() )
                     .onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
                                         remainingSpeedChange.to( remainingSpeed ) );
         }
@@ -333,14 +326,7 @@ public class MobilityModule extends Module {
             getGameObject().getController().setLocation( path.get().getTarget() );
             remainingSpeed -= path.get().getCost();
 
-            getGameObject().getGame()
-                    .getController()
-                    .fireFor( new PredicateNN<Player>() {
-                        @Override
-                        public boolean apply(@Nonnull final Player input) {
-                            return input.canObserve( getGameObject().getLocation() );
-                        }
-                    } )
+            getGameController().fireIfObservable( getGameObject().getLocation() )
                     .onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
                                       remainingSpeedChange.to( remainingSpeed ) );
         }

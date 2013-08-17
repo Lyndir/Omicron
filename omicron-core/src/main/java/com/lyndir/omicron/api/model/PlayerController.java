@@ -1,10 +1,13 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.Security.*;
+
 import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
+import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
 
@@ -42,13 +45,18 @@ public class PlayerController implements GameObserver {
 
     @Override
     @Authenticated
-    public boolean canObserve(@Nonnull final Tile location) {
-        return FluentIterable.from( getPlayer().getObjects() ).anyMatch( new Predicate<GameObject>() {
+    public Maybool canObserve(@Nonnull final Tile location) {
+        return FluentIterable.from( getPlayer().getObjects() ).transform( new Function<GameObject, Maybool>() {
             @Override
-            public boolean apply(final GameObject input) {
+            public Maybool apply(final GameObject input) {
                 return input.canObserve( location );
             }
-        } );
+        } ).firstMatch( new Predicate<Maybool>() {
+            @Override
+            public boolean apply(final Maybool input) {
+                return input.isTrue();
+            }
+        } ).or( Maybool.NO );
     }
 
     @Nonnull
@@ -72,7 +80,7 @@ public class PlayerController implements GameObserver {
      */
     @Authenticated
     public ImmutableCollection<GameObject> listObjects() {
-        if (!ObjectUtils.isEqual( getPlayer(), Security.getCurrentPlayer() ))
+        if (!ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
             return ImmutableSet.of();
 
         return ImmutableSet.copyOf( getPlayer().getObjects() );
@@ -90,7 +98,7 @@ public class PlayerController implements GameObserver {
         return FluentIterable.from( getPlayer().getObjects() ).filter( new Predicate<GameObject>() {
             @Override
             public boolean apply(final GameObject input) {
-                return observer.canObserve( input.getLocation() );
+                return observer.canObserve( input.getLocation() ).isTrue();
             }
         } );
     }
@@ -99,13 +107,19 @@ public class PlayerController implements GameObserver {
     public Maybe<GameObject> getObject(final int objectId) {
         Optional<GameObject> object = getPlayer().getObject( objectId );
 
-        // If the object cannot be observed by the current player, treat it as absent.
-        if (!Security.getCurrentPlayer().canObserve( object.get().getLocation() ))
-            return Maybe.unknown();
-        if (!object.isPresent())
-            return Maybe.absent();
+        if (ObjectUtils.isEqual( currentPlayer(), getPlayer() ))
+            if (object.isPresent())
+                return Maybe.of( object.get() );
+            else
+                return Maybe.absent();
 
-        return Maybe.of( object.get() );
+        if (object.isPresent())
+            if (currentPlayer().canObserve( object.get().getLocation() ).isTrue())
+                return Maybe.of( object.get() );
+            else
+                return Maybe.unknown();
+
+        return Maybe.unknown();
     }
 
     int newObjectID() {

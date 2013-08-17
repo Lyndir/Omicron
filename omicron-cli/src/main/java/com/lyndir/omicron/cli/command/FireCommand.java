@@ -74,12 +74,12 @@ public class FireCommand extends Command {
         int dv = ConversionUtils.toIntegerNN( dvArgument );
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = localPlayer.getController().getObject( objectId );
-        if (!optionalObject.isPresent()) {
+        Maybe<GameObject> maybeObject = localPlayer.getController().getObject( objectId );
+        if (maybeObject.presence() != Maybe.Presence.PRESENT) {
             err( "No observable object with ID: %s", objectId );
             return;
         }
-        GameObject gameObject = optionalObject.get();
+        GameObject gameObject = maybeObject.get();
 
         String weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
         Optional<Integer> optionalWeaponIndex = ConversionUtils.toInteger( weaponIndexOrLevelArgument );

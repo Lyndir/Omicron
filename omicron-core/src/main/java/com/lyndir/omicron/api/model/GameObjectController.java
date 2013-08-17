@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -32,6 +33,10 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     void setOwner(@Nullable final Player owner) {
         Optional<Player> oldOwner = getOwner();
+        if (oldOwner.isPresent() && ObjectUtils.isEqual( oldOwner.get(), owner ))
+            // Object already owned by owner.
+            return;
+
         if (oldOwner.isPresent())
             oldOwner.get().getController().removeObject( getGameObject() );
 
@@ -44,6 +49,10 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     void setLocation(@Nonnull final Tile location) {
         final Tile oldLocation = getGameObject().getLocation();
+        if (oldLocation != null && ObjectUtils.isEqual( oldLocation, location ))
+            // Object already at location.
+            return;
+
         if (oldLocation != null)
             oldLocation.setContents( null );
 
@@ -56,7 +65,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     @Override
     @Authenticated
-    public boolean canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final Tile location) {
         return getGameObject().onModuleElse( ModuleType.BASE, 0, false ).canObserve( location );
     }
 
@@ -81,11 +90,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         getGameObject().getLocation().setContents( null );
         setOwner( null );
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onUnitDied( getGameObject() );
+        getGameObject().getGame().getController().fireIfObservable( getGameObject().getLocation() ) //
+                .onUnitDied( getGameObject() );
     }
 }

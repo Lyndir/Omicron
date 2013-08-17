@@ -4,8 +4,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
-import com.lyndir.omicron.api.model.MobilityModule;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -73,12 +73,12 @@ public class MoveCommand extends Command {
         }
 
         // Find the game object for the given ID.
-        Optional<GameObject> optionalObject = localPlayer.getController().getObject( objectId );
-        if (!optionalObject.isPresent()) {
+        Maybe<GameObject> maybeObject = localPlayer.getController().getObject( objectId );
+        if (maybeObject.presence() != Maybe.Presence.PRESENT) {
             err( "No observable object with ID: %s", objectId );
             return;
         }
-        GameObject gameObject = optionalObject.get();
+        GameObject gameObject = maybeObject.get();
 
         // Check to see if it's mobile by finding its mobility module.
         Optional<MobilityModule> optionalMobility = gameObject.getModule( ModuleType.MOBILITY, 0 );

@@ -4,9 +4,9 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
+import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
 
@@ -40,13 +40,16 @@ public class BaseModule extends Module implements GameObserver {
 
     @Override
     @Authenticated
-    public boolean canObserve(@Nonnull final Tile location) {
-        boolean canView = getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) <= viewRange;
-        if (!canView || getGameObject().isOwnedByCurrentPlayer())
-            return canView;
+    public Maybool canObserve(@Nonnull final Tile location) {
+        if (!getGameObject().isOwnedByCurrentPlayer())
+            if (Security.currentPlayer().canObserve( location ) == Maybool.NO)
+                return Maybool.UNKNOWN;
 
-        // Game object not owned by current player, check if player can see location.
-        return Security.isAuthenticated() && Security.getCurrentPlayer().canObserve( location );
+        // Game object is owned by current player, or current player can observe the location.
+        if (getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) > viewRange)
+            return Maybool.NO;
+
+        return Maybool.YES;
     }
 
     @Nonnull
@@ -56,7 +59,7 @@ public class BaseModule extends Module implements GameObserver {
         return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
             public boolean apply(final Tile input) {
-                return canObserve( input );
+                return canObserve( input ).isTrue();
             }
         } );
     }
@@ -108,12 +111,8 @@ public class BaseModule extends Module implements GameObserver {
         if (getRemainingHealth() <= 0)
             getGameObject().getController().die();
 
-        getGameObject().getGame().getController().fireFor( new PredicateNN<Player>() {
-            @Override
-            public boolean apply(@Nonnull final Player input) {
-                return input.canObserve( getGameObject().getLocation() );
-            }
-        } ).onBaseDamaged( this, damageChange.to( damage ) );
+        getGameController().fireIfObservable( getGameObject().getLocation() ) //
+                .onBaseDamaged( this, damageChange.to( damage ) );
     }
 
     @SuppressWarnings({ "ParameterHidesMemberVariable", "InnerClassFieldHidesOuterClassField" })

@@ -16,7 +16,10 @@
 
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.IncompatibleStateException.*;
+
 import com.google.common.base.Preconditions;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 
 
 /**
@@ -36,8 +39,42 @@ public final class Security {
         return currentPlayerTL.get() != null;
     }
 
-    static Player getCurrentPlayer() {
-        return Preconditions.checkNotNull( currentPlayerTL.get(),
-                                           "There is no current player.  Begin by authenticating using Security.authenticate()." );
+    static Player currentPlayer()
+            throws IncompatibleStateException {
+        return assertNotNull( currentPlayerTL.get(), NotAuthenticatedException.class );
+    }
+
+    public static void assertOwned(final GameObserver observer)
+            throws IncompatibleStateException {
+        assertState( observer.getOwner().isPresent() && ObjectUtils.equals( observer.getOwner().get(), currentPlayer() ), //
+                     NotOwnedException.class, observer );
+    }
+
+    public static void assertObservable(final Tile location) {
+        assertState( currentPlayer().canObserve( location ).isTrue(), //
+                     NotObservableException.class, location );
+    }
+
+    public static class NotAuthenticatedException extends IncompatibleStateException {
+
+        NotAuthenticatedException() {
+            super( "Not authenticated.  To perform this action, first authenticate using Security#authenticate." );
+        }
+    }
+
+
+    public static class NotOwnedException extends IncompatibleStateException {
+
+        NotOwnedException(final GameObserver observer) {
+            super( "Not owned by current player: %s", observer );
+        }
+    }
+
+
+    public static class NotObservableException extends IncompatibleStateException {
+
+        NotObservableException(final Tile location) {
+            super( "Not observable by current player: %s", location );
+        }
     }
 }
