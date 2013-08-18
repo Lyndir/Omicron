@@ -61,7 +61,6 @@ public class MapView extends View {
         this.levelType = levelType;
     }
 
-
     @Override
     protected void onReady() {
         super.onReady();
@@ -126,10 +125,10 @@ public class MapView extends View {
                 screen.putString( x + (y % 2 == 0? 0: 1), y,
                                   contents.presence() == Maybe.Presence.PRESENT? contents.get().getType().getTypeName().substring( 0, 1 )
                                           : " ", getMapColor(), bgColor, ScreenCharacterStyle.Bold );
-        // Draw off-screen warning labels.
-    }
+                // Draw off-screen warning labels.
+            }
 
-    Inset offScreen = new Inset( Math.max( 0, getOffset().getY() ),
+        Inset offScreen = new Inset( Math.max( 0, getOffset().getY() ),
                                      Math.max( 0, levelSize.getWidth() - contentSize.getWidth() - getOffset().getX() + 1 ),
                                      Math.max( 0, levelSize.getHeight() - contentSize.getHeight() - getOffset().getY() - 1 ),
                                      Math.max( 0, getOffset().getX() ) );
@@ -190,7 +189,7 @@ public class MapView extends View {
             @Override
             public boolean apply(@Nonnull final GameObject input) {
                 // Only game objects in this map's displayed level.
-                return input.getLocation().getLevel().getType() == getLevelType();
+                return input.checkLocation().get().getLevel().getType() == getLevelType();
             }
         } ).transform( new NNFunctionNN<GameObject, Coordinate>() {
             @Nonnull
@@ -199,8 +198,8 @@ public class MapView extends View {
                 // Transform game objects into their offset from the center of the map.
                 hasUnits = true;
                 Box contentBox = getContentBoxOnScreen();
-                return positionToMapCoordinate( input.getLocation().getPosition() ).translate( -contentBox.getSize().getWidth() / 2,
-                                                                                               -contentBox.getSize().getHeight() / 2 );
+                return positionToMapCoordinate( input.checkLocation().get().getPosition() ) //
+                        .translate( -contentBox.getSize().getWidth() / 2, -contentBox.getSize().getHeight() / 2 );
             }
         } ).first().or( new Supplier<Coordinate>() {
             @Override

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,7 +67,10 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     @Override
     @Authenticated
     public Maybool canObserve(@Nonnull final Tile location) {
-        return getGameObject().onModuleElse( ModuleType.BASE, 0, false ).canObserve( location );
+        if (getGameObject().isOwnedByCurrentPlayer() && ObjectUtils.equals( location, getGameObject().getLocation() ))
+            return Maybool.YES;
+
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, Maybool.NO ).canObserve( location );
     }
 
     @Nonnull

@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import javax.annotation.Nullable;
 
@@ -24,14 +25,17 @@ public abstract class IncompatibleStateException extends RuntimeException {
             return object;
 
         try {
-            throw exceptionClass.getConstructor(
+            Constructor<? extends IncompatibleStateException> constructor = exceptionClass.getDeclaredConstructor(
                     FluentIterable.from( Lists.newArrayList( args ) ).transform( new Function<Object, Class<?>>() {
                         @Nullable
                         @Override
                         public Class<?> apply(final Object input) {
                             return input.getClass();
                         }
-                    } ).toList().toArray( new Class<?>[args.length] ) ).newInstance( args );
+                    } ).toList().toArray( new Class<?>[args.length] ) );
+            constructor.setAccessible( true );
+
+            throw constructor.newInstance( args );
         }
         catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new InternalInconsistencyException( "Fix the constructor of: " + exceptionClass, e );
@@ -45,17 +49,21 @@ public abstract class IncompatibleStateException extends RuntimeException {
             return;
 
         try {
-            throw exceptionClass.getConstructor(
+            Constructor<? extends IncompatibleStateException> constructor = exceptionClass.getDeclaredConstructor(
                     FluentIterable.from( Lists.newArrayList( args ) ).transform( new Function<Object, Class<?>>() {
                         @Nullable
                         @Override
                         public Class<?> apply(final Object input) {
                             return input.getClass();
                         }
-                    } ).toList().toArray( new Class<?>[args.length] ) ).newInstance( args );
+                    } ).toList().toArray( new Class<?>[args.length] ) );
+            constructor.setAccessible( true );
+
+            throw constructor.newInstance( args );
         }
         catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new InternalInconsistencyException( "Fix the constructor of: " + exceptionClass, e );
+
         }
     }
 }

@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
@@ -32,6 +33,10 @@ public interface GameObserver {
     @Authenticated
     Iterable<Tile> listObservableTiles();
 
+    /**
+     * @return The player that has control over this observer, if any.
+     */
     @Nonnull
+    // TODO: This should return a Maybe to avoid being able to detect ownership changes on objects that are not observable.
     Optional<Player> getOwner();
 }

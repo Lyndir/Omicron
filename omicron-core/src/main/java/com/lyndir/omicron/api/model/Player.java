@@ -77,11 +77,11 @@ public class Player extends MetaObject implements GameObserver {
         return playerID;
     }
 
-    public boolean hasKey(final PlayerKey playerKey) {
+    boolean hasKey(final PlayerKey playerKey) {
         return ObjectUtils.isEqual( key, playerKey );
     }
 
-    public boolean isKeyLess() {
+    boolean isKeyLess() {
         return key == null;
     }
 

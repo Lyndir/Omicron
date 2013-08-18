@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
+import com.lyndir.omicron.api.util.PathUtils;
 
 
 public abstract class Module extends MetaObject {
@@ -52,9 +53,50 @@ public abstract class Module extends MetaObject {
         return getGameObject().getGame().getController();
     }
 
+    void assertOwned() {
+        Security.assertOwned( getGameObject() );
+    }
+
+    void assertObservable() {
+        Security.assertObservable( getGameObject().getLocation() );
+    }
+
     protected abstract void onReset();
 
     protected abstract void onNewTurn();
 
     public abstract ModuleType<?> getType();
+
+
+    public static class ImpossibleException extends IncompatibleStateException {
+
+         ImpossibleException() {
+            super( "Action not possible." );
+        }
+    }
+
+
+    public static class InvalidatedException extends IncompatibleStateException {
+
+         InvalidatedException() {
+            super( "State change has invalidated this action." );
+        }
+    }
+
+
+    public static class PathInvalidatedException extends InvalidatedException {
+
+        private final PathUtils.Path<Tile> path;
+
+         PathInvalidatedException(final PathUtils.Path<Tile> path) {
+            this.path = path;
+        }
+
+        /**
+         * @return The path to the point where it has become invalidated (target is the invalid tile).
+         */
+        public PathUtils.Path<Tile> getPath() {
+            return path;
+        }
+    }
 }

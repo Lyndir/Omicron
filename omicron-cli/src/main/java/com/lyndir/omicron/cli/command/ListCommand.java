@@ -5,6 +5,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
@@ -67,10 +68,12 @@ public class ListCommand extends Command {
             gameObjectBuilder.addAll( player.getController().iterateObservableObjects( localPlayer ) );
 
         inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
-        for (final GameObject gameObject : gameObjectBuilder.build())
+        for (final GameObject gameObject : gameObjectBuilder.build()) {
+            Tile location = gameObject.checkLocation().get();
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
                  gameObject.getObjectID(), ifNotNullElse( Player.class, gameObject.getOwner().orNull(), "-" ).getName(),
-                 gameObject.getLocation().getLevel().getType().getName(), gameObject.getLocation().getPosition().getU(),
-                 gameObject.getLocation().getPosition().getV(), gameObject.getType().getTypeName() );
+                 location.getLevel().getType().getName(), location.getPosition().getU(), location.getPosition().getV(),
+                 gameObject.getType().getTypeName() );
+        }
     }
 }

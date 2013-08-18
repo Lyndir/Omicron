@@ -1,5 +1,7 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.Security.currentPlayer;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
@@ -42,7 +44,7 @@ public class BaseModule extends Module implements GameObserver {
     @Authenticated
     public Maybool canObserve(@Nonnull final Tile location) {
         if (!getGameObject().isOwnedByCurrentPlayer())
-            if (Security.currentPlayer().canObserve( location ) == Maybool.NO)
+            if (!currentPlayer().canObserve( location ).isTrue())
                 return Maybool.UNKNOWN;
 
         // Game object is owned by current player, or current player can observe the location.
@@ -71,22 +73,32 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     public int getMaxHealth() {
+        assertObservable();
+
         return maxHealth;
     }
 
     public int getRemainingHealth() {
+        assertObservable();
+
         return Math.max( 0, maxHealth - damage );
     }
 
     public int getArmor() {
+        assertObservable();
+
         return armor;
     }
 
     public int getViewRange() {
+        assertObservable();
+
         return viewRange;
     }
 
     public ImmutableSet<LevelType> getSupportedLayers() {
+        assertObservable();
+
         return supportedLayers;
     }
 

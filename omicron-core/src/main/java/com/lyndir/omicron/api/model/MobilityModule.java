@@ -1,10 +1,10 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.omicron.api.model.IncompatibleStateException.assertState;
 import static com.lyndir.omicron.api.util.PathUtils.*;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import java.util.EnumMap;
@@ -38,6 +38,8 @@ public class MobilityModule extends Module {
     }
 
     public double getRemainingSpeed() {
+        assertObservable();
+
         return remainingSpeed;
     }
 
@@ -49,6 +51,8 @@ public class MobilityModule extends Module {
      * @return The speed cost.
      */
     public double costForMovingInLevel(final LevelType levelType) {
+        assertObservable();
+
         return ifNotNullElse( movementCost.get( levelType ), Double.MAX_VALUE );
     }
 
@@ -60,6 +64,8 @@ public class MobilityModule extends Module {
      * @return The speed cost.
      */
     public double costForLevelingToLevel(final LevelType levelType) {
+        assertObservable();
+
         // Level up until we reach the target level.
         double cost = 0;
         LevelType currentLevel = getGameObject().getLocation().getLevel().getType();
@@ -117,9 +123,7 @@ public class MobilityModule extends Module {
      */
     @Authenticated
     public Leveling leveling(final LevelType levelType) {
-        if (!getGameObject().isOwnedByCurrentPlayer())
-            // Cannot level object that doesn't belong to the current player.
-            return new Leveling( 0 );
+        assertOwned();
 
         Tile currentLocation = getGameObject().getLocation();
         if (levelType == currentLocation.getLevel().getType())
@@ -141,9 +145,7 @@ public class MobilityModule extends Module {
      */
     @Authenticated
     public Movement movement(final Tile target) {
-        if (!getGameObject().isOwnedByCurrentPlayer())
-            // Cannot move object that doesn't belong to the current player.
-            return new Movement( 0 );
+        assertOwned();
 
         Leveling leveling = leveling( target.getLevel().getType() );
         if (!leveling.isPossible())
@@ -238,8 +240,10 @@ public class MobilityModule extends Module {
 
         @Authenticated
         public void execute() {
-            Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
-            Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
+            assertOwned();
+            assertState( isPossible(), ImpossibleException.class );
+            assertState( cost <= remainingSpeed, InvalidatedException.class );
+
             // TODO: No target.isAccessible check: Most units that level cannot see other levels before they go there.
             // TODO: Should we disallow leveling until you can see the level above you like we do with movement and the tile you move to?
             Change.From<Tile> locationChange = Change.from( getGameObject().getLocation() );
@@ -299,17 +303,18 @@ public class MobilityModule extends Module {
 
         @Authenticated
         public void execute() {
-            Preconditions.checkState( isPossible(), "Cannot execute: it is not possible." );
-            Preconditions.checkState( cost <= remainingSpeed, "Cannot execute: not enough remaining speed." );
+            assertOwned();
+            assertState( isPossible(), ImpossibleException.class );
+            assertState( cost <= remainingSpeed, InvalidatedException.class );
+
             Change.From<Tile> locationChange = Change.from( getGameObject().getLocation() );
             ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
             do {
-                Preconditions.checkState( tracePath.getTarget().checkAccessible() || //
-                                          ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ),
-                                          "Cannot execute: path no longer accessible." );
+                assertState( tracePath.getTarget().checkAccessible() || //
+                             ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ), PathInvalidatedException.class, tracePath );
 
                 Optional<Path<Tile>> parent = tracePath.getParent();
                 if (!parent.isPresent())

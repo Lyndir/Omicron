@@ -31,10 +31,14 @@ public class ExtractorModule extends Module {
     }
 
     public ResourceType getResourceType() {
+        assertObservable();
+
         return resourceType;
     }
 
     public int getSpeed() {
+        assertObservable();
+
         return speed;
     }
 

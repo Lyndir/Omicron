@@ -1,11 +1,14 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.Security.*;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.Change;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -103,8 +106,16 @@ public class GameObject extends MetaObject implements GameObserver {
         return game;
     }
 
-    public Tile getLocation() {
+    Tile getLocation() {
         return location;
+    }
+
+    @Authenticated
+    public Maybe<Tile> checkLocation() {
+        if (!currentPlayer().canObserve( getLocation() ).isTrue())
+            return Maybe.unknown();
+
+        return Maybe.fromNullable( getLocation() );
     }
 
     void setLocation(@Nonnull final Tile location) {
@@ -129,6 +140,8 @@ public class GameObject extends MetaObject implements GameObserver {
      * @return The module of the given type at the given index.
      */
     public <M extends Module> Optional<M> getModule(final ModuleType<M> moduleType, final int index) {
+        assertObservable( getLocation() );
+
         return Optional.fromNullable( Iterables.get( getModules( moduleType ), index, null ) );
     }
 
@@ -142,6 +155,8 @@ public class GameObject extends MetaObject implements GameObserver {
      */
     @SuppressWarnings("unchecked")
     public <M extends Module> List<M> getModules(final ModuleType<M> moduleType) {
+        assertObservable( getLocation() );
+
         // Checked by Module's constructor.
         return (List<M>) modules.get( moduleType );
     }
@@ -156,6 +171,8 @@ public class GameObject extends MetaObject implements GameObserver {
      * @return A proxy object that you can run your method on.
      */
     public <M extends Module> M onModuleElse(final ModuleType<M> moduleType, final int index, @Nullable final Object elseValue) {
+        assertObservable( getLocation() );
+
         return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orNull(), elseValue );
     }
 
@@ -169,10 +186,14 @@ public class GameObject extends MetaObject implements GameObserver {
      * @return A proxy object that you can run your method on.
      */
     public <M extends Module> M onModule(final ModuleType<M> moduleType, final int index) {
+        assertObservable( getLocation() );
+
         return onModuleElse( moduleType, index, null );
     }
 
     public ImmutableCollection<? extends Module> listModules() {
+        assertObservable( getLocation() );
+
         return ImmutableList.copyOf( modules.values() );
     }
 }

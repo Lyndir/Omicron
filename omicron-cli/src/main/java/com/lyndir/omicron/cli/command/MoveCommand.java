@@ -88,8 +88,15 @@ public class MoveCommand extends Command {
         }
         MobilityModule mobilityModule = optionalMobility.get();
 
-        Coordinate targetPosition = side.get().delta( mobilityModule.getGameObject().getLocation().getPosition() );
-        Optional<Tile> targetLocation = mobilityModule.getGameObject().getLocation().getLevel().getTile( targetPosition );
+        Maybe<Tile> maybeLocation = mobilityModule.getGameObject().checkLocation();
+        if (maybeLocation.presence() != Maybe.Presence.PRESENT) {
+            err( "Object's location is not known: %s", gameObject );
+            return;
+        }
+        Tile location = maybeLocation.get();
+
+        Coordinate targetPosition = side.get().delta( location.getPosition() );
+        Optional<Tile> targetLocation = location.getLevel().getTile( targetPosition );
         if (!targetLocation.isPresent()) {
             err( "No tile at that side for position: %s.", targetPosition );
             return;
@@ -97,6 +104,6 @@ public class MoveCommand extends Command {
 
         // Move the object.
         mobilityModule.movement( targetLocation.get() );
-        inf( "Object is now at: %s", gameObject.getLocation() );
+        inf( "Object is now at: %s", gameObject.checkLocation() );
     }
 }

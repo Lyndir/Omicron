@@ -46,34 +46,46 @@ public class WeaponModule extends Module {
     }
 
     public int getFirePower() {
+        assertObservable();
+
         return firePower;
     }
 
     public int getVariance() {
+        assertObservable();
+
         return variance;
     }
 
     public int getRange() {
+        assertObservable();
+
         return range;
     }
 
     public int getRepeat() {
+        assertObservable();
+
         return repeat;
     }
 
     public int getAmmunitionLoad() {
+        assertObservable();
+
         return ammunitionLoad;
     }
 
     public ImmutableSet<LevelType> getSupportedLayers() {
+        assertObservable();
+
         return ImmutableSet.copyOf( supportedLayers );
     }
 
     @Authenticated
     public boolean fireAt(final Tile target)
             throws IncompatibleStateException {
-        assertOwned( getGameObject() );
-        assertObservable( target );
+        assertOwned();
+        Security.assertObservable( target );
         assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, OutOfRangeException.class );
         assertState( repeated < repeat, OutOfRepeatsException.class );
         assertState( ammunition > 0, OutOfAmmunitionException.class );
@@ -191,7 +203,7 @@ public class WeaponModule extends Module {
 
     public static class OutOfRangeException extends IncompatibleStateException {
 
-        private OutOfRangeException() {
+         OutOfRangeException() {
             super( "The target is out of range for this weapon." );
         }
     }
@@ -199,7 +211,7 @@ public class WeaponModule extends Module {
 
     public static class OutOfRepeatsException extends IncompatibleStateException {
 
-        private OutOfRepeatsException() {
+         OutOfRepeatsException() {
             super( "The weapon cannot repeat anymore." );
         }
     }
@@ -207,7 +219,7 @@ public class WeaponModule extends Module {
 
     public static class OutOfAmmunitionException extends IncompatibleStateException {
 
-        private OutOfAmmunitionException() {
+         OutOfAmmunitionException() {
             super( "The weapon is out of ammunition." );
         }
     }

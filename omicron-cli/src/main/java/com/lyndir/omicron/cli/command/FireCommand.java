@@ -1,14 +1,12 @@
 package com.lyndir.omicron.cli.command;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
-import com.lyndir.omicron.api.model.GameController;
-import com.lyndir.omicron.api.model.WeaponModule;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
@@ -80,6 +78,7 @@ public class FireCommand extends Command {
             return;
         }
         GameObject gameObject = maybeObject.get();
+        Tile location = gameObject.checkLocation().get();
 
         String weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
         Optional<Integer> optionalWeaponIndex = ConversionUtils.toInteger( weaponIndexOrLevelArgument );
@@ -89,7 +88,7 @@ public class FireCommand extends Command {
             weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
         }
 
-        final String levelArgument = ifNotNullElse( weaponIndexOrLevelArgument, gameObject.getLocation().getLevel().getType().getName() );
+        final String levelArgument = ifNotNullElse( weaponIndexOrLevelArgument, location.getLevel().getType().getName() );
         Optional<Level> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<Level>() {
             @Override
             public boolean apply(final Level input) {
@@ -114,7 +113,7 @@ public class FireCommand extends Command {
         WeaponModule weaponModule = optionalWeapon.get();
 
         // Find the target tile.
-        Coordinate targetCoordinate = gameObject.getLocation().getPosition().delta( du, dv );
+        Coordinate targetCoordinate = location.getPosition().delta( du, dv );
         Optional<Tile> target = level.get().getTile( targetCoordinate );
         if (!(target.isPresent())) {
             err( "No tile in level: %s, at position: %s", level.get().getType().getName(), targetCoordinate );

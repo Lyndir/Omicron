@@ -16,19 +16,22 @@ public class MobilityModuleTest extends AbstractTest {
                                               .movementSpeed( 0 )
                                               .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
                                               .levelingCost( ImmutableMap.<LevelType, Double>of() );
-        createUnit( testUnitType( "Mover", module ) );
+        createUnit( testUnitType( "Ground Mover", module ) );
 
         assertEquals( module.costForMovingInLevel( LevelType.GROUND ), 1d );
         assertEquals( module.costForMovingInLevel( LevelType.SKY ), Double.MAX_VALUE );
         assertEquals( module.costForMovingInLevel( LevelType.SPACE ), Double.MAX_VALUE );
+        module.getGameObject().getController().die();
 
         ImmutableMap.Builder<LevelType, Double> builder = ImmutableMap.builder();
         for (final LevelType levelType : LevelType.values())
             builder.put( levelType, (double) levelType.ordinal() );
+
         module = MobilityModule.createWithStandardResourceCost()
                                .movementSpeed( 0 )
                                .movementCost( builder.build() )
                                .levelingCost( ImmutableMap.<LevelType, Double>of() );
+        createUnit( testUnitType( "Everywhere Mover", module ) );
 
         for (final LevelType levelType : LevelType.values())
             assertEquals( module.costForMovingInLevel( levelType ), (double) levelType.ordinal() );
@@ -96,7 +99,7 @@ public class MobilityModuleTest extends AbstractTest {
         try {
             leveling.execute();
             assertFalse( true );
-        } catch (IllegalStateException ignored) {
+        } catch (Module.ImpossibleException ignored) {
         }
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.SKY );
         assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
@@ -142,7 +145,7 @@ public class MobilityModuleTest extends AbstractTest {
         try {
             movement.execute();
             assertFalse( true );
-        } catch (IllegalStateException ignored) {
+        } catch (Module.ImpossibleException ignored) {
         }
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.SPACE );
         assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );

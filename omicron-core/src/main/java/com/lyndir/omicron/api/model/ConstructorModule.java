@@ -17,8 +17,10 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.omicron.api.model.IncompatibleStateException.*;
 
-import com.google.common.base.*;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
@@ -148,31 +150,40 @@ public class ConstructorModule extends Module {
     }
 
     public ModuleType<?> getBuildsModule() {
+        assertObservable();
+
         return buildsModule;
     }
 
     public int getBuildSpeed() {
+        assertObservable();
+
         return buildSpeed;
     }
 
     public boolean isResourceConstrained() {
+        assertObservable();
+
         return resourceConstrained;
     }
 
     public int getRemainingSpeed() {
+        assertObservable();
+
         return remainingSpeed;
     }
 
-    GameObject getTarget() {
+    public GameObject getTarget() {
+        assertObservable();
+
         return target;
     }
 
     @Authenticated
     public void setTarget(final GameObject target) {
-        Preconditions.checkArgument( getGameObject().isOwnedByCurrentPlayer(),
-                                     "Cannot control the target of a module that is not owned by the current player." );
-        Preconditions.checkArgument( ObjectUtils.isEqual( getGameObject().getOwner().get(), target.getOwner().get() ),
-                                     "Can only target units of the same player." );
+        assertOwned();
+        Security.assertOwned( target );
+
         Change.From<GameObject> targetChange = Change.from( this.target );
 
         this.target = target;
@@ -200,13 +211,11 @@ public class ConstructorModule extends Module {
      */
     @Authenticated
     public ConstructionSite schedule(final UnitType unitType, final Tile location) {
-        Preconditions.checkArgument( getGameObject().isOwnedByCurrentPlayer(),
-                                     "Cannot schedule build: module is not owned by the current player." );
-        Preconditions.checkArgument( location.isAccessible(), "Cannot schedule build: location not accessible." );
-        Preconditions.checkArgument( location.getLevel().equals( getGameObject().getLocation().getLevel() ),
-                                     "Cannot schedule build: location not on the constructor's level." );
-        Preconditions.checkArgument( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1,
-                                     "Cannot schedule build: location not adjacent to constructor." );
+        assertOwned();
+        Security.assertObservable( location );
+        assertState( location.isAccessible(), InaccessibleException.class );
+        assertState( location.getLevel().equals( getGameObject().getLocation().getLevel() ), IncompatibleLevelException.class );
+        assertState( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1, OutOfRangeException.class );
 
         ConstructionSite site = new ConstructionSite( unitType, getGameObject().getGame(), getGameObject().getOwner().get(), location );
         setTarget( site );
@@ -389,6 +398,30 @@ public class ConstructorModule extends Module {
             ConstructorModule buildsModule(final ModuleType<?> buildsModule) {
                 return new ConstructorModule( resourceCost, buildSpeed, buildsModule );
             }
+        }
+    }
+
+
+    public static class InaccessibleException extends IncompatibleStateException {
+
+        InaccessibleException() {
+            super( "Location is inaccessible." );
+        }
+    }
+
+
+    public static class IncompatibleLevelException extends IncompatibleStateException {
+
+        IncompatibleLevelException() {
+            super( "Target location's level is incompatible with the current state." );
+        }
+    }
+
+
+    public static class OutOfRangeException extends IncompatibleStateException {
+
+        OutOfRangeException() {
+            super( "Target location is out of range." );
         }
     }
 }

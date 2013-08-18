@@ -25,18 +25,26 @@ public class ContainerModule extends Module {
     }
 
     public ResourceType getResourceType() {
+        assertObservable();
+
         return resourceType;
     }
 
     public int getCapacity() {
+        assertObservable();
+
         return capacity;
     }
 
     public int getStock() {
+        assertObservable();
+
         return stock;
     }
 
     public int getAvailable() {
+        assertObservable();
+
         return capacity - stock;
     }
 
