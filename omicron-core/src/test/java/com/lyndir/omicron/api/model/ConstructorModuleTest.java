@@ -235,7 +235,7 @@ public class ConstructorModuleTest extends AbstractTest {
         initMobilityConstructorModule = ConstructorModule.createWithStandardResourceCost()
                                                          .buildSpeed( 2 )
                                                          .buildsModule( ModuleType.MOBILITY );
-        GameObject mobilityConstructorUnit = createUnit( testUnitType( "Mobility Constructor", initMobilityConstructorModule ), 5, 6 );
+        IGameObject mobilityConstructorUnit = createUnit( testUnitType( "Mobility Constructor", initMobilityConstructorModule ), 5, 6 );
         mobilityConstructorModule = mobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         staticGame.getController().setReady();
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );

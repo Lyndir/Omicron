@@ -17,7 +17,8 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-import static com.lyndir.omicron.api.model.IncompatibleStateException.*;
+import static com.lyndir.omicron.api.model.CoreUtils.*;
+import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
@@ -31,7 +32,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class ConstructorModule extends Module {
+public class ConstructorModule extends Module implements IConstructorModule {
 
     private final int           buildSpeed;
     private final ModuleType<?> buildsModule;
@@ -149,55 +150,49 @@ public class ConstructorModule extends Module {
                 .onConstructorWorked( this, remainingSpeedChange.to( remainingSpeed ) );
     }
 
+    @Override
     public ModuleType<?> getBuildsModule() {
-        assertObservable();
-
         return buildsModule;
     }
 
+    @Override
     public int getBuildSpeed() {
-        assertObservable();
-
         return buildSpeed;
     }
 
+    @Override
     public boolean isResourceConstrained() {
-        assertObservable();
-
         return resourceConstrained;
     }
 
+    @Override
     public int getRemainingSpeed() {
-        assertObservable();
-
         return remainingSpeed;
     }
 
-    public GameObject getTarget() {
-        assertObservable();
-
+    @Override
+    public IGameObject getTarget() {
         return target;
     }
 
+    @Override
     @Authenticated
-    public void setTarget(final GameObject target) {
-        assertOwned();
-        Security.assertOwned( target );
+    public void setTarget(final IGameObject target) {
+        Change.From<IGameObject> targetChange = Change.<IGameObject>from( this.target );
 
-        Change.From<GameObject> targetChange = Change.from( this.target );
-
-        this.target = target;
+        this.target = coreGO( target );
 
         getGameController().fireIfObservable( getGameObject().getLocation() ) //
                 .onConstructorTargeted( this, targetChange.to( this.target ) );
     }
 
     @Override
-    public ModuleType<?> getType() {
+    public ModuleType<ConstructorModule> getType() {
         return ModuleType.CONSTRUCTOR;
     }
 
-    ImmutableSet<? extends UnitType> blueprints() {
+    @Override
+    public ImmutableSet<? extends UnitType> blueprints() {
         return ImmutableSet.copyOf( UnitTypes.values() );
     }
 
@@ -209,15 +204,16 @@ public class ConstructorModule extends Module {
      *
      * @return The job that will be created for the construction of the new unit.
      */
+    @Override
     @Authenticated
-    public ConstructionSite schedule(final UnitType unitType, final Tile location) {
-        assertOwned();
-        Security.assertObservable( location );
-        assertState( location.isAccessible(), InaccessibleException.class );
+    public ConstructionSite schedule(final IUnitType unitType, final ITile location)
+            throws Security.NotAuthenticatedException, InaccessibleException, IncompatibleLevelException, OutOfRangeException {
+        assertState( location.checkAccessible(), InaccessibleException.class );
         assertState( location.getLevel().equals( getGameObject().getLocation().getLevel() ), IncompatibleLevelException.class );
         assertState( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1, OutOfRangeException.class );
 
-        ConstructionSite site = new ConstructionSite( unitType, getGameObject().getGame(), getGameObject().getOwner().get(), location );
+        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().getOwner().get(),
+                                                      coreT( location ) );
         setTarget( site );
 
         return site;
@@ -227,10 +223,10 @@ public class ConstructorModule extends Module {
      * A construction site is a unit that is under construction.  Its controller manages its construction progress and it turns into the
      * constructed unit upon completion.
      */
-    public static class ConstructionSite extends GameObject {
+    public static class ConstructionSite extends GameObject implements IConstructionSite {
 
         private final UnitType constructionUnitType;
-        private final Map<ModuleType<?>, Integer> remainingWork = Maps.newHashMap();
+        private final Map<PublicModuleType<?>, Integer> remainingWork = Maps.newHashMap();
         private final List<? extends Module> constructionModules;
 
         private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner,
@@ -245,10 +241,12 @@ public class ConstructorModule extends Module {
                                    ifNotNullElse( remainingWork.get( module.getType() ), 0 ) + constructionUnitType.getConstructionWork() );
         }
 
-        public int getRemainingWork(final ModuleType<?> moduleType) {
+        @Override
+        public int getRemainingWork(final PublicModuleType<?> moduleType) {
             return ifNotNullElse( remainingWork.get( moduleType ), 0 );
         }
 
+        @Override
         public ImmutableResourceCost getRemainingResourceCost() {
             MutableResourceCost remainingResourceCost = ResourceCost.mutable();
             for (final Module constructionModule : constructionModules)
@@ -258,7 +256,8 @@ public class ConstructorModule extends Module {
             return ResourceCost.immutable( remainingResourceCost );
         }
 
-        public Optional<ImmutableResourceCost> getResourceCostToPerformWork(final ModuleType<?> moduleType) {
+        @Override
+        public Optional<ImmutableResourceCost> getResourceCostToPerformWork(final PublicModuleType<?> moduleType) {
             for (final Module constructionModule : constructionModules)
                 if (constructionModule.getType().equals( moduleType ) && getRemainingWork( constructionModule.getType() ) > 0)
                     return Optional.of( constructionModule.getResourceCost() );
@@ -318,8 +317,8 @@ public class ConstructorModule extends Module {
                     NNFunctionNN<GameObject, Iterable<GameObject>> neighboursFunction = new NNFunctionNN<GameObject, Iterable<GameObject>>() {
                         @Nonnull
                         @Override
-                        public Iterable<GameObject> apply(
-                                @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") @Nonnull final GameObject neighbourInput) {
+                        public Iterable<GameObject> apply(@SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") @Nonnull
+                                                           final GameObject neighbourInput) {
                             return FluentIterable.from( neighbourInput.getLocation().neighbours() )
                                                  .transform( new NFunctionNN<Tile, GameObject>() {
                                                      @Nullable
@@ -327,10 +326,9 @@ public class ConstructorModule extends Module {
                                                      public GameObject apply(@Nonnull final Tile input) {
                                                          Optional<GameObject> contents = input.getContents();
                                                          if (contents.isPresent()) {
-                                                             for (final ConstructorModule module : contents.get()
-                                                                                                           .getModules(
-                                                                                                                   ModuleType.CONSTRUCTOR )) {
-                                                                 if (ObjectUtils.isEqual( module.getTarget(), neighbourInput )) {
+                                                             for (final ConstructorModule module : contents.get().getModules(
+                                                                     ModuleType.CONSTRUCTOR )) {
+                                                                 if (ObjectUtils.isEqual( neighbourInput, module.getTarget() )) {
                                                                      return contents.get();
                                                                  }
                                                              }
@@ -346,8 +344,8 @@ public class ConstructorModule extends Module {
                     // Find paths to constructor and use them to work on the job.
                     while (true) {
                         Optional<PathUtils.Path<GameObject>> path = PathUtils.find( getGameObject(), foundFunction, costFunction,
-                                                                                    Constants.MAX_DISTANCE_TO_CONSTRUCTOR,
-                                                                                    neighboursFunction );
+                                                                                     Constants.MAX_DISTANCE_TO_CONSTRUCTOR,
+                                                                                     neighboursFunction );
                         if (!path.isPresent())
                             // No more constructors with remaining speed or construction finished.
                             break;
@@ -398,30 +396,6 @@ public class ConstructorModule extends Module {
             ConstructorModule buildsModule(final ModuleType<?> buildsModule) {
                 return new ConstructorModule( resourceCost, buildSpeed, buildsModule );
             }
-        }
-    }
-
-
-    public static class InaccessibleException extends IncompatibleStateException {
-
-        InaccessibleException() {
-            super( "Location is inaccessible." );
-        }
-    }
-
-
-    public static class IncompatibleLevelException extends IncompatibleStateException {
-
-        IncompatibleLevelException() {
-            super( "Target location's level is incompatible with the current state." );
-        }
-    }
-
-
-    public static class OutOfRangeException extends IncompatibleStateException {
-
-        OutOfRangeException() {
-            super( "Target location is out of range." );
         }
     }
 }

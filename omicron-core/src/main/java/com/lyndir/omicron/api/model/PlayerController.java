@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.CoreUtils.*;
 import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.*;
@@ -11,7 +12,7 @@ import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
 
-public class PlayerController implements GameObserver {
+public class PlayerController implements IPlayerController {
 
     private final Player         player;
     private       GameController gameController;
@@ -20,6 +21,7 @@ public class PlayerController implements GameObserver {
         this.player = player;
     }
 
+    @Override
     public Player getPlayer() {
         return player;
     }
@@ -39,16 +41,17 @@ public class PlayerController implements GameObserver {
             gameController.setReady( getPlayer() );
     }
 
+    @Override
     public GameController getGameController() {
         return Preconditions.checkNotNull( gameController, "This player has not yet been added to a game!" );
     }
 
     @Override
     @Authenticated
-    public Maybool canObserve(@Nonnull final Tile location) {
-        return FluentIterable.from( getPlayer().getObjects() ).transform( new Function<GameObject, Maybool>() {
+    public Maybool canObserve(@Nonnull final ITile location) {
+        return FluentIterable.from( getPlayer().getObjects() ).transform( new Function<IGameObject, Maybool>() {
             @Override
-            public Maybool apply(final GameObject input) {
+            public Maybool apply(final IGameObject input) {
                 return input.canObserve( location );
             }
         } ).firstMatch( new Predicate<Maybool>() {
@@ -62,10 +65,11 @@ public class PlayerController implements GameObserver {
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<Tile> listObservableTiles() {
+    public Iterable<Tile> listObservableTiles()
+            throws NotAuthenticatedException {
         return FluentIterable.from( getPlayer().getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
             @Override
-            public Iterable<? extends Tile> apply(final GameObject input) {
+            public Iterable<Tile> apply(final GameObject input) {
                 return input.listObservableTiles();
             }
         } );
@@ -78,8 +82,10 @@ public class PlayerController implements GameObserver {
      *
      * @return A list of game objects owned by this controller's player.
      */
+    @Override
     @Authenticated
-    public ImmutableCollection<GameObject> listObjects() {
+    public ImmutableCollection<GameObject> listObjects()
+            throws NotAuthenticatedException {
         if (!ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
             return ImmutableSet.of();
 
@@ -93,6 +99,7 @@ public class PlayerController implements GameObserver {
      *
      * @return An iterable of game objects owned by this controller's player.
      */
+    @Override
     @Authenticated
     public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {
         return FluentIterable.from( getPlayer().getObjects() ).filter( new Predicate<GameObject>() {
@@ -103,11 +110,13 @@ public class PlayerController implements GameObserver {
         } );
     }
 
+    @Override
     @Authenticated
-    public Maybe<GameObject> getObject(final int objectId) {
+    public Maybe<GameObject> getObject(final int objectId)
+            throws NotAuthenticatedException {
         Optional<GameObject> object = getPlayer().getObject( objectId );
 
-        if (ObjectUtils.isEqual( currentPlayer(), getPlayer() ))
+        if (ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
             if (object.isPresent())
                 return Maybe.of( object.get() );
             else
@@ -126,7 +135,7 @@ public class PlayerController implements GameObserver {
         return getPlayer().nextObjectID();
     }
 
-    void removeObject(final GameObject gameObject) {
+    void removeObject(final IGameObject gameObject) {
         getPlayer().removeObject( gameObject );
     }
 

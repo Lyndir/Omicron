@@ -96,7 +96,7 @@ public class Coordinate extends MetaObject {
         return wrapSize;
     }
 
-    private int getDU(final Coordinate other) {
+    public int getDU(final Coordinate other) {
         int du = other.getU() - u;
 
         // Take wrapping into account.
@@ -109,7 +109,7 @@ public class Coordinate extends MetaObject {
         return du;
     }
 
-    private int getDV(final Coordinate other) {
+    public int getDV(final Coordinate other) {
         int dv = other.getV() - v;
 
         // Take wrapping into account.

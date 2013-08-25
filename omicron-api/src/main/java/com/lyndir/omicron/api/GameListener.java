@@ -31,7 +31,7 @@ public abstract class GameListener {
      *
      * @param readyPlayer The player who's just ended his turn.
      */
-    public void onPlayerReady(final Player readyPlayer) {
+    public void onPlayerReady(final IPlayer readyPlayer) {
     }
 
     /**
@@ -48,7 +48,7 @@ public abstract class GameListener {
      * @param baseModule The module that received the damage.
      * @param damage     The total amount of damage the module had and has incurred.
      */
-    public void onBaseDamaged(final BaseModule baseModule, final ChangeInt damage) {
+    public void onBaseDamaged(final IBaseModule baseModule, final ChangeInt damage) {
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class GameListener {
      * @param tile     The tile whose contents has changed.
      * @param contents The contents of the tile before and after the change.
      */
-    public void onTileContents(final Tile tile, final Change<GameObject> contents) {
+    public void onTileContents(final ITile tile, final Change<IGameObject> contents) {
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class GameListener {
      * @param resourceType     The type of resource on the tile that was affected.
      * @param resourceQuantity The total amount of resource of the given type available at the tile before and after the change.
      */
-    public void onTileResources(final Tile tile, final ResourceType resourceType, final ChangeInt resourceQuantity) {
+    public void onTileResources(final ITile tile, final ResourceType resourceType, final ChangeInt resourceQuantity) {
     }
 
     /**
@@ -76,7 +76,7 @@ public abstract class GameListener {
      * @param player The player whose score was affected.
      * @param score  The total score the player had and has.
      */
-    public void onPlayerScore(final Player player, final ChangeInt score) {
+    public void onPlayerScore(final IPlayer player, final ChangeInt score) {
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class GameListener {
      * @param player     The player who gained control of the object.
      * @param gameObject The object that has come under the control of the player.
      */
-    public void onPlayerGainedObject(final Player player, final GameObject gameObject) {
+    public void onPlayerGainedObject(final IPlayer player, final IGameObject gameObject) {
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract class GameListener {
      * @param player     The player who lost control of the object.
      * @param gameObject The object that is no longer under the control of the player.
      */
-    public void onPlayerLostObject(final Player player, final GameObject gameObject) {
+    public void onPlayerLostObject(final IPlayer player, final IGameObject gameObject) {
     }
 
     /**
@@ -109,7 +109,7 @@ public abstract class GameListener {
      * @param gameObject The object whose owner changed.
      * @param owner      The previous and new owner of the object.
      */
-    public void onUnitCaptured(final GameObject gameObject, final Change<Player> owner) {
+    public void onUnitCaptured(final IGameObject gameObject, final Change<IPlayer> owner) {
     }
 
     /**
@@ -118,7 +118,7 @@ public abstract class GameListener {
      * @param gameObject The object whose location changed.
      * @param location   The previous and new location of the object.
      */
-    public void onUnitMoved(final GameObject gameObject, final Change<Tile> location) {
+    public void onUnitMoved(final IGameObject gameObject, final Change<ITile> location) {
     }
 
     /**
@@ -128,7 +128,7 @@ public abstract class GameListener {
      *
      * @param gameObject The object that has been destroyed.
      */
-    public void onUnitDied(final GameObject gameObject) {
+    public void onUnitDied(final IGameObject gameObject) {
     }
 
     /**
@@ -137,7 +137,7 @@ public abstract class GameListener {
      * @param containerModule The module that incurred the stock change.
      * @param stock           The total amount of resources stocked in this container before and after the change.
      */
-    public void onContainerStockChanged(final ContainerModule containerModule, final ChangeInt stock) {
+    public void onContainerStockChanged(final IContainerModule containerModule, final ChangeInt stock) {
     }
 
     /**
@@ -147,7 +147,7 @@ public abstract class GameListener {
      * @param location       The location of the module's unit before and after the change.
      * @param remainingSpeed The total remaining speed of the module before and after the change.
      */
-    public void onMobilityLeveled(final MobilityModule mobilityModule, final Change<Tile> location, final ChangeDbl remainingSpeed) {
+    public void onMobilityLeveled(final IMobilityModule mobilityModule, final Change<ITile> location, final ChangeDbl remainingSpeed) {
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class GameListener {
      * @param location       The location of the module's unit before and after the change.
      * @param remainingSpeed The total remaining speed of the module before and after the change.
      */
-    public void onMobilityMoved(final MobilityModule mobilityModule, final Change<Tile> location, final ChangeDbl remainingSpeed) {
+    public void onMobilityMoved(final IMobilityModule mobilityModule, final Change<ITile> location, final ChangeDbl remainingSpeed) {
     }
 
     /**
@@ -166,7 +166,7 @@ public abstract class GameListener {
      * @param constructorModule The module that performed the work.
      * @param remainingSpeed    The total remaining speed of the module before and after the change.
      */
-    public void onConstructorWorked(final ConstructorModule constructorModule, final ChangeInt remainingSpeed) {
+    public void onConstructorWorked(final IConstructorModule constructorModule, final ChangeInt remainingSpeed) {
     }
 
     /**
@@ -175,7 +175,7 @@ public abstract class GameListener {
      * @param constructorModule The module that performed the work.
      * @param target            The target of the constructor before and after the change.
      */
-    public void onConstructorTargeted(final ConstructorModule constructorModule, final Change<GameObject> target) {
+    public void onConstructorTargeted(final IConstructorModule constructorModule, final Change<IGameObject> target) {
     }
 
     /**
@@ -186,7 +186,7 @@ public abstract class GameListener {
      * @param remainingWork    The total amount of remaining work to complete the construction of the given module type at the site before
      *                         and after the change.
      */
-    public void onConstructionSiteWorked(final ConstructorModule.ConstructionSite constructionSite, final ModuleType<?> moduleType,
+    public void onConstructionSiteWorked(final IConstructorModule.IConstructionSite constructionSite, final PublicModuleType<?> moduleType,
                                          final ChangeInt remainingWork) {
     }
 
@@ -198,7 +198,7 @@ public abstract class GameListener {
      * @param repeated     The total amount of repeats that this weapon has performed before and after the action.
      * @param ammunition   The total amount of ammunition that is remaining for this weapon before and after the action.
      */
-    public void onWeaponFired(final WeaponModule weaponModule, final Tile target, final ChangeInt repeated, final ChangeInt ammunition) {
+    public void onWeaponFired(final IWeaponModule weaponModule, final ITile target, final ChangeInt repeated, final ChangeInt ammunition) {
     }
 
     /**
@@ -206,7 +206,7 @@ public abstract class GameListener {
      *
      * @param game The game whose first turn has begun.
      */
-    public void onGameStarted(final Game game) {
+    public void onGameStarted(final IGame game) {
     }
 
     /**
@@ -216,6 +216,6 @@ public abstract class GameListener {
      * @param victoryCondition The victory condition that caused the game to end.
      * @param victor           The player that was declared the victor of the game by the condition.
      */
-    public void onGameEnded(final Game game, final VictoryConditionType victoryCondition, @Nullable final Player victor) {
+    public void onGameEnded(final IGame game, final PublicVictoryConditionType victoryCondition, @Nullable final IPlayer victor) {
     }
 }

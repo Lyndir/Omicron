@@ -1,6 +1,6 @@
 package com.lyndir.omicron.cli;
 
-import com.lyndir.omicron.api.model.Game;
+import com.lyndir.omicron.api.model.IGame;
 import javax.annotation.Nullable;
 
 
@@ -12,15 +12,15 @@ import javax.annotation.Nullable;
 public class Builders {
 
     @Nullable
-    private Game.Builder gameBuilder;
+    private IGame.IBuilder gameBuilder;
 
     @Nullable
-    public Game.Builder getGameBuilder() {
+    public IGame.IBuilder getGameBuilder() {
 
         return gameBuilder;
     }
 
-    public void setGameBuilder(@Nullable final Game.Builder gameBuilder) {
+    public void setGameBuilder(@Nullable final IGame.IBuilder gameBuilder) {
 
         this.gameBuilder = gameBuilder;
     }

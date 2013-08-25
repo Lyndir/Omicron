@@ -1,5 +1,7 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.CoreUtils.*;
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
@@ -17,9 +19,9 @@ import javax.annotation.Nonnull;
  * @author lhunath
  */
 @SuppressWarnings("ParameterHidesMemberVariable") // IDEA doesn't understand setters that return this.
-public class Game extends MetaObject {
+public class Game extends MetaObject implements IGame {
 
-    static final Logger logger = Logger.get( Game.class );
+    static final Logger logger = Logger.get( IGame.class );
 
     private static final Random RANDOM = new Random();
 
@@ -35,7 +37,9 @@ public class Game extends MetaObject {
     private boolean running;
 
     private Game(final Size levelSize, final List<Player> players, final List<VictoryConditionType> victoryConditions,
-                 final List<GameListener> gameListeners, final GameResourceConfig resourceConfig, final GameUnitConfig unitConfig) {
+                 final List<GameListener> gameListeners, final IGame.GameResourceConfig resourceConfig,
+                 final IGame.GameUnitConfig unitConfig)
+            throws Security.NotAuthenticatedException {
         this.levelSize = levelSize;
         levels = ImmutableList.of( new Level( levelSize, LevelType.GROUND, this ), new Level( levelSize, LevelType.SKY, this ),
                                    new Level( levelSize, LevelType.SPACE, this ) );
@@ -50,7 +54,12 @@ public class Game extends MetaObject {
 
         // Give each player some units.
         for (final Player player : players)
-            unitConfig.addUnits( this, player );
+            unitConfig.addUnits( this, player, new UnitAdder() {
+                @Override
+                public void add(final IUnitType unitType, final ITile location) {
+                    player.addObject( new GameObject( coreUT( unitType ), Game.this, player, coreT( location ) ) );
+                }
+            } );
 
         // Add resources to the tiles.
         // Figure out how many resources we're distributing for each of the resource types supported by our levels.
@@ -113,10 +122,12 @@ public class Game extends MetaObject {
         return new Builder();
     }
 
+    @Override
     public GameController getController() {
         return gameController;
     }
 
+    @Override
     public Level getLevel(final LevelType levelType) {
         return FluentIterable.from( levels ).firstMatch( new Predicate<Level>() {
             @Override
@@ -126,6 +137,7 @@ public class Game extends MetaObject {
         } ).get();
     }
 
+    @Override
     public Turn getCurrentTurn() {
         return currentTurn;
     }
@@ -134,10 +146,12 @@ public class Game extends MetaObject {
         this.currentTurn = currentTurn;
     }
 
+    @Override
     public ImmutableList<Level> listLevels() {
         return levels;
     }
 
+    @Override
     public ImmutableList<Player> getPlayers() {
         return players;
     }
@@ -150,169 +164,147 @@ public class Game extends MetaObject {
         this.running = running;
     }
 
+    @Override
     public boolean isRunning() {
         return running;
     }
 
+    @Override
     public Size getLevelSize() {
         return levelSize;
     }
 
-    public static class Builder {
+    public static class Builder implements IGame.IBuilder {
 
-        private final List<GameListener>         gameListeners     = Lists.newLinkedList();
-        private final List<Player>               players           = Lists.newArrayList();
-        private final List<VictoryConditionType> victoryConditions = Lists.newArrayList( VictoryConditionType.values() );
+        private final List<GameListener>               gameListeners     = Lists.newLinkedList();
+        private final List<IPlayer>                    players           = Lists.newArrayList();
+        private final List<PublicVictoryConditionType> victoryConditions = Lists.newArrayList( PublicVictoryConditionType.values() );
 
-        private Size               levelSize      = new Size( 200, 200 );
-        private int                nextPlayerID   = 1;
-        private int                totalPlayers   = 4;
-        private GameResourceConfig resourceConfig = GameResourceConfigs.PLENTY;
-        private GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
+        private Size                     levelSize      = new Size( 200, 200 );
+        private int                      nextPlayerID   = 1;
+        private int                      totalPlayers   = 4;
+        private IGame.GameResourceConfig resourceConfig = IGame.GameResourceConfigs.PLENTY;
+        private IGame.GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
 
         private Builder() {
         }
 
-        public Game build() {
+        @Override
+        public Game build()
+                throws Security.NotAuthenticatedException {
             // Add random players until totalPlayers count is satisfied.
             while (players.size() < totalPlayers)
                 addPlayer( new Player( nextPlayerID(), null, Player.randomName(), Color.Template.randomColor(),
                                        Color.Template.randomColor() ) );
 
-            return new Game( levelSize, players, victoryConditions, gameListeners, resourceConfig, unitConfig );
+            return new Game( levelSize, coreP( players ), coreVCT( victoryConditions ), gameListeners, resourceConfig, unitConfig );
         }
 
+        @Override
         public Size getLevelSize() {
             return levelSize;
         }
 
+        @Override
         public Builder setLevelSize(final Size levelSize) {
             this.levelSize = levelSize;
 
             return this;
         }
 
-        public List<Player> getPlayers() {
+        @Override
+        public List<IPlayer> getPlayers() {
             return players;
         }
 
-        public Builder addPlayer(final Player player) {
+        @Override
+        public Builder addPlayer(final IPlayer player) {
             players.add( player );
 
             return this;
         }
 
-        public List<VictoryConditionType> getVictoryConditions() {
+        @Override
+        public List<PublicVictoryConditionType> getVictoryConditions() {
             return victoryConditions;
         }
 
-        public Builder addVictoryCondition(final VictoryConditionType victoryCondition) {
+        @Override
+        public Builder addVictoryCondition(final PublicVictoryConditionType victoryCondition) {
             victoryConditions.add( victoryCondition );
 
             return this;
         }
 
+        @Override
         public Integer getTotalPlayers() {
             return totalPlayers;
         }
 
-        public void setTotalPlayers(final Integer totalPlayers) {
+        @Override
+        public Builder setTotalPlayers(final Integer totalPlayers) {
             this.totalPlayers = totalPlayers;
+
+            return this;
         }
 
-        public void addGameListener(final GameListener gameListener) {
+        @Override
+        public Builder addGameListener(final GameListener gameListener) {
             gameListeners.add( gameListener );
+
+            return this;
         }
 
-        public GameResourceConfig getResourceConfig() {
+        @Override
+        public IGame.GameResourceConfig getResourceConfig() {
             return resourceConfig;
         }
 
-        public void setResourceConfig(final GameResourceConfig resourceConfig) {
+        @Override
+        public Builder setResourceConfig(final IGame.GameResourceConfig resourceConfig) {
             this.resourceConfig = resourceConfig;
+
+            return this;
         }
 
-        public GameUnitConfig getUnitConfig() {
+        @Override
+        public IGame.GameUnitConfig getUnitConfig() {
             return unitConfig;
         }
 
-        public void setUnitConfig(final GameUnitConfig unitConfig) {
+        @Override
+        public Builder setUnitConfig(final IGame.GameUnitConfig unitConfig) {
             this.unitConfig = unitConfig;
+
+            return this;
         }
 
+        @Override
         public int nextPlayerID() {
             return nextPlayerID++;
         }
     }
 
 
-    public interface GameResourceConfig {
-
-        int quantity(ResourceType resourceType);
-
-        int quantityPerTile(ResourceType resourceType);
-
-        int puddleSize(ResourceType resourceType);
-    }
-
-
-    public interface GameUnitConfig {
-
-        void addUnits(Game game, Player player);
-    }
-
-
-    public enum GameResourceConfigs implements GameResourceConfig {
-        NONE( 0, 0, 0 ),
-        SCARCE( 1500, 20, 1 ),
-        PLENTY( 5000, 30, 2 ),
-        LOTS( 20000, 40, 5 ),
-        EXCESSIVE( 1000000, 100, 5 );
-
-        private final int quantity;
-        private final int quantityPerTile;
-        private final int puddleSize;
-
-        GameResourceConfigs(final int quantity, final int quantityPerTile, final int puddleSize) {
-            this.quantity = quantity;
-            this.quantityPerTile = quantityPerTile;
-            this.puddleSize = puddleSize;
-        }
-
-        @Override
-        public int quantity(final ResourceType resourceType) {
-            return quantity;
-        }
-
-        @Override
-        public int quantityPerTile(final ResourceType resourceType) {
-            return quantityPerTile;
-        }
-
-        @Override
-        public int puddleSize(final ResourceType resourceType) {
-            return puddleSize;
-        }
-    }
-
-
-    public enum GameUnitConfigs implements GameUnitConfig {
+    enum GameUnitConfigs implements IGame.GameUnitConfig {
         NONE {
             @Override
-            public void addUnits(final Game game, final Player player) {
+            public void addUnits(final IGame game, final IPlayer player, final IGame.UnitAdder unitAdder) {
             }
         },
         BASIC {
             @Override
-            public void addUnits(final Game game, final Player player) {
+            public void addUnits(final IGame game, final IPlayer player, final IGame.UnitAdder unitAdder) {
+                Game coreGame = coreG( game );
+
                 // Find tiles for the units.
                 Tile startTileEngineer, startTileAirship, startTileScout;
                 do {
-                    Level ground = game.getLevel( LevelType.GROUND );
+                    Level ground = coreGame.getLevel( LevelType.GROUND );
                     startTileEngineer = ground.getTile( RANDOM.nextInt( ground.getSize().getWidth() ),
                                                         RANDOM.nextInt( ground.getSize().getHeight() ) ).get();
 
-                    Level sky = game.getLevel( LevelType.SKY );
+                    Level sky = coreGame.getLevel( LevelType.SKY );
                     Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
                     startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
 
@@ -324,9 +316,9 @@ public class Game extends MetaObject {
                        startTileScout.getContents().isPresent());
 
                 // Add the units.
-                new GameObject( UnitTypes.ENGINEER, game, player, startTileEngineer );
-                new GameObject( UnitTypes.AIRSHIP, game, player, startTileAirship );
-                new GameObject( UnitTypes.SCOUT, game, player, startTileScout );
+                unitAdder.add( UnitTypes.ENGINEER, startTileEngineer );
+                unitAdder.add( UnitTypes.AIRSHIP, startTileAirship );
+                unitAdder.add( UnitTypes.SCOUT, startTileScout );
             }
         }
     }

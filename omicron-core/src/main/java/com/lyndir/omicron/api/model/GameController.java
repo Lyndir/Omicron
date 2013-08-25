@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Function;
+import static com.lyndir.omicron.api.model.CoreUtils.*;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
@@ -15,10 +16,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class GameController {
+public class GameController implements IGameController {
 
     private final Game game;
-    private final Map<GameListener, Player> gameListeners = new HashMap<>();
+    private final Map<GameListener, IPlayer> gameListeners = new HashMap<>();
 
     GameController(final Game game) {
         this.game = game;
@@ -27,6 +28,7 @@ public class GameController {
             player.getController().setGameController( this );
     }
 
+    @Override
     public Game getGame() {
         return game;
     }
@@ -35,8 +37,10 @@ public class GameController {
         gameListeners.put( gameListener, null );
     }
 
+    @Override
     @Authenticated
-    public void addGameListener(final GameListener gameListener) {
+    public void addGameListener(final GameListener gameListener)
+            throws Security.NotAuthenticatedException {
         gameListeners.put( gameListener, Security.currentPlayer() );
     }
 
@@ -47,25 +51,28 @@ public class GameController {
      *
      * @return Information visible to the current player about the given player.
      */
+    @Override
     @Authenticated
-    public PlayerGameInfo getPlayerGameInfo(final Player player) {
+    public PlayerGameInfo getPlayerGameInfo(final IPlayer player)
+            throws Security.NotAuthenticatedException {
         if (player.listObservableTiles().iterator().hasNext())
             return PlayerGameInfo.discovered( player, player.getScore() );
 
         return PlayerGameInfo.undiscovered( player );
     }
 
+    @Override
     @Authenticated
-    public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo() {
-        return ImmutableList.copyOf( Lists.transform( game.getPlayers(), new Function<Player, PlayerGameInfo>() {
-            @Override
-            public PlayerGameInfo apply(final Player input) {
+    public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo()
+            throws Security.NotAuthenticatedException {
+        ImmutableList.Builder<PlayerGameInfo> playerGameInfoBuilder = ImmutableList.builder();
+        for (final IPlayer player : game.getPlayers())
+            playerGameInfoBuilder.add( getPlayerGameInfo( player ) );
 
-                return getPlayerGameInfo( input );
-            }
-        } ) );
+        return playerGameInfoBuilder.build();
     }
 
+    @Override
     public Iterable<Player> listPlayers() {
         return game.getPlayers();
     }
@@ -75,9 +82,11 @@ public class GameController {
      *
      * @return true if this action has caused a new turn to begin.
      */
+    @Override
     @Authenticated
-    public boolean setReady() {
-        return setReady( Security.currentPlayer() );
+    public boolean setReady()
+            throws Security.NotAuthenticatedException {
+        return setReady( coreP( Security.currentPlayer() ) );
     }
 
     /**
@@ -87,7 +96,8 @@ public class GameController {
      *
      * @return true if this action has caused a new turn to begin.
      */
-    boolean setReady(final Player player) {
+    boolean setReady(final Player player)
+            throws Security.NotAuthenticatedException {
         if (!player.isKeyLess())
             Preconditions.checkState( ObjectUtils.isEqual( player, Security.currentPlayer() ),
                                       "Cannot set protected player ready: not authenticated.  First authenticate using Security.authenticate()." );
@@ -112,11 +122,11 @@ public class GameController {
         fire().onGameStarted( game );
     }
 
-    void end(final VictoryConditionType victoryCondition, @Nullable final Player victor) {
+    void end(final VictoryConditionType victoryCondition, @Nullable final IPlayer victor) {
         Preconditions.checkState( game.isRunning(), "The game cannot end: It isn't running yet." );
 
         game.setRunning( false );
-        fire().onGameEnded( game, victoryCondition, victor );
+        fire().onGameEnded( game, publicVCT( victoryCondition ), victor );
     }
 
     private void fireNewTurn() {
@@ -131,16 +141,18 @@ public class GameController {
         if (!game.isRunning())
             start();
 
-        for (final Player player : ImmutableList.copyOf( game.getPlayers() )) {
+        for (final Player player : game.getPlayers()) {
             player.getController().fireReset();
             player.getController().fireNewTurn();
         }
     }
 
+    @Override
     public ImmutableList<Level> listLevels() {
         return game.listLevels();
     }
 
+    @Override
     public ImmutableSet<Player> listReadyPlayers() {
         return ImmutableSet.copyOf( game.getReadyPlayers() );
     }
@@ -155,7 +167,7 @@ public class GameController {
             @SuppressWarnings("ProhibitedExceptionDeclared")
             public Object invoke(final Object proxy, final Method method, final Object[] args)
                     throws Throwable {
-                for (final Map.Entry<GameListener, Player> gameListenerEntry : gameListeners.entrySet())
+                for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet())
                     method.invoke( gameListenerEntry.getKey(), args );
 
                 return null;
@@ -169,15 +181,15 @@ public class GameController {
      *
      * @param playerCondition The predicate that should hold true for all players eligible to receive the notification.
      */
-    GameListener fireIfPlayer(@Nonnull final PredicateNN<Player> playerCondition) {
+    GameListener fireIfPlayer(@Nonnull final PredicateNN<IPlayer> playerCondition) {
         return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
             @Override
             @Nullable
             @SuppressWarnings("ProhibitedExceptionDeclared")
             public Object invoke(final Object proxy, final Method method, final Object[] args)
                     throws Throwable {
-                for (final Map.Entry<GameListener, Player> gameListenerEntry : gameListeners.entrySet()) {
-                    Player gameListenerOwner = gameListenerEntry.getValue();
+                for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
+                    IPlayer gameListenerOwner = gameListenerEntry.getValue();
                     if (gameListenerOwner == null || playerCondition.apply( gameListenerOwner ))
                         method.invoke( gameListenerEntry.getKey(), args );
                 }
@@ -194,9 +206,9 @@ public class GameController {
      * @param location The location that should be observable.
      */
     GameListener fireIfObservable(@Nonnull final Tile location) {
-        return fireIfPlayer( new PredicateNN<Player>() {
+        return fireIfPlayer( new PredicateNN<IPlayer>() {
             @Override
-            public boolean apply(@Nonnull final Player input) {
+            public boolean apply(@Nonnull final IPlayer input) {
                 return input.canObserve( location ).isTrue();
             }
         } );

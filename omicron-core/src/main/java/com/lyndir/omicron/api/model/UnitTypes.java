@@ -16,8 +16,8 @@
 
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.collection.SSupplier;
 
 
 /**
@@ -26,7 +26,7 @@ import com.google.common.collect.*;
 public enum UnitTypes implements UnitType {
 
     ENGINEER( "Engineer", 5, //
-              new Supplier<ImmutableList<? extends Module>>() {
+              new SSupplier<ImmutableList<? extends Module>>() {
                   @Override
                   public ImmutableList<? extends Module> get() {
                       return ImmutableList.of( BaseModule.createWithStandardResourceCost()
@@ -59,7 +59,7 @@ public enum UnitTypes implements UnitType {
                   }
               } ),
     QUARRY( "Quarry", 5, //
-            new Supplier<ImmutableList<? extends Module>>() {
+            new SSupplier<ImmutableList<? extends Module>>() {
                 @Override
                 public ImmutableList<? extends Module> get() {
                     return ImmutableList.of( BaseModule.createWithStandardResourceCost()
@@ -73,7 +73,7 @@ public enum UnitTypes implements UnitType {
                 }
             } ),
     DRILL( "Drill Site", 5, //
-           new Supplier<ImmutableList<? extends Module>>() {
+           new SSupplier<ImmutableList<? extends Module>>() {
                @Override
                public ImmutableList<? extends Module> get() {
                    return ImmutableList.of( BaseModule.createWithStandardResourceCost()
@@ -85,7 +85,7 @@ public enum UnitTypes implements UnitType {
                }
            } ),
     CONTAINER( "Container", 5, //
-               new Supplier<ImmutableList<? extends Module>>() {
+               new SSupplier<ImmutableList<? extends Module>>() {
                    @Override
                    public ImmutableList<? extends Module> get() {
                        return ImmutableList.of( BaseModule.createWithStandardResourceCost()
@@ -108,7 +108,7 @@ public enum UnitTypes implements UnitType {
                    }
                } ),
     SCOUT( "Scout", 5, //
-           new Supplier<ImmutableList<? extends Module>>() {
+           new SSupplier<ImmutableList<? extends Module>>() {
                @Override
                public ImmutableList<? extends Module> get() {
                    return ImmutableList.of( BaseModule.createWithStandardResourceCost()
@@ -130,7 +130,7 @@ public enum UnitTypes implements UnitType {
                }
            } ),
     AIRSHIP( "Airship", 10, //
-             new Supplier<ImmutableList<? extends Module>>() {
+             new SSupplier<ImmutableList<? extends Module>>() {
                  @Override
                  public ImmutableList<? extends Module> get() {
                      return ImmutableList.of( BaseModule.createWithStandardResourceCost()
@@ -145,22 +145,22 @@ public enum UnitTypes implements UnitType {
                  }
              } ),
     CONSTRUCTION( "Construction Site", Integer.MAX_VALUE, //
-                  new Supplier<ImmutableList<? extends Module>>() {
+                  new SSupplier<ImmutableList<? extends Module>>() {
                       @Override
                       public ImmutableList<? extends Module> get() {
-                          return ImmutableList.<Module>of( BaseModule.createWithStandardResourceCost()
-                                                                     .maxHealth( 1 )
-                                                                     .armor( 1 )
-                                                                     .viewRange( 1 )
-                                                                     .supportedLayers( ImmutableSet.copyOf( LevelType.values() ) ) );
+                          return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                             .maxHealth( 1 )
+                                                             .armor( 1 )
+                                                             .viewRange( 1 )
+                                                             .supportedLayers( ImmutableSet.copyOf( LevelType.values() ) ) );
                       }
                   } );
 
-    private final String                                    typeName;
-    private final int                                       constructionWork;
-    private final Supplier<ImmutableList<? extends Module>> moduleSupplier;
+    private final String                                     typeName;
+    private final int                                        constructionWork;
+    private final SSupplier<ImmutableList<? extends Module>> moduleSupplier;
 
-    UnitTypes(final String typeName, final int constructionWork, final Supplier<ImmutableList<? extends Module>> moduleSupplier) {
+    UnitTypes(final String typeName, final int constructionWork, final SSupplier<ImmutableList<? extends Module>> moduleSupplier) {
         this.typeName = typeName;
         this.constructionWork = constructionWork;
         this.moduleSupplier = moduleSupplier;

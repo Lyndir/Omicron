@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.CoreUtils.*;
 import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.Optional;
@@ -20,18 +21,18 @@ import javax.annotation.Nullable;
  *
  * @author lhunath
  */
-public class GameObject extends MetaObject implements GameObserver {
+public class GameObject extends MetaObject implements IGameObject {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     final Logger logger = Logger.get( getClass() );
 
-    private final GameObjectController<?>             controller;
-    private final UnitType                            unitType;
-    private final Game                                game;
-    private final int                                 objectID;
-    private final ListMultimap<ModuleType<?>, Module> modules;
-    private       Player                              owner;
-    private       Tile                                location;
+    private final GameObjectController<? extends GameObject> controller;
+    private final UnitType                                   unitType;
+    private final Game                                       game;
+    private final int                                        objectID;
+    private final ListMultimap<ModuleType<?>, Module>        modules;
+    private       Player                                     owner;
+    private       Tile                                       location;
 
     GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner, @Nonnull final Tile location) {
         this( unitType, game, owner, owner.nextObjectID(), location );
@@ -59,6 +60,7 @@ public class GameObject extends MetaObject implements GameObserver {
         location.setContents( this );
     }
 
+    @Override
     @Nonnull
     public GameObjectController<? extends GameObject> getController() {
         return controller;
@@ -70,13 +72,15 @@ public class GameObject extends MetaObject implements GameObserver {
         return Optional.fromNullable( owner );
     }
 
+    @Override
     @Authenticated
-    public boolean isOwnedByCurrentPlayer() {
+    public boolean isOwnedByCurrentPlayer()
+            throws NotAuthenticatedException {
         return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.currentPlayer() );
     }
 
     void setOwner(@Nullable final Player owner) {
-        Change.From<Player> ownerChange = Change.from( this.owner );
+        Change.From<IPlayer> ownerChange = Change.<IPlayer>from( this.owner );
 
         this.owner = owner;
 
@@ -87,21 +91,25 @@ public class GameObject extends MetaObject implements GameObserver {
     @Authenticated
     @Override
     @SuppressWarnings("ParameterHidesMemberVariable")
-    public Maybool canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final ITile location)
+            throws NotAuthenticatedException {
         return getController().canObserve( location );
     }
 
     @Authenticated
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles() {
+    public Iterable<Tile> listObservableTiles()
+            throws NotAuthenticatedException, NotObservableException {
         return getController().listObservableTiles();
     }
 
+    @Override
     public int getObjectID() {
         return objectID;
     }
 
+    @Override
     public Game getGame() {
         return game;
     }
@@ -110,8 +118,9 @@ public class GameObject extends MetaObject implements GameObserver {
         return location;
     }
 
-    @Authenticated
-    public Maybe<Tile> checkLocation() {
+    @Override
+    public Maybe<Tile> checkLocation()
+            throws NotAuthenticatedException {
         if (!currentPlayer().canObserve( getLocation() ).isTrue())
             return Maybe.unknown();
 
@@ -119,13 +128,14 @@ public class GameObject extends MetaObject implements GameObserver {
     }
 
     void setLocation(@Nonnull final Tile location) {
-        final Change.From<Tile> locationChange = Change.from( this.location );
+        final Change.From<ITile> locationChange = Change.<ITile>from( this.location );
         this.location = location;
 
         getGame().getController().fireIfObservable( location ) //
                 .onUnitMoved( this, locationChange.to( this.location ) );
     }
 
+    @Override
     public UnitType getType() {
         return unitType;
     }
@@ -139,7 +149,9 @@ public class GameObject extends MetaObject implements GameObserver {
      *
      * @return The module of the given type at the given index.
      */
-    public <M extends Module> Optional<M> getModule(final ModuleType<M> moduleType, final int index) {
+    @Override
+    public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final int index)
+            throws NotAuthenticatedException, NotObservableException {
         assertObservable( getLocation() );
 
         return Optional.fromNullable( Iterables.get( getModules( moduleType ), index, null ) );
@@ -153,12 +165,14 @@ public class GameObject extends MetaObject implements GameObserver {
      *
      * @return A list of modules of the given type or an empty list if there are none.
      */
-    @SuppressWarnings("unchecked")
-    public <M extends Module> List<M> getModules(final ModuleType<M> moduleType) {
+    @Override
+    public <M extends IModule> List<M> getModules(final PublicModuleType<M> moduleType)
+            throws NotAuthenticatedException, NotObservableException {
         assertObservable( getLocation() );
 
         // Checked by Module's constructor.
-        return (List<M>) modules.get( moduleType );
+        //noinspection unchecked
+        return (List<M>) modules.get( coreMT( moduleType ) );
     }
 
     /**
@@ -170,7 +184,9 @@ public class GameObject extends MetaObject implements GameObserver {
      *
      * @return A proxy object that you can run your method on.
      */
-    public <M extends Module> M onModuleElse(final ModuleType<M> moduleType, final int index, @Nullable final Object elseValue) {
+    @Override
+    public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final int index, @Nullable final Object elseValue)
+            throws NotAuthenticatedException, NotObservableException {
         assertObservable( getLocation() );
 
         return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orNull(), elseValue );
@@ -185,13 +201,17 @@ public class GameObject extends MetaObject implements GameObserver {
      *
      * @return A proxy object that you can run your method on.
      */
-    public <M extends Module> M onModule(final ModuleType<M> moduleType, final int index) {
+    @Override
+    public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final int index)
+            throws NotAuthenticatedException, NotObservableException {
         assertObservable( getLocation() );
 
         return onModuleElse( moduleType, index, null );
     }
 
-    public ImmutableCollection<? extends Module> listModules() {
+    @Override
+    public ImmutableCollection<Module> listModules()
+            throws NotAuthenticatedException, NotObservableException {
         assertObservable( getLocation() );
 
         return ImmutableList.copyOf( modules.values() );

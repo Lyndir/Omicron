@@ -16,40 +16,31 @@
 
 package com.lyndir.omicron.api.model;
 
-import com.lyndir.lhunath.opal.system.util.MetaObject;
-
-
 /**
  * @author lhunath, 2013-08-02
  */
-public abstract class ModuleType<M extends Module> extends MetaObject {
+public abstract class ModuleType<M extends IModule> extends PublicModuleType<M> {
 
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final ModuleType<ExtractorModule>   EXTRACTOR   = //
-            new ModuleType<ExtractorModule>( ExtractorModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<ExtractorModule>( ExtractorModule.class, PublicModuleType.EXTRACTOR.getStandardCost() ) {};
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final ModuleType<ContainerModule>   CONTAINER   = //
-            new ModuleType<ContainerModule>( ContainerModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<ContainerModule>( ContainerModule.class, PublicModuleType.CONTAINER.getStandardCost() ) {};
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final ModuleType<MobilityModule>    MOBILITY    = //
-            new ModuleType<MobilityModule>( MobilityModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<MobilityModule>( MobilityModule.class, PublicModuleType.MOBILITY.getStandardCost() ) {};
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final ModuleType<ConstructorModule> CONSTRUCTOR = //
-            new ModuleType<ConstructorModule>( ConstructorModule.class, ResourceCost.immutableOf( ResourceType.METALS, 2 ) ) {};
+            new ModuleType<ConstructorModule>( ConstructorModule.class, PublicModuleType.CONSTRUCTOR.getStandardCost() ) {};
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final ModuleType<BaseModule>        BASE        = //
-            new ModuleType<BaseModule>( BaseModule.class, ResourceCost.immutableOf( ResourceType.METALS, 1 ) ) {};
+            new ModuleType<BaseModule>( BaseModule.class, PublicModuleType.BASE.getStandardCost() ) {};
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     public static final ModuleType<WeaponModule>      WEAPON      = //
-            new ModuleType<WeaponModule>( WeaponModule.class, ResourceCost.immutableOf( ResourceType.METALS, 2 ) ) {};
+            new ModuleType<WeaponModule>( WeaponModule.class, PublicModuleType.WEAPON.getStandardCost() ) {};
 
-    private final Class<M>              moduleType;
-    private final ImmutableResourceCost standardCost;
-
-    ModuleType(final Class<M> moduleType, final ImmutableResourceCost standardCost) {
-        this.moduleType = moduleType;
-        this.standardCost = standardCost;
-    }
-
-    public Class<M> getModuleType() {
-        return moduleType;
-    }
-
-    public ImmutableResourceCost getStandardCost() {
-        return standardCost;
+    private ModuleType(final Class<M> moduleType, final ImmutableResourceCost standardCost) {
+        super( moduleType, standardCost );
     }
 }

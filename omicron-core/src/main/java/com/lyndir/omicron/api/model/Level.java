@@ -13,13 +13,13 @@ import javax.annotation.Nullable;
  *
  * @author lhunath
  */
-public class Level extends MetaObject {
+public class Level extends MetaObject implements ILevel {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Size      size;
     private final LevelType type;
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final Game      game;
+    private final Game     game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private final ImmutableMap<Coordinate, Tile> tileMap;
@@ -38,18 +38,22 @@ public class Level extends MetaObject {
         tileMap = tileMapBuilder.build();
     }
 
+    @Override
     public Size getSize() {
         return size;
     }
 
+    @Override
     public LevelType getType() {
         return type;
     }
 
+    @Override
     public Game getGame() {
         return game;
     }
 
+    @Override
     public Map<Coordinate, Tile> getTiles() {
         return tileMap;
     }
@@ -61,6 +65,7 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
+    @Override
     public Optional<Tile> getTile(final Coordinate position) {
         if (!size.isInBounds( position ))
             return Optional.absent();
@@ -76,6 +81,7 @@ public class Level extends MetaObject {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
+    @Override
     public Optional<Tile> getTile(final int u, final int v) {
         return getTile( new Coordinate( u, v, getSize() ) );
     }

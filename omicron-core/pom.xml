@@ -35,23 +35,13 @@
     <!-- DEPENDENCY MANAGEMENT -->
     <dependencies>
 
-        <!-- Opal -->
         <dependency>
-            <groupId>com.lyndir.lhunath.opal</groupId>
-            <artifactId>opal-security</artifactId>
-            <version>GIT-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lyndir.lhunath.opal</groupId>
-            <artifactId>opal-crypto</artifactId>
+            <groupId>com.lyndir.lhunath.omicron</groupId>
+            <artifactId>omicron-api</artifactId>
             <version>GIT-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
@@ -66,6 +56,10 @@
         </dependency>
 
         <!-- Web -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>

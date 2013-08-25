@@ -2,7 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.lyndir.omicron.api.Authenticated;
-import com.lyndir.omicron.api.util.Maybe;
+import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
@@ -22,7 +22,8 @@ public interface GameObserver {
      * @return true if the current player is allowed to know and the given tile is visible to this observer.
      */
     @Authenticated
-    Maybool canObserve(@Nonnull Tile location);
+    Maybool canObserve(@Nonnull ITile location)
+            throws Security.NotAuthenticatedException;
 
     /**
      * Enumerate the tiles this observer can observe.
@@ -31,12 +32,13 @@ public interface GameObserver {
      */
     @Nonnull
     @Authenticated
-    Iterable<Tile> listObservableTiles();
+    Iterable<? extends ITile> listObservableTiles()
+            throws Security.NotAuthenticatedException, Security.NotObservableException;
 
     /**
      * @return The player that has control over this observer, if any.
      */
     @Nonnull
     // TODO: This should return a Maybe to avoid being able to detect ownership changes on objects that are not observable.
-    Optional<Player> getOwner();
+    Optional<? extends IPlayer> getOwner();
 }

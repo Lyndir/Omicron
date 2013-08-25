@@ -20,7 +20,7 @@ public class CreateCommand extends Command {
     @SubCommand(abbr = "g", desc = "Create a new game of Omicron")
     public void game(final Iterator<String> tokens) {
 
-        Game.Builder gameBuilder = getOmicron().getBuilders().getGameBuilder();
+        IGame.IBuilder gameBuilder = getOmicron().getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game has been built yet.  Begin with the 'build' command." );
             return;
@@ -30,10 +30,10 @@ public class CreateCommand extends Command {
             return;
         }
 
-        Game game = gameBuilder.build();
+        IGame game = gameBuilder.build();
         getOmicron().getBuilders().setGameBuilder( null );
 
-        GameController gameController = game.getController();
+        IGameController gameController = game.getController();
         getOmicron().setGameController( gameController );
         if (getOmicron().getLocalPlayer().isPresent())
             gameController.setReady();

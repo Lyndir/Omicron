@@ -43,6 +43,7 @@
 
     <!-- MODULES -->
     <modules>
+        <module>omicron-api</module>
         <module>omicron-core</module>
         <module>omicron-cli</module>
         <module>omicron-wiki</module>

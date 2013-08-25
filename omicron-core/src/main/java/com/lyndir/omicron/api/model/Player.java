@@ -1,5 +1,7 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.CoreUtils.*;
+
 import com.google.common.base.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
@@ -15,7 +17,7 @@ import javax.annotation.Nullable;
  *
  * @author lhunath
  */
-public class Player extends MetaObject implements GameObserver {
+public class Player extends MetaObject implements IPlayer {
 
     private static final String[] firstNames = { "Jack", "Daniel", "Derrick", "Yasmin", "Catherin", "Mary" };
     private static final String[] lastNames  = { "Taylor", "Smith", "Brown", "Wilson", "Jones", "Lee" };
@@ -49,6 +51,7 @@ public class Player extends MetaObject implements GameObserver {
         this.secondaryColor = secondaryColor;
     }
 
+    @Override
     @Nonnull
     public PlayerController getController() {
         return controller;
@@ -56,7 +59,8 @@ public class Player extends MetaObject implements GameObserver {
 
     @Authenticated
     @Override
-    public Maybool canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final ITile location)
+            throws Security.NotAuthenticatedException {
         return getController().canObserve( location );
     }
 
@@ -73,11 +77,13 @@ public class Player extends MetaObject implements GameObserver {
         return Optional.of( this );
     }
 
+    @Override
     public int getPlayerID() {
         return playerID;
     }
 
-    boolean hasKey(final PlayerKey playerKey) {
+    @Override
+    public boolean hasKey(final PlayerKey playerKey) {
         return ObjectUtils.isEqual( key, playerKey );
     }
 
@@ -85,14 +91,17 @@ public class Player extends MetaObject implements GameObserver {
         return key == null;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public Color getPrimaryColor() {
         return primaryColor;
     }
 
+    @Override
     public Color getSecondaryColor() {
         return secondaryColor;
     }
@@ -105,6 +114,7 @@ public class Player extends MetaObject implements GameObserver {
         return Joiner.on( ' ' ).join( firstNames[random.nextInt( firstNames.length )], lastNames[random.nextInt( lastNames.length )] );
     }
 
+    @Override
     public int getScore() {
         return score;
     }
@@ -126,29 +136,29 @@ public class Player extends MetaObject implements GameObserver {
         return Optional.fromNullable( objects.get( objectId ) );
     }
 
-    void removeObject(final GameObject gameObject) {
-        GameObject lostObject = objects.remove( gameObject.getObjectID() );
+    void removeObject(final IGameObject gameObject) {
+        IGameObject lostObject = objects.remove( gameObject.getObjectID() );
         Preconditions.checkState( lostObject == null || lostObject == gameObject );
 
         if (lostObject != null)
-            getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
+            getController().getGameController().fireIfPlayer( new PredicateNN<IPlayer>() {
                 @Override
-                public boolean apply(@Nonnull final Player input) {
-                    return ObjectUtils.isEqual( input, Player.this );
+                public boolean apply(@Nonnull final IPlayer input) {
+                    return ObjectUtils.isEqual( Player.this, input );
                 }
             } ).onPlayerLostObject( this, gameObject );
     }
 
-    void addObject(final GameObject gameObject) {
-        GameObject previousObject = objects.put( gameObject.getObjectID(), gameObject );
+    void addObject(final IGameObject gameObject) {
+        GameObject previousObject = objects.put( gameObject.getObjectID(), coreGO( gameObject ) );
         Preconditions.checkState( previousObject == null || previousObject == gameObject );
 
         //noinspection VariableNotUsedInsideIf
         if (previousObject == null)
-            getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
+            getController().getGameController().fireIfPlayer( new PredicateNN<IPlayer>() {
                 @Override
-                public boolean apply(@Nonnull final Player input) {
-                    return ObjectUtils.isEqual( input, Player.this );
+                public boolean apply(@Nonnull final IPlayer input) {
+                    return ObjectUtils.isEqual( Player.this, input );
                 }
             } ).onPlayerGainedObject( this, gameObject );
     }

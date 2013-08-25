@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-import static com.lyndir.omicron.api.model.IncompatibleStateException.assertState;
+import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 import static com.lyndir.omicron.api.util.PathUtils.*;
 
 import com.google.common.base.Optional;
@@ -12,7 +12,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 
-public class MobilityModule extends Module {
+public class MobilityModule extends Module implements IMobilityModule {
 
     private final int movementSpeed;
     private final Map<LevelType, Double> movementCost = new EnumMap<>( LevelType.class );
@@ -37,7 +37,9 @@ public class MobilityModule extends Module {
         return new Builder0( ModuleType.MOBILITY.getStandardCost().add( resourceCost ) );
     }
 
-    public double getRemainingSpeed() {
+    @Override
+    public double getRemainingSpeed()
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
         assertObservable();
 
         return remainingSpeed;
@@ -50,7 +52,9 @@ public class MobilityModule extends Module {
      *
      * @return The speed cost.
      */
-    public double costForMovingInLevel(final LevelType levelType) {
+    @Override
+    public double costForMovingInLevel(final LevelType levelType)
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
         assertObservable();
 
         return ifNotNullElse( movementCost.get( levelType ), Double.MAX_VALUE );
@@ -63,7 +67,9 @@ public class MobilityModule extends Module {
      *
      * @return The speed cost.
      */
-    public double costForLevelingToLevel(final LevelType levelType) {
+    @Override
+    public double costForLevelingToLevel(final LevelType levelType)
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
         assertObservable();
 
         // Level up until we reach the target level.
@@ -121,8 +127,10 @@ public class MobilityModule extends Module {
      *
      * @param levelType The side of the adjacent tile relative to the current.
      */
+    @Override
     @Authenticated
-    public Leveling leveling(final LevelType levelType) {
+    public Leveling leveling(final LevelType levelType)
+            throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException {
         assertOwned();
 
         Tile currentLocation = getGameObject().getLocation();
@@ -143,8 +151,10 @@ public class MobilityModule extends Module {
      *
      * @param target The side of the adjacent tile relative to the current.
      */
+    @Override
     @Authenticated
-    public Movement movement(final Tile target) {
+    public Movement movement(final ITile target)
+            throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException {
         assertOwned();
 
         Leveling leveling = leveling( target.getLevel().getType() );
@@ -196,11 +206,11 @@ public class MobilityModule extends Module {
     }
 
     @Override
-    public ModuleType<?> getType() {
+    public ModuleType<MobilityModule> getType() {
         return ModuleType.MOBILITY;
     }
 
-    public class Leveling {
+    public class Leveling implements ILeveling {
 
         private final double         cost;
         private final Optional<Tile> target;
@@ -215,6 +225,7 @@ public class MobilityModule extends Module {
             this.target = Optional.of( target );
         }
 
+        @Override
         public boolean isPossible() {
             return target.isPresent();
         }
@@ -225,6 +236,7 @@ public class MobilityModule extends Module {
          *
          * @return An amount of speed.
          */
+        @Override
         public double getCost() {
             return cost;
         }
@@ -234,19 +246,22 @@ public class MobilityModule extends Module {
          *
          * @throws IllegalStateException if the leveling is not possible ({@link #isPossible()} returns {@code false})
          */
-        Tile getTarget() {
+        @Override
+        public Tile getTarget() {
             return target.get();
         }
 
+        @Override
         @Authenticated
-        public void execute() {
+        public void execute()
+                throws Security.NotAuthenticatedException, Security.NotOwnedException, ImpossibleException, InvalidatedException {
             assertOwned();
             assertState( isPossible(), ImpossibleException.class );
             assertState( cost <= remainingSpeed, InvalidatedException.class );
 
             // TODO: No target.isAccessible check: Most units that level cannot see other levels before they go there.
             // TODO: Should we disallow leveling until you can see the level above you like we do with movement and the tile you move to?
-            Change.From<Tile> locationChange = Change.from( getGameObject().getLocation() );
+            Change.From<ITile> locationChange = Change.<ITile>from( getGameObject().getLocation() );
             ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Execute the leveling.
@@ -260,10 +275,10 @@ public class MobilityModule extends Module {
     }
 
 
-    public class Movement {
+    public class Movement implements IMovement {
 
-        private final double               cost;
-        private final Leveling             leveling;
+        private final double                cost;
+        private final Leveling              leveling;
         private final Optional<Path<Tile>> path;
 
         Movement(final double cost) {
@@ -284,6 +299,7 @@ public class MobilityModule extends Module {
          *
          * @return An amount of speed.
          */
+        @Override
         public double getCost() {
             return cost;
         }
@@ -293,28 +309,33 @@ public class MobilityModule extends Module {
          *
          * @throws IllegalStateException if the leveling is not possible ({@link #isPossible()} returns {@code false})
          */
-        Path<Tile> getPath() {
+        @Override
+        public Path<Tile> getPath() {
             return path.get();
         }
 
+        @Override
         public boolean isPossible() {
             return path.isPresent();
         }
 
+        @Override
         @Authenticated
-        public void execute() {
+        public void execute()
+                throws Security.NotAuthenticatedException, Security.NotOwnedException, ImpossibleException, InvalidatedException {
             assertOwned();
             assertState( isPossible(), ImpossibleException.class );
             assertState( cost <= remainingSpeed, InvalidatedException.class );
 
-            Change.From<Tile> locationChange = Change.from( getGameObject().getLocation() );
+            Change.From<ITile> locationChange = Change.<ITile>from( getGameObject().getLocation() );
             ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
 
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
             do {
                 assertState( tracePath.getTarget().checkAccessible() || //
-                             ObjectUtils.isEqual( tracePath.getTarget(), getGameObject().getLocation() ), PathInvalidatedException.class, tracePath );
+                             ObjectUtils.isEqual( getGameObject().getLocation(), tracePath.getTarget() ), PathInvalidatedException.class,
+                             tracePath );
 
                 Optional<Path<Tile>> parent = tracePath.getParent();
                 if (!parent.isPresent())

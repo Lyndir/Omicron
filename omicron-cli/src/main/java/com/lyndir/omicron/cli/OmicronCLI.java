@@ -5,10 +5,8 @@ import ch.qos.logback.classic.LoggerContext;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lanterna.view.OmicronWindow;
-import com.lyndir.omicron.api.model.GameController;
+import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.GameListener;
-import com.lyndir.omicron.api.model.Player;
-import com.lyndir.omicron.api.model.PlayerKey;
 import java.util.*;
 import javax.annotation.Nonnull;
 import org.slf4j.LoggerFactory;
@@ -28,8 +26,8 @@ public class OmicronCLI {
     private final List<String>      log           = new LinkedList<>();
     private final Set<GameListener> gameListeners = new HashSet<>();
     private       boolean           running       = true;
-    private GameController gameController;
-    private Player         localPlayer;
+    private IGameController gameController;
+    private IPlayer         localPlayer;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments)
@@ -63,12 +61,12 @@ public class OmicronCLI {
         this.running = running;
     }
 
-    public Optional<GameController> getGameController() {
+    public Optional<IGameController> getGameController() {
 
         return Optional.fromNullable( gameController );
     }
 
-    public void setGameController(@Nonnull final GameController gameController) {
+    public void setGameController(@Nonnull final IGameController gameController) {
 
         Preconditions.checkState( this.gameController == null, "Cannot assign a new game controller, one has already been assigned." );
         this.gameController = gameController;
@@ -77,12 +75,12 @@ public class OmicronCLI {
             gameController.addGameListener( gameListener );
     }
 
-    public Optional<Player> getLocalPlayer() {
+    public Optional<IPlayer> getLocalPlayer() {
 
         return Optional.fromNullable( localPlayer );
     }
 
-    public void setLocalPlayer(final Player localPlayer) {
+    public void setLocalPlayer(final IPlayer localPlayer) {
 
         Preconditions.checkState( this.localPlayer == null, "Cannot assign a new local player, one has already been assigned." );
         this.localPlayer = localPlayer;

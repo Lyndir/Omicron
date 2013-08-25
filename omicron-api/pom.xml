@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PROJECT METADATA -->
+    <parent>
+        <groupId>com.lyndir.lhunath.omicron</groupId>
+        <artifactId>omicron</artifactId>
+        <version>GIT-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>omicron-api</artifactId>
+    <version>GIT-SNAPSHOT</version>
+
+    <name>Omicron API</name>
+    <description>
+        The public API to the Omicron game.
+    </description>
+
+
+    <!-- BUILD CONFIGURATION -->
+    <build />
+
+    <!-- DEPENDENCY MANAGEMENT -->
+    <dependencies>
+
+        <!-- Opal -->
+        <dependency>
+            <groupId>com.lyndir.lhunath.opal</groupId>
+            <artifactId>opal-system</artifactId>
+            <version>GIT-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+</project>
+

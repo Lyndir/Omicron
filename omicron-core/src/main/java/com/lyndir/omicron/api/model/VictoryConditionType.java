@@ -14,7 +14,7 @@ public enum VictoryConditionType {
         void install(final Game game) {
             game.getController().addInternalGameListener( new GameListener() {
                 @Override
-                public void onPlayerLostObject(final Player player, final GameObject gameObject) {
+                public void onPlayerLostObject(final IPlayer player, final IGameObject gameObject) {
                     if (!game.isRunning())
                         return;
 
@@ -43,7 +43,7 @@ public enum VictoryConditionType {
         @Override
         void install(final Game game) {
             game.getController().addInternalGameListener( new GameListener() {
-                private Player mightyPlayer;
+                private IPlayer mightyPlayer;
                 private Turn mightySince;
 
                 @Override
@@ -57,7 +57,7 @@ public enum VictoryConditionType {
                 }
 
                 @Override
-                public void onPlayerScore(final Player player, final ChangeInt score) {
+                public void onPlayerScore(final IPlayer player, final ChangeInt score) {
                     if (mightyPlayer != null) {
                         // There is a mighty player, check if this player's new score dethrones him.
                         if (ObjectUtils.isEqual( mightyPlayer, player ))
@@ -72,9 +72,9 @@ public enum VictoryConditionType {
 
                     if (mightyPlayer == null) {
                         // There is no mighty player.  Check if a player has become mighty.
-                        Player mightiestPlayer = null;
+                        IPlayer mightiestPlayer = null;
                         boolean mightiestIsMighty = true;
-                        for (final Player aPlayer : game.getPlayers()) {
+                        for (final IPlayer aPlayer : game.getPlayers()) {
                             if (mightiestPlayer == null)
                                 mightiestPlayer = aPlayer;
                             else if (aPlayer.getScore() > mightiestPlayer.getScore()) {

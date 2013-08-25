@@ -23,13 +23,13 @@ public class AddGameCommand extends Command {
     @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
     public void player(final Iterator<String> tokens) {
 
-        Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (localPlayerOptional.isPresent()) {
             err( "There is already a local player: %s", localPlayerOptional.get().getName() );
             return;
         }
 
-        Game.Builder gameBuilder = getOmicron().getBuilders().getGameBuilder();
+        IGame.IBuilder gameBuilder = getOmicron().getBuilders().getGameBuilder();
         if (gameBuilder == null) {
             err( "No game build to add game properties to.  Begin with the 'build' command." );
             return;
@@ -46,8 +46,8 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        Player newPlayer = new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, //
-                                       Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
+        IPlayer newPlayer = new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, //
+                                        Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
         gameBuilder.getPlayers().add( newPlayer );
         getOmicron().setLocalPlayer( newPlayer );
 

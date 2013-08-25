@@ -29,22 +29,22 @@ public class PrintCommand extends Command {
     @SubCommand(abbr = "f", desc = "A view of all observable tiles.")
     public void field(final Iterator<String> tokens) {
 
-        final Optional<GameController> gameController = getOmicron().getGameController();
+        final Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final Player localPlayer = localPlayerOptional.get();
+        final IPlayer localPlayer = localPlayerOptional.get();
 
         // Create an empty grid.
         Size maxSize = null;
-        for (final Level level : gameController.get().listLevels())
+        for (final ILevel level : gameController.get().listLevels())
             maxSize = Size.max( maxSize, level.getSize() );
         assert maxSize != null;
         Table<Integer, Integer, StringBuilder> grid = HashBasedTable.create( maxSize.getHeight(), maxSize.getWidth() );
@@ -53,8 +53,8 @@ public class PrintCommand extends Command {
                 grid.put( v, u, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
-        for (final Tile tile : localPlayer.listObservableTiles()) {
-            Maybe<GameObject> contents = tile.checkContents();
+        for (final ITile tile : localPlayer.listObservableTiles()) {
+            Maybe<? extends IGameObject> contents = tile.checkContents();
             char contentsChar;
             if (contents.presence() == Maybe.Presence.PRESENT)
                 contentsChar = contents.get().getType().getTypeName().charAt( 0 );

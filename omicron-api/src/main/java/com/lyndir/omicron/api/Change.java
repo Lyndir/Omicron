@@ -12,7 +12,6 @@ public class Change<T> {
     private final T to;
 
     Change(@Nullable final T from, @Nullable final T to) {
-
         this.from = from;
         this.to = to;
     }

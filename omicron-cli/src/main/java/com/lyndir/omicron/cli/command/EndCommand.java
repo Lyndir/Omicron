@@ -3,8 +3,7 @@ package com.lyndir.omicron.cli.command;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.lyndir.omicron.api.model.GameController;
-import com.lyndir.omicron.api.model.Player;
+import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -24,19 +23,19 @@ public class EndCommand extends Command {
     @SubCommand(abbr = "t", desc = "The current turn.")
     public void turn(final Iterator<String> tokens) {
 
-        final Optional<GameController> gameController = getOmicron().getGameController();
+        final Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
 
-        Player localPlayer = localPlayerOptional.get();
+        IPlayer localPlayer = localPlayerOptional.get();
         if (gameController.get().setReady())
             inf( "%s ready.  New turn started.", localPlayer.getName() );
         else

@@ -1,9 +1,8 @@
 package com.lyndir.omicron.cli.command;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
+import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
@@ -28,18 +27,18 @@ public class FireCommand extends Command {
     @Override
     public void evaluate(final Iterator<String> tokens) {
 
-        final Optional<GameController> gameController = getOmicron().getGameController();
+        final Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final Player localPlayer = localPlayerOptional.get();
+        final IPlayer localPlayer = localPlayerOptional.get();
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
@@ -72,13 +71,13 @@ public class FireCommand extends Command {
         int dv = ConversionUtils.toIntegerNN( dvArgument );
 
         // Find the game object for the given ID.
-        Maybe<GameObject> maybeObject = localPlayer.getController().getObject( objectId );
+        Maybe<? extends IGameObject> maybeObject = localPlayer.getController().getObject( objectId );
         if (maybeObject.presence() != Maybe.Presence.PRESENT) {
             err( "No observable object with ID: %s", objectId );
             return;
         }
-        GameObject gameObject = maybeObject.get();
-        Tile location = gameObject.checkLocation().get();
+        IGameObject gameObject = maybeObject.get();
+        ITile location = gameObject.checkLocation().get();
 
         String weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
         Optional<Integer> optionalWeaponIndex = ConversionUtils.toInteger( weaponIndexOrLevelArgument );
@@ -89,9 +88,9 @@ public class FireCommand extends Command {
         }
 
         final String levelArgument = ifNotNullElse( weaponIndexOrLevelArgument, location.getLevel().getType().getName() );
-        Optional<Level> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<Level>() {
+        Optional<? extends ILevel> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<ILevel>() {
             @Override
-            public boolean apply(final Level input) {
+            public boolean apply(final ILevel input) {
 
                 return input.getType().getName().equalsIgnoreCase( levelArgument );
             }
@@ -102,7 +101,7 @@ public class FireCommand extends Command {
         }
 
         // Check to see if it's mobile by finding its mobility module.
-        Optional<WeaponModule> optionalWeapon = gameObject.getModule( ModuleType.WEAPON, weaponIndex );
+        Optional<IWeaponModule> optionalWeapon = gameObject.getModule( PublicModuleType.WEAPON, weaponIndex );
         if (!optionalWeapon.isPresent()) {
             if (weaponIndex == 0)
                 err( "Object has no weapons: %s", gameObject );
@@ -110,19 +109,30 @@ public class FireCommand extends Command {
                 err( "Object has no weapon at index %d: %s", weaponIndex, gameObject );
             return;
         }
-        WeaponModule weaponModule = optionalWeapon.get();
+        IWeaponModule weaponModule = optionalWeapon.get();
 
         // Find the target tile.
         Coordinate targetCoordinate = location.getPosition().delta( du, dv );
-        Optional<Tile> target = level.get().getTile( targetCoordinate );
+        Optional<? extends ITile> target = level.get().getTile( targetCoordinate );
         if (!(target.isPresent())) {
             err( "No tile in level: %s, at position: %s", level.get().getType().getName(), targetCoordinate );
             return;
         }
 
         // Fire at the target.
-        weaponModule.fireAt( target.get() );
-        Maybe<GameObject> targetContents = target.get().checkContents();
-        inf( "Fired at: %s", targetContents );
+        try {
+            weaponModule.fireAt( target.get() );
+            Maybe<? extends IGameObject> targetContents = target.get().checkContents();
+            inf( "Fired at: %s", targetContents );
+        }
+        catch (IWeaponModule.OutOfRangeException ignored) {
+            err( "Couldn't fire, target out of range: %s", target.get() );
+        }
+        catch (IWeaponModule.OutOfRepeatsException ignored) {
+            err( "Couldn't fire, weapon out of repeats." );
+        }
+        catch (IWeaponModule.OutOfAmmunitionException ignored) {
+            err( "Couldn't fire, weapon out of ammunition." );
+        }
     }
 }

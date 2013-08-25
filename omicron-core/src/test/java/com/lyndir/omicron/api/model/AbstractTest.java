@@ -18,7 +18,7 @@ public abstract class AbstractTest {
 
     protected final Logger logger = Logger.get( getClass() );
 
-    private static final List<LevelType>           levelIndexes    = ImmutableList.of( LevelType.GROUND, LevelType.SKY, LevelType.SPACE );
+    private static final List<LevelType> levelIndexes = ImmutableList.of( LevelType.GROUND, LevelType.SKY, LevelType.SPACE );
 
     protected Game   staticGame;
     protected Player staticPlayer;
@@ -27,7 +27,7 @@ public abstract class AbstractTest {
         Game.Builder builder = Game.builder();
         PlayerKey key = new PlayerKey();
         staticPlayer = new Player( builder.nextPlayerID(), key, "testPlayer", Color.Template.randomColor(),
-                                   Color.Template.randomColor() ) {
+                                    Color.Template.randomColor() ) {
             private final PlayerController playerController = new PlayerController( this ) {
                 @Override
                 protected void onNewTurn() {
@@ -75,7 +75,7 @@ public abstract class AbstractTest {
             }
         };
         builder.setLevelSize( new Size( 10, 10 ) );
-        builder.setResourceConfig( Game.GameResourceConfigs.NONE );
+        builder.setResourceConfig( IGame.GameResourceConfigs.NONE );
         builder.setUnitConfig( Game.GameUnitConfigs.NONE );
         builder.addPlayer( staticPlayer );
         staticGame = builder.build();

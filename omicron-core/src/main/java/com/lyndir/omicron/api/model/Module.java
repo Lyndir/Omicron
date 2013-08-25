@@ -20,10 +20,11 @@ import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
+import com.lyndir.omicron.api.model.error.OmicronException;
 import com.lyndir.omicron.api.util.PathUtils;
 
 
-public abstract class Module extends MetaObject {
+public abstract class Module extends MetaObject implements IModule {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     protected final Logger logger = Logger.get( getClass() );
@@ -37,6 +38,7 @@ public abstract class Module extends MetaObject {
         Preconditions.checkState( getType().getModuleType().isInstance( this ), "Invalid module type for module: %s", this );
     }
 
+    @Override
     public ImmutableResourceCost getResourceCost() {
         return resourceCost;
     }
@@ -45,19 +47,23 @@ public abstract class Module extends MetaObject {
         this.gameObject = gameObject;
     }
 
+    @Override
     public GameObject getGameObject() {
         return Preconditions.checkNotNull( gameObject, "This module has not yet been initialized by its game object." );
     }
 
-    protected GameController getGameController() {
+    @Override
+    public GameController getGameController() {
         return getGameObject().getGame().getController();
     }
 
-    void assertOwned() {
+    void assertOwned()
+            throws Security.NotAuthenticatedException, Security.NotOwnedException {
         Security.assertOwned( getGameObject() );
     }
 
-    void assertObservable() {
+    void assertObservable()
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
         Security.assertObservable( getGameObject().getLocation() );
     }
 
@@ -65,38 +71,6 @@ public abstract class Module extends MetaObject {
 
     protected abstract void onNewTurn();
 
-    public abstract ModuleType<?> getType();
-
-
-    public static class ImpossibleException extends IncompatibleStateException {
-
-         ImpossibleException() {
-            super( "Action not possible." );
-        }
-    }
-
-
-    public static class InvalidatedException extends IncompatibleStateException {
-
-         InvalidatedException() {
-            super( "State change has invalidated this action." );
-        }
-    }
-
-
-    public static class PathInvalidatedException extends InvalidatedException {
-
-        private final PathUtils.Path<Tile> path;
-
-         PathInvalidatedException(final PathUtils.Path<Tile> path) {
-            this.path = path;
-        }
-
-        /**
-         * @return The path to the point where it has become invalidated (target is the invalid tile).
-         */
-        public PathUtils.Path<Tile> getPath() {
-            return path;
-        }
-    }
+    @Override
+    public abstract ModuleType<? extends Module> getType();
 }

@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class ExtractorModule extends Module {
+public class ExtractorModule extends Module implements IExtractorModule {
 
     private final ResourceType resourceType;
     private final int          speed;
@@ -30,12 +30,14 @@ public class ExtractorModule extends Module {
         return new Builder0( ModuleType.EXTRACTOR.getStandardCost().add( resourceCost ) );
     }
 
+    @Override
     public ResourceType getResourceType() {
         assertObservable();
 
         return resourceType;
     }
 
+    @Override
     public int getSpeed() {
         assertObservable();
 
@@ -114,7 +116,7 @@ public class ExtractorModule extends Module {
     }
 
     @Override
-    public ModuleType<?> getType() {
+    public ModuleType<ExtractorModule> getType() {
         return ModuleType.EXTRACTOR;
     }
 

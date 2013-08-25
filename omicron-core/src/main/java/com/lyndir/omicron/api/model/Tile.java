@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.omicron.api.model.CoreUtils.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.ImmutableCollection;
@@ -20,7 +21,7 @@ import javax.annotation.Nullable;
  * @author lhunath
  */
 @ObjectMeta(useFor = { })
-public class Tile extends MetaObject {
+public class Tile extends MetaObject implements ITile {
 
     @Nullable
     private       GameObject contents;
@@ -45,9 +46,10 @@ public class Tile extends MetaObject {
         return Optional.fromNullable( contents );
     }
 
+    @Override
     @Nonnull
-    @Authenticated
-    public Maybe<GameObject> checkContents() {
+    public Maybe<GameObject> checkContents()
+            throws Security.NotAuthenticatedException {
         if (!Security.currentPlayer().canObserve( this ).isTrue())
             // Cannot observe tile.
             return Maybe.unknown();
@@ -58,7 +60,7 @@ public class Tile extends MetaObject {
     void setContents(@Nullable final GameObject contents) {
         if (contents != null)
             Preconditions.checkState( this.contents == null, "Cannot put object on tile that is not empty: %s", this );
-        Change.From<GameObject> contentsChange = Change.from( this.contents );
+        Change.From<IGameObject> contentsChange = Change.<IGameObject>from( this.contents );
 
         this.contents = contents;
 
@@ -66,10 +68,12 @@ public class Tile extends MetaObject {
                 .onTileContents( this, contentsChange.to( this.contents ) );
     }
 
+    @Override
     public Coordinate getPosition() {
         return position;
     }
 
+    @Override
     public Level getLevel() {
         return level;
     }
@@ -94,8 +98,10 @@ public class Tile extends MetaObject {
         return Optional.fromNullable( resourceQuantities.get( resourceType ) );
     }
 
+    @Override
     @Authenticated
-    public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType) {
+    public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType)
+            throws Security.NotAuthenticatedException {
         if (!Security.currentPlayer().canObserve( this ).isTrue())
             // Cannot observe location.
             return Maybe.unknown();
@@ -103,11 +109,13 @@ public class Tile extends MetaObject {
         return Maybe.fromNullable( resourceQuantities.get( resourceType ) );
     }
 
+    @Override
     @Nonnull
     public Tile neighbour(final Coordinate.Side side) {
         return level.getTile( getPosition().neighbour( side ) ).get();
     }
 
+    @Override
     public ImmutableCollection<Tile> neighbours() {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         for (final Coordinate.Side side : Coordinate.Side.values())
@@ -116,6 +124,7 @@ public class Tile extends MetaObject {
         return neighbours.build();
     }
 
+    @Override
     public ImmutableCollection<Tile> neighbours(final int distance) {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         // FIXME: Not correct.
@@ -126,8 +135,9 @@ public class Tile extends MetaObject {
         return neighbours.build();
     }
 
-    @Authenticated
-    public Maybe<Boolean> checkContains(@Nonnull final GameObject target) {
+    @Override
+    public Maybe<Boolean> checkContains(@Nonnull final IGameObject target)
+            throws Security.NotAuthenticatedException {
         Maybe<GameObject> contents = checkContents();
         if (contents.presence() == Maybe.Presence.ABSENT)
             return Maybe.of( false );
@@ -161,8 +171,10 @@ public class Tile extends MetaObject {
     /**
      * @return true if this tile is visible to the current player and has no contents.
      */
+    @Override
     @Authenticated
-    public boolean checkAccessible() {
+    public boolean checkAccessible()
+            throws Security.NotAuthenticatedException {
         return checkContents().presence() == Maybe.Presence.ABSENT;
     }
 }

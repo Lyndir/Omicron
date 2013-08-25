@@ -51,7 +51,6 @@
     <!-- DEPENDENCY MANAGEMENT -->
     <dependencies>
 
-        <!-- Opal -->
         <dependency>
             <groupId>com.lyndir.lhunath.omicron</groupId>
             <artifactId>omicron-core</artifactId>

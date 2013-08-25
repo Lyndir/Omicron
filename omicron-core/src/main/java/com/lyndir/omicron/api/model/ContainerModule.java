@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.lyndir.omicron.api.ChangeInt;
 
 
-public class ContainerModule extends Module {
+public class ContainerModule extends Module implements IContainerModule {
 
     private final ResourceType resourceType;
     private final int          capacity;
@@ -24,24 +24,28 @@ public class ContainerModule extends Module {
         return new Builder0( ModuleType.CONTAINER.getStandardCost().add( resourceCost ) );
     }
 
+    @Override
     public ResourceType getResourceType() {
         assertObservable();
 
         return resourceType;
     }
 
+    @Override
     public int getCapacity() {
         assertObservable();
 
         return capacity;
     }
 
+    @Override
     public int getStock() {
         assertObservable();
 
         return stock;
     }
 
+    @Override
     public int getAvailable() {
         assertObservable();
 
@@ -101,7 +105,7 @@ public class ContainerModule extends Module {
     }
 
     @Override
-    public ModuleType<?> getType() {
+    public ModuleType<ContainerModule> getType() {
         return ModuleType.CONTAINER;
     }
 

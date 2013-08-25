@@ -14,15 +14,19 @@
  *   limitations under the License.
  */
 
-package com.lyndir.omicron.api;
+package com.lyndir.omicron.api.model;
 
-import com.lyndir.omicron.api.model.*;
+import com.google.common.collect.ImmutableList;
 
 
 /**
- * Indicates that a certain method requires that the current player has authenticated himself using {@link Security#authenticate(Player,
- * PlayerKey)}.
- *
- * @author lhunath, 2013-08-10
+ * @author lhunath, 2013-08-03
  */
-public @interface Authenticated {}
+public interface IUnitType {
+
+    String getTypeName();
+
+    int getConstructionWork();
+
+    ImmutableList<? extends IModule> createModules();
+}

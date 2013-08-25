@@ -1,11 +1,10 @@
 package com.lyndir.omicron.cli.command;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
+import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.model.*;
-import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
@@ -26,7 +25,7 @@ public class ListCommand extends Command {
     @SubCommand(abbr = "p", desc = "Enumerate all players in the game.")
     public void players(final Iterator<String> tokens) {
 
-        final Optional<GameController> gameController = getOmicron().getGameController();
+        final Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
@@ -50,28 +49,28 @@ public class ListCommand extends Command {
     @SubCommand(abbr = "o", desc = "Enumerate all types of game objects the player can detect.")
     public void objects(final Iterator<String> tokens) {
 
-        final Optional<GameController> gameController = getOmicron().getGameController();
+        final Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final Player localPlayer = localPlayerOptional.get();
+        final IPlayer localPlayer = localPlayerOptional.get();
 
-        ImmutableList.Builder<GameObject> gameObjectBuilder = ImmutableList.builder();
-        for (final Player player : gameController.get().listPlayers())
+        ImmutableList.Builder<IGameObject> gameObjectBuilder = ImmutableList.builder();
+        for (final IPlayer player : gameController.get().listPlayers())
             gameObjectBuilder.addAll( player.getController().iterateObservableObjects( localPlayer ) );
 
         inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
-        for (final GameObject gameObject : gameObjectBuilder.build()) {
-            Tile location = gameObject.checkLocation().get();
+        for (final IGameObject gameObject : gameObjectBuilder.build()) {
+            ITile location = gameObject.checkLocation().get();
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
-                 gameObject.getObjectID(), ifNotNullElse( Player.class, gameObject.getOwner().orNull(), "-" ).getName(),
+                 gameObject.getObjectID(), ifNotNullElse( IPlayer.class, gameObject.getOwner().orNull(), "-" ).getName(),
                  location.getLevel().getType().getName(), location.getPosition().getU(), location.getPosition().getV(),
                  gameObject.getType().getTypeName() );
         }

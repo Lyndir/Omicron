@@ -5,13 +5,12 @@ import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
-import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 
-public class GameObjectController<O extends GameObject> extends MetaObject implements GameObserver {
+public class GameObjectController<O extends GameObject> extends MetaObject implements IGameObjectController<O> {
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     final Logger logger = Logger.get( getClass() );
@@ -22,6 +21,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         this.gameObject = gameObject;
     }
 
+    @Override
     public O getGameObject() {
         return gameObject;
     }
@@ -66,7 +66,8 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     @Override
     @Authenticated
-    public Maybool canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final ITile location)
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
         if (getGameObject().isOwnedByCurrentPlayer() && ObjectUtils.equals( location, getGameObject().getLocation() ))
             return Maybool.YES;
 
@@ -76,7 +77,8 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<Tile> listObservableTiles() {
+    public Iterable<Tile> listObservableTiles()
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
         return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles();
     }
 

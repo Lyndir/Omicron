@@ -17,16 +17,20 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
+import com.lyndir.omicron.api.model.IModule;
 
 
 /**
  * @author lhunath, 2013-08-03
  */
-public interface UnitType {
+public interface UnitType extends IUnitType {
 
+    @Override
     String getTypeName();
 
+    @Override
     int getConstructionWork();
 
+    @Override
     ImmutableList<? extends Module> createModules();
 }

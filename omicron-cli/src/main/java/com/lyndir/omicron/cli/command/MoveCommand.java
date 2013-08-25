@@ -25,12 +25,12 @@ public class MoveCommand extends Command {
     @Override
     public void evaluate(final Iterator<String> tokens) {
 
-        final Optional<Player> localPlayerOptional = getOmicron().getLocalPlayer();
+        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final Player localPlayer = localPlayerOptional.get();
+        final IPlayer localPlayer = localPlayerOptional.get();
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
@@ -73,30 +73,30 @@ public class MoveCommand extends Command {
         }
 
         // Find the game object for the given ID.
-        Maybe<GameObject> maybeObject = localPlayer.getController().getObject( objectId );
+        Maybe<? extends IGameObject> maybeObject = localPlayer.getController().getObject( objectId );
         if (maybeObject.presence() != Maybe.Presence.PRESENT) {
             err( "No observable object with ID: %s", objectId );
             return;
         }
-        GameObject gameObject = maybeObject.get();
+        IGameObject gameObject = maybeObject.get();
 
         // Check to see if it's mobile by finding its mobility module.
-        Optional<MobilityModule> optionalMobility = gameObject.getModule( ModuleType.MOBILITY, 0 );
+        Optional<IMobilityModule> optionalMobility = gameObject.getModule( PublicModuleType.MOBILITY, 0 );
         if (!optionalMobility.isPresent()) {
             err( "Object is not mobile: %s", gameObject );
             return;
         }
-        MobilityModule mobilityModule = optionalMobility.get();
+        IMobilityModule mobilityModule = optionalMobility.get();
 
-        Maybe<Tile> maybeLocation = mobilityModule.getGameObject().checkLocation();
+        Maybe<? extends ITile> maybeLocation = mobilityModule.getGameObject().checkLocation();
         if (maybeLocation.presence() != Maybe.Presence.PRESENT) {
             err( "Object's location is not known: %s", gameObject );
             return;
         }
-        Tile location = maybeLocation.get();
+        ITile location = maybeLocation.get();
 
         Coordinate targetPosition = side.get().delta( location.getPosition() );
-        Optional<Tile> targetLocation = location.getLevel().getTile( targetPosition );
+        Optional<? extends ITile> targetLocation = location.getLevel().getTile( targetPosition );
         if (!targetLocation.isPresent()) {
             err( "No tile at that side for position: %s.", targetPosition );
             return;

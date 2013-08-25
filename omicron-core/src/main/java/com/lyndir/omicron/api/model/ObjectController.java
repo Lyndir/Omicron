@@ -1,6 +1,6 @@
 package com.lyndir.omicron.api.model;
 
-public class ObjectController<O extends GameObject> {
+public class ObjectController<O extends IGameObject> {
 
     private final O gameObject;
 

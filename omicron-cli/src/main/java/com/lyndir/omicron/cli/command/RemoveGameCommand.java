@@ -1,8 +1,7 @@
 package com.lyndir.omicron.cli.command;
 
 import com.google.common.collect.Iterators;
-import com.lyndir.omicron.api.model.Game;
-import com.lyndir.omicron.api.model.Player;
+import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -15,9 +14,9 @@ import java.util.Iterator;
 @CommandGroup(parent = RemoveCommand.class, name = "game", abbr = "g", desc = "Remove things from an Omicron game that is being built.")
 public class RemoveGameCommand extends Command {
 
-    private Game.Builder gameBuilder;
+    private IGame.IBuilder gameBuilder;
 
-    public RemoveGameCommand(final OmicronCLI omicron, final Game.Builder gameBuilder) {
+    public RemoveGameCommand(final OmicronCLI omicron) {
         super( omicron );
     }
 
@@ -42,7 +41,7 @@ public class RemoveGameCommand extends Command {
             return;
         }
 
-        Iterator<Player> playerIt = gameBuilder.getPlayers().iterator();
+        Iterator<IPlayer> playerIt = gameBuilder.getPlayers().iterator();
         while (playerIt.hasNext()) {
             if (playerIt.next().getName().equals( value )) {
                 playerIt.remove();

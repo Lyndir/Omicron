@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 
 // TODO: Should this module's logic be moved to GameObjectController?
 // TODO: It uniquely describes a game object and can exist only once and lots of external code assumes there is one and only one...
-public class BaseModule extends Module implements GameObserver {
+public class BaseModule extends Module implements IBaseModule {
 
     private final int                     maxHealth;
     private final int                     armor;
@@ -41,8 +41,8 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @Override
-    @Authenticated
-    public Maybool canObserve(@Nonnull final Tile location) {
+    public Maybool canObserve(@Nonnull final ITile location)
+            throws Security.NotAuthenticatedException {
         if (!getGameObject().isOwnedByCurrentPlayer())
             if (!currentPlayer().canObserve( location ).isTrue())
                 return Maybool.UNKNOWN;
@@ -57,7 +57,8 @@ public class BaseModule extends Module implements GameObserver {
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<Tile> listObservableTiles() {
+    public Iterable<Tile> listObservableTiles()
+            throws Security.NotAuthenticatedException {
         return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
             public boolean apply(final Tile input) {
@@ -72,33 +73,28 @@ public class BaseModule extends Module implements GameObserver {
         return getGameObject().getOwner();
     }
 
+    @Override
     public int getMaxHealth() {
-        assertObservable();
-
         return maxHealth;
     }
 
+    @Override
     public int getRemainingHealth() {
-        assertObservable();
-
         return Math.max( 0, maxHealth - damage );
     }
 
+    @Override
     public int getArmor() {
-        assertObservable();
-
         return armor;
     }
 
+    @Override
     public int getViewRange() {
-        assertObservable();
-
         return viewRange;
     }
 
+    @Override
     public ImmutableSet<LevelType> getSupportedLayers() {
-        assertObservable();
-
         return supportedLayers;
     }
 
@@ -111,7 +107,7 @@ public class BaseModule extends Module implements GameObserver {
     }
 
     @Override
-    public ModuleType<?> getType() {
+    public ModuleType<BaseModule> getType() {
         return ModuleType.BASE;
     }
 

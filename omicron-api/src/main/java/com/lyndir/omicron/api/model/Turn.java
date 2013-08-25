@@ -11,12 +11,12 @@ public class Turn extends MetaObject {
     private final Turn previousTurn;
     private final int  number;
 
-    Turn() {
+    public Turn() {
         previousTurn = null;
         number = 0;
     }
 
-    Turn(@Nonnull final Turn previousTurn) {
+    public Turn(@Nonnull final Turn previousTurn) {
         this.previousTurn = previousTurn;
         number = previousTurn.getNumber() + 1;
     }

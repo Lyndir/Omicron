@@ -26,17 +26,14 @@ public class Color extends MetaObject implements Serializable {
         private final Color color;
 
         Template(final Color color) {
-
             this.color = color;
         }
 
         public Color get() {
-
             return color;
         }
 
         public static Color randomColor() {
-
             return values()[random.nextInt( values().length )].get();
         }
     }
@@ -47,34 +44,28 @@ public class Color extends MetaObject implements Serializable {
     private final byte blue;
 
     public Color(final int red, final int green, final int blue) {
-
         this( (byte) red, (byte) green, (byte) blue );
     }
 
     public Color(final byte red, final byte green, final byte blue) {
-
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
 
     public byte getRed() {
-
         return red;
     }
 
     public byte getGreen() {
-
         return green;
     }
 
     public byte getBlue() {
-
         return blue;
     }
 
     public static Color of(final String colorString) {
-
         for (final Template template : Template.values())
             if (template.name().equalsIgnoreCase( colorString ))
                 return template.get();

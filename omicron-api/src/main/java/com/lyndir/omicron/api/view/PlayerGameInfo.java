@@ -1,6 +1,6 @@
 package com.lyndir.omicron.api.view;
 
-import com.lyndir.omicron.api.model.Player;
+import com.lyndir.omicron.api.model.IPlayer;
 
 
 /**
@@ -10,18 +10,18 @@ import com.lyndir.omicron.api.model.Player;
  */
 public class PlayerGameInfo {
 
-    private final Player  player;
+    private final IPlayer player;
     private final boolean discovered;
     private final int     score;
 
-    public PlayerGameInfo(final Player player, final boolean discovered, final int score) {
+    public PlayerGameInfo(final IPlayer player, final boolean discovered, final int score) {
 
         this.player = player;
         this.discovered = discovered;
         this.score = score;
     }
 
-    public Player getPlayer() {
+    public IPlayer getPlayer() {
 
         return player;
     }
@@ -36,12 +36,12 @@ public class PlayerGameInfo {
         return score;
     }
 
-    public static PlayerGameInfo discovered(final Player player, final Integer score) {
+    public static PlayerGameInfo discovered(final IPlayer player, final Integer score) {
 
         return new PlayerGameInfo( player, true, score );
     }
 
-    public static PlayerGameInfo undiscovered(final Player player) {
+    public static PlayerGameInfo undiscovered(final IPlayer player) {
 
         return new PlayerGameInfo( player, false, 0 );
     }

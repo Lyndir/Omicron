@@ -3,6 +3,7 @@ package com.lyndir.omicron.cli.command;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.model.Size;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -15,7 +16,7 @@ import java.util.Iterator;
 @CommandGroup( parent = SetCommand.class, name = "game", abbr = "g", desc = "Set properties of an Omicron game that is being built.")
 public class SetGameCommand extends Command {
 
-    private Game.Builder gameBuilder;
+    private IGame.IBuilder gameBuilder;
 
     public SetGameCommand(final OmicronCLI omicron) {
         super( omicron );
@@ -33,7 +34,7 @@ public class SetGameCommand extends Command {
         super.evaluate( tokens );
     }
 
-    @SubCommand( abbr = "w", desc = "The tile dimension of each level in the game.")
+    @SubCommand(abbr = "w", desc = "The tile dimension of each level in the game.")
     public void worldSize(final Iterator<String> tokens) {
 
         String gameSettingValue = Iterators.getOnlyElement( tokens, null );
@@ -58,7 +59,7 @@ public class SetGameCommand extends Command {
         }
 
         inf( "players currently:" );
-        for (final Player player : gameBuilder.getPlayers())
+        for (final IPlayer player : gameBuilder.getPlayers())
             inf( "    %s", player );
     }
 }

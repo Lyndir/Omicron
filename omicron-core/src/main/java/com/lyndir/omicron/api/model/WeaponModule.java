@@ -1,17 +1,17 @@
 package com.lyndir.omicron.api.model;
 
-import static com.lyndir.omicron.api.model.IncompatibleStateException.*;
+import static com.lyndir.omicron.api.model.CoreUtils.*;
 import static com.lyndir.omicron.api.model.Security.*;
+import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
-import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
 import java.util.Random;
 import java.util.Set;
 
 
-public class WeaponModule extends Module {
+public class WeaponModule extends Module implements IWeaponModule {
 
     private static final Random RANDOM = new Random();
     private final int            firePower;
@@ -45,50 +45,64 @@ public class WeaponModule extends Module {
         return new Builder0( ModuleType.WEAPON.getStandardCost().add( resourceCost ) );
     }
 
-    public int getFirePower() {
-        assertObservable();
-
+    @Override
+    public int getFirePower()
+            throws NotAuthenticatedException, NotObservableException {
         return firePower;
     }
 
-    public int getVariance() {
-        assertObservable();
-
+    @Override
+    public int getVariance()
+            throws NotAuthenticatedException, NotObservableException {
         return variance;
     }
 
-    public int getRange() {
-        assertObservable();
-
+    @Override
+    public int getRange()
+            throws NotAuthenticatedException, NotObservableException {
         return range;
     }
 
-    public int getRepeat() {
-        assertObservable();
-
+    @Override
+    public int getRepeat()
+            throws NotAuthenticatedException, NotObservableException {
         return repeat;
     }
 
-    public int getAmmunitionLoad() {
-        assertObservable();
-
+    @Override
+    public int getAmmunitionLoad()
+            throws NotAuthenticatedException, NotObservableException {
         return ammunitionLoad;
     }
 
-    public ImmutableSet<LevelType> getSupportedLayers() {
+    @Override
+    public int getRepeated() {
+        return repeated;
+    }
+
+    @Override
+    public int getAmmunition() {
+        return ammunition;
+    }
+
+    @Override
+    public ImmutableSet<LevelType> getSupportedLayers()
+            throws NotAuthenticatedException, NotObservableException {
         assertObservable();
 
         return ImmutableSet.copyOf( supportedLayers );
     }
 
-    @Authenticated
-    public boolean fireAt(final Tile target)
-            throws IncompatibleStateException {
+    @Override
+    public boolean fireAt(final ITile target)
+            throws NotAuthenticatedException, NotOwnedException, NotObservableException, IWeaponModule.OutOfRangeException,
+                   IWeaponModule.OutOfRepeatsException, IWeaponModule.OutOfAmmunitionException {
         assertOwned();
         Security.assertObservable( target );
-        assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, OutOfRangeException.class );
-        assertState( repeated < repeat, OutOfRepeatsException.class );
-        assertState( ammunition > 0, OutOfAmmunitionException.class );
+        assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range,
+                     IWeaponModule.OutOfRangeException.class );
+        assertState( repeated < repeat, IWeaponModule.OutOfRepeatsException.class );
+        assertState( ammunition > 0, IWeaponModule.OutOfAmmunitionException.class );
 
         ChangeInt.From repeatedChange = ChangeInt.from( repeated );
         ChangeInt.From ammunitionChange = ChangeInt.from( ammunition );
@@ -99,7 +113,8 @@ public class WeaponModule extends Module {
         getGameController().fireIfObservable( getGameObject().getLocation() )
                 .onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
 
-        Optional<GameObject> targetGameObject = target.getContents();
+        Tile coreTarget = coreT( target );
+        Optional<GameObject> targetGameObject = coreTarget.getContents();
         if (targetGameObject.isPresent())
             targetGameObject.get().onModule( ModuleType.BASE, 0 ).addDamage( firePower + RANDOM.nextInt( variance ) );
 
@@ -197,30 +212,6 @@ public class WeaponModule extends Module {
                     }
                 }
             }
-        }
-    }
-
-
-    public static class OutOfRangeException extends IncompatibleStateException {
-
-         OutOfRangeException() {
-            super( "The target is out of range for this weapon." );
-        }
-    }
-
-
-    public static class OutOfRepeatsException extends IncompatibleStateException {
-
-         OutOfRepeatsException() {
-            super( "The weapon cannot repeat anymore." );
-        }
-    }
-
-
-    public static class OutOfAmmunitionException extends IncompatibleStateException {
-
-         OutOfAmmunitionException() {
-            super( "The weapon is out of ammunition." );
         }
     }
 }

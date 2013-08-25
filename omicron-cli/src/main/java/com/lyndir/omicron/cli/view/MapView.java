@@ -50,7 +50,6 @@ public class MapView extends View {
             ImmutableMap.of( ResourceType.FUEL, Terminal.Color.RED, ResourceType.METALS, Terminal.Color.WHITE, ResourceType.SILICON,
                              Terminal.Color.YELLOW, ResourceType.RARE_ELEMENTS, Terminal.Color.MAGENTA );
 
-    @Nonnull
     private Coordinate offset = new Coordinate( 0, 0 );
     private LevelType      levelType;
     private Terminal.Color mapColor;
@@ -77,21 +76,21 @@ public class MapView extends View {
     protected void drawForeground(final Screen screen) {
         super.drawForeground( screen );
 
-        Optional<GameController> gameController = OmicronCLI.get().getGameController();
+        Optional<IGameController> gameController = OmicronCLI.get().getGameController();
         if (!gameController.isPresent())
             return;
 
-        final Optional<Player> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
+        final Optional<IPlayer> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
         if (!localPlayerOptional.isPresent())
             return;
-        final Player localPlayer = localPlayerOptional.get();
+        final IPlayer localPlayer = localPlayerOptional.get();
 
         // Create an empty grid.
         Size levelSize = gameController.get().getGame().getLevel( getLevelType() ).getSize();
-        Table<Integer, Integer, Tile> grid = HashBasedTable.create( levelSize.getHeight(), levelSize.getWidth() );
+        Table<Integer, Integer, ITile> grid = HashBasedTable.create( levelSize.getHeight(), levelSize.getWidth() );
 
         // Iterate observable tiles and populate the grid.
-        for (final Tile tile : localPlayer.listObservableTiles()) {
+        for (final ITile tile : localPlayer.listObservableTiles()) {
             Coordinate coordinate = positionToMapCoordinate( tile.getPosition() );
             grid.put( coordinate.getY(), coordinate.getX(), tile );
         }
@@ -106,8 +105,8 @@ public class MapView extends View {
                 if (!levelSize.isInBounds( new com.lyndir.omicron.api.model.Coordinate( u, v, levelSize ) ))
                     continue;
 
-                Tile tile = grid.get( v, u );
-                Maybe<GameObject> contents;
+                ITile tile = grid.get( v, u );
+                Maybe<? extends IGameObject> contents;
                 Terminal.Color bgColor = getBackgroundColor();
                 if (tile == null)
                     contents = Maybe.absent();
@@ -180,21 +179,21 @@ public class MapView extends View {
     }
 
     private void setHomeOffset() {
-        Optional<Player> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
-        ImmutableCollection<GameObject> gameObjects = ImmutableSet.of();
+        Optional<IPlayer> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
+        ImmutableCollection<? extends IGameObject> gameObjects = ImmutableSet.of();
         if (localPlayerOptional.isPresent())
             gameObjects = localPlayerOptional.get().getController().listObjects();
 
-        setOffset( FluentIterable.from( gameObjects ).filter( new PredicateNN<GameObject>() {
+        setOffset( FluentIterable.from( gameObjects ).filter( new PredicateNN<IGameObject>() {
             @Override
-            public boolean apply(@Nonnull final GameObject input) {
+            public boolean apply(@Nonnull final IGameObject input) {
                 // Only game objects in this map's displayed level.
                 return input.checkLocation().get().getLevel().getType() == getLevelType();
             }
-        } ).transform( new NNFunctionNN<GameObject, Coordinate>() {
+        } ).transform( new NNFunctionNN<IGameObject, Coordinate>() {
             @Nonnull
             @Override
-            public Coordinate apply(@Nonnull final GameObject input) {
+            public Coordinate apply(@Nonnull final IGameObject input) {
                 // Transform game objects into their offset from the center of the map.
                 hasUnits = true;
                 Box contentBox = getContentBoxOnScreen();
