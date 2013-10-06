@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
  */
 public abstract class ResourceCost extends MetaObject {
 
-    protected abstract Map<ResourceType, Integer> getResourceQuantities();
+    protected abstract ImmutableMap<ResourceType, Integer> getResourceQuantities();
 
     /**
      * Create a new zero resource cost instance.

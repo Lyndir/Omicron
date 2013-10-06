@@ -26,13 +26,13 @@ public class GameObject extends MetaObject implements IGameObject {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     final Logger logger = Logger.get( getClass() );
 
-    private final GameObjectController<? extends GameObject> controller;
-    private final UnitType                                   unitType;
-    private final Game                                       game;
-    private final int                                        objectID;
-    private final ListMultimap<ModuleType<?>, Module>        modules;
-    private       Player                                     owner;
-    private       Tile                                       location;
+    private final GameObjectController<? extends GameObject>   controller;
+    private final UnitType                                     unitType;
+    private final Game                                         game;
+    private final int                                          objectID;
+    private final ImmutableListMultimap<ModuleType<?>, Module> modules;
+    private       Player                                       owner;
+    private       Tile                                         location;
 
     GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner, @Nonnull final Tile location) {
         this( unitType, game, owner, owner.nextObjectID(), location );

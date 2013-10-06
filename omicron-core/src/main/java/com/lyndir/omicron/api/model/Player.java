@@ -3,6 +3,8 @@ package com.lyndir.omicron.api.model;
 import static com.lyndir.omicron.api.model.CoreUtils.*;
 
 import com.google.common.base.*;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
@@ -35,7 +37,7 @@ public class Player extends MetaObject implements IPlayer {
     @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
     private final Color     secondaryColor;
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final Map<Integer, GameObject> objects = new HashMap<>();
+    private final Map<Integer, GameObject> objects = Collections.synchronizedMap( new HashMap<Integer, GameObject>() );
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private int score;
@@ -106,8 +108,8 @@ public class Player extends MetaObject implements IPlayer {
         return secondaryColor;
     }
 
-    Collection<GameObject> getObjects() {
-        return objects.values();
+    ImmutableSet<GameObject> getObjects() {
+        return ImmutableSet.copyOf( objects.values() );
     }
 
     public static String randomName() {

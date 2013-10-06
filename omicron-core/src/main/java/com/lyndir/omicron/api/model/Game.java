@@ -33,7 +33,7 @@ public class Game extends MetaObject implements IGame {
     private final Size                  levelSize;
     private final ImmutableList<Level>  levels;
     private final ImmutableList<Player> players;
-    private final Set<Player> readyPlayers = new HashSet<>();
+    private final Set<Player> readyPlayers = Collections.synchronizedSet( new HashSet<Player>() );
     private boolean running;
 
     private Game(final Size levelSize, final List<Player> players, final List<VictoryConditionType> victoryConditions,

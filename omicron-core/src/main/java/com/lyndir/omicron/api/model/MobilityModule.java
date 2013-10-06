@@ -7,16 +7,15 @@ import static com.lyndir.omicron.api.util.PathUtils.*;
 import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nonnull;
 
 
 public class MobilityModule extends Module implements IMobilityModule {
 
     private final int movementSpeed;
-    private final Map<LevelType, Double> movementCost = new EnumMap<>( LevelType.class );
-    private final Map<LevelType, Double> levelingCost = new EnumMap<>( LevelType.class );
+    private final Map<LevelType, Double> movementCost = Collections.synchronizedMap( new EnumMap<LevelType, Double>(LevelType.class) );
+    private final Map<LevelType, Double> levelingCost = Collections.synchronizedMap( new EnumMap<LevelType, Double>( LevelType.class ) );
 
     private double remainingSpeed;
 

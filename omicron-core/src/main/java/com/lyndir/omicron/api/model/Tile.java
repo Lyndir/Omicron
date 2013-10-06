@@ -1,16 +1,15 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-import static com.lyndir.omicron.api.model.CoreUtils.*;
 
+import com.google.common.base.Objects;
 import com.google.common.base.*;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.Maybe;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -30,7 +29,8 @@ public class Tile extends MetaObject implements ITile {
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Level      level;
     @ObjectMeta(useFor = ObjectMeta.For.all)
-    private final Map<ResourceType, Integer> resourceQuantities = new EnumMap<>( ResourceType.class );
+    private final Map<ResourceType, Integer> resourceQuantities = Collections.synchronizedMap(
+            new EnumMap<ResourceType, Integer>( ResourceType.class ) );
 
     Tile(final Coordinate position, final Level level) {
         this.position = position;

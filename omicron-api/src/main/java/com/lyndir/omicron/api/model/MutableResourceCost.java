@@ -18,8 +18,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -27,7 +26,8 @@ import java.util.Map;
  */
 public class MutableResourceCost extends ResourceCost {
 
-    private final Map<ResourceType, Integer> resourceQuantities = new EnumMap<>( ResourceType.class );
+    private final Map<ResourceType, Integer> resourceQuantities = Collections.synchronizedMap(
+            new EnumMap<ResourceType, Integer>( ResourceType.class ) );
 
     protected MutableResourceCost() {
         this( ImmutableMap.<ResourceType, Integer>of() );
@@ -38,8 +38,8 @@ public class MutableResourceCost extends ResourceCost {
     }
 
     @Override
-    protected Map<ResourceType, Integer> getResourceQuantities() {
-        return resourceQuantities;
+    protected ImmutableMap<ResourceType, Integer> getResourceQuantities() {
+        return ImmutableMap.copyOf( resourceQuantities );
     }
 
     /**

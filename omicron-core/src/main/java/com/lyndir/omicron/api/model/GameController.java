@@ -10,8 +10,7 @@ import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,7 +18,7 @@ import javax.annotation.Nullable;
 public class GameController implements IGameController {
 
     private final Game game;
-    private final Map<GameListener, IPlayer> gameListeners = new HashMap<>();
+    private final Map<GameListener, IPlayer> gameListeners = Collections.synchronizedMap( Maps.<GameListener, IPlayer>newHashMap() );
 
     GameController(final Game game) {
         this.game = game;
@@ -102,14 +101,17 @@ public class GameController implements IGameController {
             Preconditions.checkState( ObjectUtils.isEqual( player, Security.currentPlayer() ),
                                       "Cannot set protected player ready: not authenticated.  First authenticate using Security.authenticate()." );
 
-        game.getReadyPlayers().add( player );
-        for (final GameListener gameListener : gameListeners.keySet())
-            gameListener.onPlayerReady( player );
+        Set<Player> readyPlayers = game.getReadyPlayers();
+        synchronized (readyPlayers) {
+            readyPlayers.add( player );
+            for (final GameListener gameListener : gameListeners.keySet())
+                gameListener.onPlayerReady( player );
 
-        if (game.getReadyPlayers().containsAll( game.getPlayers() )) {
-            game.getReadyPlayers().clear();
-            fireNewTurn();
-            return true;
+            if (readyPlayers.containsAll( game.getPlayers() )) {
+                readyPlayers.clear();
+                fireNewTurn();
+                return true;
+            }
         }
 
         return false;
@@ -132,8 +134,10 @@ public class GameController implements IGameController {
     private void fireNewTurn() {
         onNewTurn();
 
-        for (final GameListener gameListener : gameListeners.keySet())
-            gameListener.onNewTurn( game.getCurrentTurn() );
+        synchronized (gameListeners) {
+            for (final GameListener gameListener : gameListeners.keySet())
+                gameListener.onNewTurn( game.getCurrentTurn() );
+        }
     }
 
     protected void onNewTurn() {
@@ -167,8 +171,10 @@ public class GameController implements IGameController {
             @SuppressWarnings("ProhibitedExceptionDeclared")
             public Object invoke(final Object proxy, final Method method, final Object[] args)
                     throws Throwable {
-                for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet())
-                    method.invoke( gameListenerEntry.getKey(), args );
+                synchronized (gameListeners) {
+                    for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet())
+                        method.invoke( gameListenerEntry.getKey(), args );
+                }
 
                 return null;
             }
@@ -188,10 +194,12 @@ public class GameController implements IGameController {
             @SuppressWarnings("ProhibitedExceptionDeclared")
             public Object invoke(final Object proxy, final Method method, final Object[] args)
                     throws Throwable {
-                for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
-                    IPlayer gameListenerOwner = gameListenerEntry.getValue();
-                    if (gameListenerOwner == null || playerCondition.apply( gameListenerOwner ))
-                        method.invoke( gameListenerEntry.getKey(), args );
+                synchronized (gameListeners) {
+                    for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
+                        IPlayer gameListenerOwner = gameListenerEntry.getValue();
+                        if (gameListenerOwner == null || playerCondition.apply( gameListenerOwner ))
+                            method.invoke( gameListenerEntry.getKey(), args );
+                    }
                 }
 
                 return null;

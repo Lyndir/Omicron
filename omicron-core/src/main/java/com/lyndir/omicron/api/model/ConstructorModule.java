@@ -26,8 +26,7 @@ import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.PathUtils;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -226,7 +225,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
     public static class ConstructionSite extends GameObject implements IConstructionSite {
 
         private final UnitType constructionUnitType;
-        private final Map<PublicModuleType<?>, Integer> remainingWork = Maps.newHashMap();
+        private final Map<PublicModuleType<?>, Integer> remainingWork = Collections.synchronizedMap(
+                Maps.<PublicModuleType<?>, Integer>newHashMap() );
         private final List<? extends Module> constructionModules;
 
         private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner,
@@ -318,7 +318,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
                         @Nonnull
                         @Override
                         public Iterable<GameObject> apply(@SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") @Nonnull
-                                                           final GameObject neighbourInput) {
+                                                          final GameObject neighbourInput) {
                             return FluentIterable.from( neighbourInput.getLocation().neighbours() )
                                                  .transform( new NFunctionNN<Tile, GameObject>() {
                                                      @Nullable
@@ -326,8 +326,9 @@ public class ConstructorModule extends Module implements IConstructorModule {
                                                      public GameObject apply(@Nonnull final Tile input) {
                                                          Optional<GameObject> contents = input.getContents();
                                                          if (contents.isPresent()) {
-                                                             for (final ConstructorModule module : contents.get().getModules(
-                                                                     ModuleType.CONSTRUCTOR )) {
+                                                             for (final ConstructorModule module : contents.get()
+                                                                                                           .getModules(
+                                                                                                                   ModuleType.CONSTRUCTOR )) {
                                                                  if (ObjectUtils.isEqual( neighbourInput, module.getTarget() )) {
                                                                      return contents.get();
                                                                  }
@@ -344,8 +345,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     // Find paths to constructor and use them to work on the job.
                     while (true) {
                         Optional<PathUtils.Path<GameObject>> path = PathUtils.find( getGameObject(), foundFunction, costFunction,
-                                                                                     Constants.MAX_DISTANCE_TO_CONSTRUCTOR,
-                                                                                     neighboursFunction );
+                                                                                    Constants.MAX_DISTANCE_TO_CONSTRUCTOR,
+                                                                                    neighboursFunction );
                         if (!path.isPresent())
                             // No more constructors with remaining speed or construction finished.
                             break;
@@ -355,16 +356,18 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     }
 
                     // Check if we managed to complete all the work.
-                    if (FluentIterable.from( remainingWork.values() ).filter( new PredicateNN<Integer>() {
-                        @Override
-                        public boolean apply(@Nonnull final Integer input) {
-                            return input > 0;
+                    synchronized (remainingWork) {
+                        if (FluentIterable.from( remainingWork.values() ).filter( new PredicateNN<Integer>() {
+                            @Override
+                            public boolean apply(@Nonnull final Integer input) {
+                                return input > 0;
+                            }
+                        } ).isEmpty()) {
+                            // No more work remaining; create the constructed unit.
+                            Player owner = getOwner().get();
+                            die();
+                            new GameObject( constructionUnitType, getGame(), owner, getLocation() );
                         }
-                    } ).isEmpty()) {
-                        // No more work remaining; create the constructed unit.
-                        Player owner = getOwner().get();
-                        die();
-                        new GameObject( constructionUnitType, getGame(), owner, getLocation() );
                     }
                 }
             };
