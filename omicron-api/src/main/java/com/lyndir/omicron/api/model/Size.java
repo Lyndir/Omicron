@@ -47,6 +47,8 @@ public class Size extends MetaObject {
 
     @Override
     public boolean equals(@Nullable final Object obj) {
+        if (obj == this)
+            return true;
         if (!(obj instanceof Size))
             return false;
 

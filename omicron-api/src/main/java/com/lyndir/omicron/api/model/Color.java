@@ -3,7 +3,8 @@ package com.lyndir.omicron.api.model;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.Random;
+import java.util.*;
+import javax.annotation.Nullable;
 
 
 /**
@@ -78,5 +79,21 @@ public class Color extends MetaObject implements Serializable {
         byte b = colorBuffer.get();
 
         return new Color( r, g, b );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( red, green, blue );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj == this)
+            return true;
+        if (!(getClass().isInstance( obj )))
+            return false;
+
+        Color o = (Color) obj;
+        return red == o.red && green == o.green && blue == o.blue;
     }
 }

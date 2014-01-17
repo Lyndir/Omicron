@@ -17,6 +17,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import java.util.Objects;
 
 
 /**
@@ -51,5 +52,10 @@ public abstract class PublicModuleType<M extends IModule> extends MetaObject {
 
     public ImmutableResourceCost getStandardCost() {
         return standardCost;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( moduleType, standardCost );
     }
 }

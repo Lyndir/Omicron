@@ -154,6 +154,8 @@ public class Tile extends MetaObject implements ITile {
 
     @Override
     public boolean equals(final Object obj) {
+        if (obj == this)
+            return true;
         if (!(obj instanceof Tile))
             return false;
 

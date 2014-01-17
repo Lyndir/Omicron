@@ -21,8 +21,9 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.lyndir.lhunath.opal.system.util.*;
-import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -156,5 +157,15 @@ public abstract class ResourceCost extends MetaObject {
     @Override
     public String toString() {
         return String.format( "{%s: %s}", getClass().getSimpleName(), ObjectUtils.describe( getResourceQuantities() ) );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( getResourceQuantities() );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        return obj == this || obj instanceof ResourceCost && ((ResourceCost) obj).getResourceQuantities().equals( getResourceQuantities() );
     }
 }

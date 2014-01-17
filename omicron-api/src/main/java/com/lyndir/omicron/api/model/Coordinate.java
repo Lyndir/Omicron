@@ -1,8 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
-import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectMeta;
+import com.lyndir.lhunath.opal.system.util.*;
 import java.util.Objects;
 
 
@@ -140,11 +139,13 @@ public class Coordinate extends MetaObject {
 
     @Override
     public boolean equals(final Object obj) {
+        if (obj == this)
+            return true;
         if (!(obj instanceof Coordinate))
             return false;
 
         Coordinate o = (Coordinate) obj;
-        return u == o.u && v == o.v && wrapSize.equals( o.wrapSize );
+        return u == o.u && v == o.v && ObjectUtils.isEqual( wrapSize, o.wrapSize );
     }
 
     @Override
