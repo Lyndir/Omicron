@@ -1,12 +1,9 @@
 package com.lyndir.omicron.api.model.error;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
 import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
+import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import javax.annotation.Nullable;
 
 
 /**
@@ -31,19 +28,12 @@ public abstract class ExceptionUtils {
     private static <E extends Exception> void fail(final Class<E> exceptionClass, final Object... args)
             throws E {
         try {
-            Constructor<? extends Exception> constructor = exceptionClass.getDeclaredConstructor(
-                    FluentIterable.from( Lists.newArrayList( args ) ).transform( new Function<Object, Class<?>>() {
-                        @Nullable
-                        @Override
-                        public Class<?> apply(final Object input) {
-                            return input.getClass();
-                        }
-                    } ).toList().toArray( new Class<?>[args.length] ) );
+            Constructor<E> constructor = TypeUtils.getConstructor( exceptionClass, args );
             constructor.setAccessible( true );
 
             throw exceptionClass.cast( constructor.newInstance( args ) );
         }
-        catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new InternalInconsistencyException( "Fix the constructor of: " + exceptionClass, e );
         }
     }
