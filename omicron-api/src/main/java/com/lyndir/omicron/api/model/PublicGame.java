@@ -5,6 +5,7 @@ import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.GameListener;
 import java.util.List;
+import javax.annotation.Nullable;
 
 
 /**
@@ -22,6 +23,19 @@ public class PublicGame extends MetaObject implements IGame {
     PublicGame(final IGame core) {
 
         this.core = core;
+    }
+
+    @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicGame)
+            return core.equals( ((PublicGame) obj).core );
+
+        return core.equals( obj );
     }
 
     @Override

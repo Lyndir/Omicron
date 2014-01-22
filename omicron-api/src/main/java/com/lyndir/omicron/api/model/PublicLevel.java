@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 
 /**
@@ -16,6 +17,19 @@ public class PublicLevel extends MetaObject implements ILevel {
 
     PublicLevel(final ILevel core) {
         this.core = core;
+    }
+
+    @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicLevel)
+            return core.equals( ((PublicLevel) obj).core );
+
+        return core.equals( obj );
     }
 
     @Override

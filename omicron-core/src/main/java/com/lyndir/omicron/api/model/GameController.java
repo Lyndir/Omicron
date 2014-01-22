@@ -28,6 +28,16 @@ public class GameController implements IGameController {
     }
 
     @Override
+    public int hashCode() {
+        return game.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof IGameController && Objects.equals( game, ((IGameController) obj).getGame() );
+    }
+
+    @Override
     public Game getGame() {
         return game;
     }

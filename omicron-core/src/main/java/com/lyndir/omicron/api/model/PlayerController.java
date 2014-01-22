@@ -1,10 +1,10 @@
 package com.lyndir.omicron.api.model;
 
-import static com.lyndir.omicron.api.model.CoreUtils.*;
 import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
@@ -12,7 +12,7 @@ import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
 
-public class PlayerController implements IPlayerController {
+public class PlayerController extends MetaObject implements IPlayerController {
 
     private final Player         player;
     private       GameController gameController;

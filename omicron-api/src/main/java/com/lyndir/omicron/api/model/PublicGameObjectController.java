@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class PublicGameObjectController<O extends IGameObject> extends MetaObject implements IGameObjectController<O> {
@@ -17,6 +18,19 @@ public class PublicGameObjectController<O extends IGameObject> extends MetaObjec
 
     PublicGameObjectController(final IGameObjectController<O> core) {
         this.core = core;
+    }
+
+    @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicGameObjectController)
+            return core.equals( ((PublicGameObjectController<?>) obj).core );
+
+        return core.equals( obj );
     }
 
     @Override

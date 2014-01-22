@@ -22,6 +22,7 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import com.lyndir.omicron.api.model.error.OmicronException;
 import com.lyndir.omicron.api.util.PathUtils;
+import javax.annotation.Nullable;
 
 
 public abstract class Module extends MetaObject implements IModule {
@@ -36,6 +37,16 @@ public abstract class Module extends MetaObject implements IModule {
     protected Module(final ImmutableResourceCost resourceCost) {
         this.resourceCost = resourceCost;
         Preconditions.checkState( getType().getModuleType().isInstance( this ), "Invalid module type for module: %s", this );
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode( this );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        return obj == this;
     }
 
     @Override

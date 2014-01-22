@@ -54,6 +54,16 @@ public class Player extends MetaObject implements IPlayer {
     }
 
     @Override
+    public int hashCode() {
+        return playerID;
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        return obj instanceof IPlayer && playerID == ((IPlayer) obj).getPlayerID();
+    }
+
+    @Override
     @Nonnull
     public PlayerController getController() {
         return controller;

@@ -11,6 +11,7 @@ import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.util.PathUtils;
 import java.util.*;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -116,6 +117,16 @@ public class Game extends MetaObject implements IGame {
                 }
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode( this );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        return obj == this;
     }
 
     public static Builder builder() {

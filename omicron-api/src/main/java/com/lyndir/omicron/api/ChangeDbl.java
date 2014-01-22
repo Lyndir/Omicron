@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api;
 
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
+import java.util.Objects;
 
 
 /**
@@ -14,6 +15,22 @@ public class ChangeDbl {
     ChangeDbl(final double from, final double to) {
         this.from = from;
         this.to = to;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( from, to );
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof ChangeDbl))
+            return false;
+
+        ChangeDbl o = (ChangeDbl) obj;
+        return from == o.from && to == o.to;
     }
 
     public double getFrom() {

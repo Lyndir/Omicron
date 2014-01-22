@@ -17,6 +17,19 @@ public class PublicPlayerController implements IPlayerController {
     }
 
     @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof PublicPlayerController)
+            return core.equals( ((PublicPlayerController) obj).core );
+
+        return core.equals( obj );
+    }
+
+    @Override
     public IPlayer getPlayer() {
         return core.getPlayer();
     }

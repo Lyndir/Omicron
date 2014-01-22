@@ -6,6 +6,7 @@ import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybool;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -19,6 +20,16 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     protected GameObjectController(final O gameObject) {
         this.gameObject = gameObject;
+    }
+
+    @Override
+    public int hashCode() {
+        return gameObject.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        return obj instanceof IGameObjectController && Objects.equals( gameObject, ((IGameObjectController<?>) obj).getGameObject() );
     }
 
     @Override

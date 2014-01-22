@@ -52,7 +52,8 @@ public class Window {
             while (isRunning()) {
                 // Measure
                 getRootView().measure( screen, new Box( 0, screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows(), 0 ) );
-                if (!isReady()) fireReady();
+                if (!isReady())
+                    fireReady();
 
                 // Draw
                 getRootView().draw( screen );
@@ -91,7 +92,8 @@ public class Window {
     protected void onStartup(final Screen screen) {
         // Start screen and resize to terminal size.
         screen.startScreen();
-        while (screen.readInput() != null) ;
+        while (screen.readInput() != null)
+            ;
         screen.refresh();
     }
 

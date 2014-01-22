@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.view;
 
 import com.lyndir.omicron.api.model.IPlayer;
+import java.util.Objects;
 
 
 /**
@@ -19,6 +20,22 @@ public class PlayerGameInfo {
         this.player = player;
         this.discovered = discovered;
         this.score = score;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(player, discovered, score);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof PlayerGameInfo))
+            return false;
+
+        PlayerGameInfo o = (PlayerGameInfo) obj;
+        return discovered == o.discovered && score == o.score && Objects.equals( player, o.player );
     }
 
     public IPlayer getPlayer() {

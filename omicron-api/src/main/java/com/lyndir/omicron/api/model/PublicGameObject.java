@@ -31,6 +31,19 @@ public class PublicGameObject extends MetaObject implements IGameObject {
     }
 
     @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicGameObject)
+            return core.equals( ((PublicGameObject) obj).core );
+
+        return core.equals( obj );
+    }
+
+    @Override
     @Nonnull
     public IGameObjectController<? extends IGameObject> getController() {
         return core.getController();

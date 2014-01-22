@@ -16,6 +16,9 @@
 
 package com.lyndir.omicron.api.model;
 
+import javax.annotation.Nonnull;
+
+
 /**
  * @author lhunath, 2013-08-02
  */
@@ -40,7 +43,7 @@ public abstract class ModuleType<M extends IModule> extends PublicModuleType<M> 
     public static final ModuleType<WeaponModule>      WEAPON      = //
             new ModuleType<WeaponModule>( WeaponModule.class, PublicModuleType.WEAPON.getStandardCost() ) {};
 
-    private ModuleType(final Class<M> moduleType, final ImmutableResourceCost standardCost) {
+    private ModuleType(@Nonnull final Class<M> moduleType, @Nonnull final ImmutableResourceCost standardCost) {
         super( moduleType, standardCost );
     }
 }

@@ -19,7 +19,7 @@ public class PlayerKey {
     public boolean equals(final Object obj) {
         if (obj == this)
             return true;
-        if (!(getClass().isInstance( obj )))
+        if (!(obj instanceof PlayerKey))
             return false;
 
         return Arrays.equals( key, ((PlayerKey) obj).key );

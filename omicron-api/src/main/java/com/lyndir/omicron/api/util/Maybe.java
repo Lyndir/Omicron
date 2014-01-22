@@ -17,6 +17,7 @@
 package com.lyndir.omicron.api.util;
 
 import com.google.common.base.Preconditions;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -56,6 +57,16 @@ public abstract class Maybe<T> {
     private static class Absent<T> extends Maybe<T> {
 
         @Override
+        public int hashCode() {
+            return Objects.hash( presence() );
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj instanceof Absent;
+        }
+
+        @Override
         public Presence presence() {
             return Presence.ABSENT;
         }
@@ -73,6 +84,16 @@ public abstract class Maybe<T> {
 
 
     private static class Unknown<T> extends Maybe<T> {
+
+        @Override
+        public int hashCode() {
+            return Objects.hash( presence() );
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj instanceof Unknown;
+        }
 
         @Override
         public Presence presence() {
@@ -97,6 +118,16 @@ public abstract class Maybe<T> {
 
         private Present(final T reference) {
             this.reference = Preconditions.checkNotNull( reference, "Missing object for present reference." );
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash( presence(), reference );
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj instanceof Present && Objects.equals( reference, ((Present<?>) obj).reference );
         }
 
         @Override

@@ -41,6 +41,22 @@ public class Tile extends MetaObject implements ITile {
         this( new Coordinate( u, v, level.getSize() ), level );
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode( position, level );
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Tile))
+            return false;
+
+        Tile o = (Tile) obj;
+        return ObjectUtils.isEqual( position, o.position ) && ObjectUtils.isEqual( level, o.level );
+    }
+
     @Nonnull
     Optional<GameObject> getContents() {
         return Optional.fromNullable( contents );
@@ -145,22 +161,6 @@ public class Tile extends MetaObject implements ITile {
             return Maybe.unknown();
 
         return Maybe.of( ObjectUtils.isEqual( contents.get(), target ) );
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode( position, level );
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == this)
-            return true;
-        if (!(obj instanceof Tile))
-            return false;
-
-        Tile o = (Tile) obj;
-        return ObjectUtils.isEqual( position, o.position ) && ObjectUtils.isEqual( level, o.level );
     }
 
     /**

@@ -21,6 +21,16 @@ public class Turn extends MetaObject {
         number = previousTurn.getNumber() + 1;
     }
 
+    @Override
+    public int hashCode() {
+        return number;
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        return obj instanceof Turn && number == ((Turn) obj).number;
+    }
+
     @Nullable
     public Turn getPreviousTurn() {
         return previousTurn;

@@ -90,7 +90,7 @@ public class Color extends MetaObject implements Serializable {
     public boolean equals(@Nullable final Object obj) {
         if (obj == this)
             return true;
-        if (!(getClass().isInstance( obj )))
+        if (!(obj instanceof Color))
             return false;
 
         Color o = (Color) obj;

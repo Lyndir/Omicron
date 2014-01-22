@@ -166,6 +166,11 @@ public abstract class ResourceCost extends MetaObject {
 
     @Override
     public boolean equals(@Nullable final Object obj) {
-        return obj == this || obj instanceof ResourceCost && ((ResourceCost) obj).getResourceQuantities().equals( getResourceQuantities() );
+        if (obj == this)
+            return true;
+        if (!(obj instanceof ResourceCost))
+            return false;
+
+        return getResourceQuantities().equals( ((ResourceCost) obj).getResourceQuantities() );
     }
 }

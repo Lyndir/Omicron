@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
+import javax.annotation.Nullable;
 
 
 public abstract class PublicModule extends MetaObject implements IModule {
@@ -32,6 +33,19 @@ public abstract class PublicModule extends MetaObject implements IModule {
         this.coreModule = coreModule;
 
         Preconditions.checkState( getType().getModuleType().isInstance( this ), "Invalid module type for module: %s", this );
+    }
+
+    @Override
+    public int hashCode() {
+        return coreModule.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicModule)
+            return coreModule.equals( ((PublicModule) obj).coreModule );
+
+        return coreModule.equals( obj );
     }
 
     @Override

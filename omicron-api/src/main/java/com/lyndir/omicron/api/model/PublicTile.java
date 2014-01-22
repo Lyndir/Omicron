@@ -5,6 +5,7 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -18,6 +19,19 @@ public class PublicTile extends MetaObject implements ITile {
 
     PublicTile(final ITile core) {
         this.core = core;
+    }
+
+    @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicTile)
+            return core.equals( ((PublicTile) obj).core );
+
+        return core.equals( obj );
     }
 
     @Override

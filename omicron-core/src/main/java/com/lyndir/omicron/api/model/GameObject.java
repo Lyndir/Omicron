@@ -12,6 +12,7 @@ import com.lyndir.omicron.api.Change;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -58,6 +59,16 @@ public class GameObject extends MetaObject implements IGameObject {
         if (owner != null)
             owner.addObject( this );
         location.setContents( this );
+    }
+
+    @Override
+    public int hashCode() {
+        return objectID;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof IGameObject && objectID == ((IGameObject) obj).getObjectID();
     }
 
     @Override

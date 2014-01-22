@@ -17,7 +17,10 @@
 package com.lyndir.omicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -41,15 +44,17 @@ public abstract class PublicModuleType<M extends IModule> extends MetaObject {
     private final Class<M>              moduleType;
     private final ImmutableResourceCost standardCost;
 
-    PublicModuleType(final Class<M> moduleType, final ImmutableResourceCost standardCost) {
+    PublicModuleType(@Nonnull final Class<M> moduleType, @Nonnull final ImmutableResourceCost standardCost) {
         this.moduleType = moduleType;
         this.standardCost = standardCost;
     }
 
+    @Nonnull
     public Class<M> getModuleType() {
         return moduleType;
     }
 
+    @Nonnull
     public ImmutableResourceCost getStandardCost() {
         return standardCost;
     }
@@ -57,5 +62,16 @@ public abstract class PublicModuleType<M extends IModule> extends MetaObject {
     @Override
     public int hashCode() {
         return Objects.hash( moduleType, standardCost );
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof PublicModuleType))
+            return false;
+
+        PublicModuleType<?> o = ((PublicModuleType<?>) obj);
+        return moduleType.equals( o.moduleType ) && standardCost.equals( o.standardCost );
     }
 }

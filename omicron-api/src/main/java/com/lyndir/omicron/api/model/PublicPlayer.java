@@ -5,6 +5,7 @@ import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -18,6 +19,19 @@ public class PublicPlayer extends MetaObject implements IPlayer {
 
     PublicPlayer(final IPlayer core) {
         this.core = core;
+    }
+
+    @Override
+    public int hashCode() {
+        return core.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object obj) {
+        if (obj instanceof PublicPlayer)
+            return core.equals( ((PublicPlayer) obj).core );
+
+        return core.equals( obj );
     }
 
     @Override
