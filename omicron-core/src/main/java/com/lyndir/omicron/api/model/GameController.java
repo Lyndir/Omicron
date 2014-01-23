@@ -4,12 +4,12 @@ import static com.lyndir.omicron.api.model.CoreUtils.*;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -114,12 +114,16 @@ public class GameController implements IGameController {
         Set<Player> readyPlayers = game.getReadyPlayers();
         synchronized (readyPlayers) {
             readyPlayers.add( player );
-            for (final GameListener gameListener : gameListeners.keySet())
-                gameListener.onPlayerReady( player );
+            fire().onPlayerReady( player );
 
             if (readyPlayers.containsAll( game.getPlayers() )) {
                 readyPlayers.clear();
-                fireNewTurn();
+                Security.godRun( new RunnableJob<Void>() {
+                    @Override
+                    public void run() {
+                        fireNewTurn();
+                    }
+                } );
                 return true;
             }
         }
@@ -144,10 +148,7 @@ public class GameController implements IGameController {
     private void fireNewTurn() {
         onNewTurn();
 
-        synchronized (gameListeners) {
-            for (final GameListener gameListener : gameListeners.keySet())
-                gameListener.onNewTurn( game.getCurrentTurn() );
-        }
+        fire().onNewTurn( game.getCurrentTurn() );
     }
 
     protected void onNewTurn() {
@@ -177,13 +178,15 @@ public class GameController implements IGameController {
     GameListener fire() {
         return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
             @Override
-            @Nullable
-            @SuppressWarnings("ProhibitedExceptionDeclared")
-            public Object invoke(final Object proxy, final Method method, final Object[] args)
-                    throws Throwable {
+            public Object invoke(final Object proxy, final Method method, final Object[] args) {
                 synchronized (gameListeners) {
-                    for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet())
-                        method.invoke( gameListenerEntry.getKey(), args );
+                    for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
+                        IPlayer gameListenerOwner = gameListenerEntry.getValue();
+                        if (gameListenerOwner == null)
+                            Security.godRun( newGameListenerJob( gameListenerEntry.getKey(), method, args ) );
+                        else
+                            Security.playerRun( gameListenerOwner, newGameListenerJob( gameListenerEntry.getKey(), method, args ) );
+                    }
                 }
 
                 return null;
@@ -192,7 +195,7 @@ public class GameController implements IGameController {
     }
 
     /**
-     * Get a game listener proxy to call an event on that should be fired for all game listeners that are either internal or registered by
+     * Get a game listener proxy to call an event that should be fired for all game listeners that are either internal or registered by
      * players that pass the playerCondition.
      *
      * @param playerCondition The predicate that should hold true for all players eligible to receive the notification.
@@ -207,8 +210,10 @@ public class GameController implements IGameController {
                 synchronized (gameListeners) {
                     for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
                         IPlayer gameListenerOwner = gameListenerEntry.getValue();
-                        if (gameListenerOwner == null || playerCondition.apply( gameListenerOwner ))
-                            method.invoke( gameListenerEntry.getKey(), args );
+                        if (gameListenerOwner == null)
+                            Security.godRun( newGameListenerJob( gameListenerEntry.getKey(), method, args ) );
+                        else if (playerCondition.apply( gameListenerOwner ))
+                            Security.playerRun( gameListenerOwner, newGameListenerJob( gameListenerEntry.getKey(), method, args ) );
                     }
                 }
 
@@ -227,8 +232,28 @@ public class GameController implements IGameController {
         return fireIfPlayer( new PredicateNN<IPlayer>() {
             @Override
             public boolean apply(@Nonnull final IPlayer input) {
-                return input.canObserve( location ).isTrue();
+                return Security.godRun( new Job<Boolean>() {
+                    @Override
+                    public Boolean execute() {
+                        return input.canObserve( location ).isTrue();
+                    }
+                } );
             }
         } );
+    }
+
+    private static RunnableJob<Void> newGameListenerJob(final GameListener gameListener, final Method method, final Object[] args) {
+        return new RunnableJob<Void>() {
+            @Override
+            public void run() {
+                try {
+                    //noinspection unchecked
+                    method.invoke( gameListener, args );
+                }
+                catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new InternalInconsistencyException( "Fix: " + gameListener, e );
+                }
+            }
+        };
     }
 }

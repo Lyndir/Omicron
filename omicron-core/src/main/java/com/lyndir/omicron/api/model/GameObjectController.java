@@ -1,5 +1,7 @@
 package com.lyndir.omicron.api.model;
 
+import static com.lyndir.omicron.api.model.Security.*;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
@@ -79,7 +81,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     @Authenticated
     public Maybool canObserve(@Nonnull final ITile location)
             throws Security.NotAuthenticatedException, Security.NotObservableException {
-        if (getGameObject().isOwnedByCurrentPlayer() && ObjectUtils.equals( location, getGameObject().getLocation() ))
+        if (isGod() || (getGameObject().isOwnedByCurrentPlayer() && ObjectUtils.equals( location, getGameObject().getLocation() )))
             return Maybool.YES;
 
         return getGameObject().onModuleElse( ModuleType.BASE, 0, Maybool.NO ).canObserve( location );

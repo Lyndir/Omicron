@@ -86,7 +86,7 @@ public class PlayerController extends MetaObject implements IPlayerController {
     @Authenticated
     public ImmutableCollection<GameObject> listObjects()
             throws NotAuthenticatedException {
-        if (!ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
+        if (!isGod() && !ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
             return ImmutableSet.of();
 
         return ImmutableSet.copyOf( getPlayer().getObjects() );
@@ -116,7 +116,7 @@ public class PlayerController extends MetaObject implements IPlayerController {
             throws NotAuthenticatedException {
         Optional<GameObject> object = getPlayer().getObject( objectId );
 
-        if (ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
+        if (isGod() || ObjectUtils.isEqual( getPlayer(), currentPlayer() ))
             if (object.isPresent())
                 return Maybe.of( object.get() );
             else

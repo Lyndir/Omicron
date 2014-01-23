@@ -19,9 +19,11 @@ package com.lyndir.omicron.api.model;
 import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 
 import com.google.common.base.Preconditions;
+import com.lyndir.lhunath.opal.system.util.Job;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.model.error.OmicronSecurityException;
 import com.lyndir.omicron.api.util.Maybe;
+import javax.annotation.Nonnull;
 
 
 /**
@@ -30,6 +32,40 @@ import com.lyndir.omicron.api.util.Maybe;
 public final class Security {
 
     private static final ThreadLocal<IPlayer> currentPlayerTL = new ThreadLocal<>();
+    private static final ThreadLocal<IPlayer> jobPlayerTL     = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> godTL           = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+
+    static <R> R godRun(final Job<R> job) {
+        if (isGod()) {
+            // Already god.
+            return job.execute();
+        }
+
+        try {
+            // Become god.
+            godTL.set( true );
+            return job.execute();
+        }
+        finally {
+            // Become mortal.
+            godTL.set( false );
+        }
+    }
+
+    static void playerRun(final IPlayer jobPlayer, final Runnable job) {
+        try {
+            jobPlayerTL.set( jobPlayer );
+            job.run();
+        }
+        finally {
+            jobPlayerTL.remove();
+        }
+    }
 
     public static void authenticate(final IPlayer currentPlayer, final PlayerKey playerKey) {
         Preconditions.checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
@@ -41,8 +77,17 @@ public final class Security {
         return currentPlayerTL.get() != null;
     }
 
+    static boolean isGod() {
+        return godTL.get();
+    }
+
+    @Nonnull
     static IPlayer currentPlayer()
             throws NotAuthenticatedException {
+        IPlayer jobPlayer = jobPlayerTL.get();
+        if (jobPlayer != null)
+            return jobPlayer;
+
         IPlayer currentPlayer = currentPlayerTL.get();
         assertSecure( currentPlayer != null, NotAuthenticatedException.class );
         assert currentPlayer != null;
@@ -52,18 +97,27 @@ public final class Security {
 
     public static void assertOwned(final GameObserver observer)
             throws NotAuthenticatedException, NotOwnedException {
+        if (isGod())
+            return;
+
         assertSecure( observer.getOwner().isPresent() && ObjectUtils.equals( observer.getOwner().get(), currentPlayer() ), //
                       NotOwnedException.class, observer );
     }
 
     public static void assertObservable(final ITile location)
             throws NotAuthenticatedException, NotObservableException {
+        if (isGod())
+            return;
+
         assertSecure( currentPlayer().canObserve( location ).isTrue(), //
                       NotObservableException.class, location );
     }
 
     public static void assertObservable(final IGameObject gameObject)
             throws NotAuthenticatedException, NotObservableException {
+        if (isGod())
+            return;
+
         assertSecure( gameObject.checkLocation().presence() == Maybe.Presence.PRESENT, //
                       NotObservableException.class, gameObject );
     }

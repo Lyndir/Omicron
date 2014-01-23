@@ -132,7 +132,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public Maybe<Tile> checkLocation()
             throws NotAuthenticatedException {
-        if (!currentPlayer().canObserve( getLocation() ).isTrue())
+        if (!isGod() && !currentPlayer().canObserve( getLocation() ).isTrue())
             return Maybe.unknown();
 
         return Maybe.fromNullable( getLocation() );

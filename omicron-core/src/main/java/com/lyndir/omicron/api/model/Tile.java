@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
+import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.Objects;
 import com.google.common.base.*;
@@ -66,7 +67,7 @@ public class Tile extends MetaObject implements ITile {
     @Nonnull
     public Maybe<GameObject> checkContents()
             throws Security.NotAuthenticatedException {
-        if (!Security.currentPlayer().canObserve( this ).isTrue())
+        if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
             // Cannot observe tile.
             return Maybe.unknown();
 
@@ -118,7 +119,7 @@ public class Tile extends MetaObject implements ITile {
     @Authenticated
     public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType)
             throws Security.NotAuthenticatedException {
-        if (!Security.currentPlayer().canObserve( this ).isTrue())
+        if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
             // Cannot observe location.
             return Maybe.unknown();
 

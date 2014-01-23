@@ -1,6 +1,6 @@
 package com.lyndir.omicron.api.model;
 
-import static com.lyndir.omicron.api.model.Security.currentPlayer;
+import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -43,11 +43,11 @@ public class BaseModule extends Module implements IBaseModule {
     @Override
     public Maybool canObserve(@Nonnull final ITile location)
             throws Security.NotAuthenticatedException {
-        if (!getGameObject().isOwnedByCurrentPlayer())
-            if (!currentPlayer().canObserve( location ).isTrue())
+        if (!isGod() && !getGameObject().isOwnedByCurrentPlayer())
+            if (!currentPlayer().canObserve( location ).isTrue() || !currentPlayer().canObserve( getGameObject().getLocation() ).isTrue())
                 return Maybool.UNKNOWN;
 
-        // Game object is owned by current player, or current player can observe the location.
+        // Game object is owned by current player, or current player can observe the location and the game object.
         if (getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) > viewRange)
             return Maybool.NO;
 
