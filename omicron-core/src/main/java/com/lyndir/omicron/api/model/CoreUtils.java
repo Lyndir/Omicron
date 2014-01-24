@@ -36,9 +36,8 @@ public abstract class CoreUtils {
         return (Tile) object;
     }
 
-    @SuppressWarnings("unchecked")
     static <M extends IModule> ModuleType<M> coreMT(final PublicModuleType<M> object) {
-        return (ModuleType<M>) object;
+        return ModuleType.of(object);
     }
 
     @SuppressWarnings("unchecked")

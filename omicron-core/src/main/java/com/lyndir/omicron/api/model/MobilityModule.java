@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 public class MobilityModule extends Module implements IMobilityModule {
 
     private final int movementSpeed;
-    private final Map<LevelType, Double> movementCost = Collections.synchronizedMap( new EnumMap<LevelType, Double>(LevelType.class) );
+    private final Map<LevelType, Double> movementCost = Collections.synchronizedMap( new EnumMap<LevelType, Double>( LevelType.class ) );
     private final Map<LevelType, Double> levelingCost = Collections.synchronizedMap( new EnumMap<LevelType, Double>( LevelType.class ) );
 
     private double remainingSpeed;
@@ -209,7 +209,7 @@ public class MobilityModule extends Module implements IMobilityModule {
         return ModuleType.MOBILITY;
     }
 
-    public class Leveling implements ILeveling {
+    public class Leveling extends MetaObject implements ILeveling {
 
         private final double         cost;
         private final Optional<Tile> target;
@@ -268,16 +268,16 @@ public class MobilityModule extends Module implements IMobilityModule {
             remainingSpeed -= cost;
 
             getGameController().fireIfObservable( getGameObject().getLocation() )
-                    .onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
-                                        remainingSpeedChange.to( remainingSpeed ) );
+                               .onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
+                                                   remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 
 
-    public class Movement implements IMovement {
+    public class Movement extends MetaObject implements IMovement {
 
-        private final double                cost;
-        private final Leveling              leveling;
+        private final double               cost;
+        private final Leveling             leveling;
         private final Optional<Path<Tile>> path;
 
         Movement(final double cost) {
@@ -352,8 +352,8 @@ public class MobilityModule extends Module implements IMobilityModule {
             remainingSpeed -= path.get().getCost();
 
             getGameController().fireIfObservable( getGameObject().getLocation() )
-                    .onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
-                                      remainingSpeedChange.to( remainingSpeed ) );
+                               .onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
+                                                 remainingSpeedChange.to( remainingSpeed ) );
         }
     }
 

@@ -1,7 +1,6 @@
 package com.lyndir.omicron.cli.command;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
+import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.model.*;
@@ -103,7 +102,18 @@ public class MoveCommand extends Command {
         }
 
         // Move the object.
-        mobilityModule.movement( targetLocation.get() );
-        inf( "Object is now at: %s", gameObject.checkLocation() );
+        IMobilityModule.IMovement movement = mobilityModule.movement( targetLocation.get() );
+        if (!movement.isPossible()) {
+            err( "This movement is not possible: %s.", movement );
+            return;
+        }
+
+        try {
+            movement.execute();
+            inf( "Object is now at: %s", gameObject.checkLocation() );
+        }
+        catch (IModule.ImpossibleException | IModule.InvalidatedException e) {
+            throw Throwables.propagate( e );
+        }
     }
 }

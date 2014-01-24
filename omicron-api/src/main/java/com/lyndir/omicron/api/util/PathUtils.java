@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
+import java.io.Serializable;
 import java.util.*;
 import javax.annotation.Nonnull;
 

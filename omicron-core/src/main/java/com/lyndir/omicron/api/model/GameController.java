@@ -156,10 +156,14 @@ public class GameController implements IGameController {
         if (!game.isRunning())
             start();
 
-        for (final Player player : game.getPlayers()) {
-            player.getController().fireReset();
-            player.getController().fireNewTurn();
-        }
+        for (final Player player : game.getPlayers())
+            Security.playerRun( player, new Runnable() {
+                @Override
+                public void run() {
+                    player.getController().fireReset();
+                    player.getController().fireNewTurn();
+                }
+            } );
     }
 
     @Override
@@ -248,7 +252,8 @@ public class GameController implements IGameController {
             public void run() {
                 try {
                     //noinspection unchecked
-                    method.invoke( gameListener, args );
+                    if (method.getDeclaringClass() == GameListener.class)
+                        method.invoke( gameListener, args );
                 }
                 catch (IllegalAccessException | InvocationTargetException e) {
                     throw new InternalInconsistencyException( "Fix: " + gameListener, e );

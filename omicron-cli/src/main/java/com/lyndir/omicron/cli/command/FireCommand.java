@@ -121,9 +121,12 @@ public class FireCommand extends Command {
 
         // Fire at the target.
         try {
-            weaponModule.fireAt( target.get() );
-            Maybe<? extends IGameObject> targetContents = target.get().checkContents();
-            inf( "Fired at: %s", targetContents );
+            if (!weaponModule.fireAt( target.get() )) {
+                err( "Firing not possible." );
+                return;
+            }
+
+            inf( "Fired at: %s", target.get().checkContents() );
         }
         catch (IWeaponModule.OutOfRangeException ignored) {
             err( "Couldn't fire, target out of range: %s", target.get() );

@@ -23,6 +23,8 @@ import com.lyndir.lhunath.opal.system.util.Job;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.model.error.OmicronSecurityException;
 import com.lyndir.omicron.api.util.Maybe;
+import java.util.Deque;
+import java.util.LinkedList;
 import javax.annotation.Nonnull;
 
 
@@ -31,12 +33,12 @@ import javax.annotation.Nonnull;
  */
 public final class Security {
 
-    private static final ThreadLocal<IPlayer> currentPlayerTL = new ThreadLocal<>();
-    private static final ThreadLocal<IPlayer> jobPlayerTL     = new ThreadLocal<>();
-    private static final ThreadLocal<Boolean> godTL           = new ThreadLocal<Boolean>() {
+    private static final ThreadLocal<IPlayer>        currentPlayerTL = new ThreadLocal<>();
+    private static final ThreadLocal<IPlayer>        jobPlayerTL     = new ThreadLocal<>();
+    private static final ThreadLocal<Deque<Boolean>> godTL           = new ThreadLocal<Deque<Boolean>>() {
         @Override
-        protected Boolean initialValue() {
-            return false;
+        protected Deque<Boolean> initialValue() {
+            return new LinkedList<>();
         }
     };
 
@@ -48,21 +50,23 @@ public final class Security {
 
         try {
             // Become god.
-            godTL.set( true );
+            godTL.get().push( true );
             return job.execute();
         }
         finally {
             // Become mortal.
-            godTL.set( false );
+            Preconditions.checkState( godTL.get().pop(), "Expected to be god." );
         }
     }
 
     static void playerRun(final IPlayer jobPlayer, final Runnable job) {
         try {
+            godTL.get().push( false );
             jobPlayerTL.set( jobPlayer );
             job.run();
         }
         finally {
+            Preconditions.checkState( !godTL.get().pop(), "Expected to not be god." );
             jobPlayerTL.remove();
         }
     }
@@ -78,7 +82,7 @@ public final class Security {
     }
 
     static boolean isGod() {
-        return godTL.get();
+        return !godTL.get().isEmpty() && godTL.get().peek();
     }
 
     @Nonnull

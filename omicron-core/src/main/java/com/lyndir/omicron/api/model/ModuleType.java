@@ -16,6 +16,10 @@
 
 package com.lyndir.omicron.api.model;
 
+import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
+import com.lyndir.lhunath.opal.system.logging.Logger;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import javax.annotation.Nonnull;
 
 
@@ -24,7 +28,8 @@ import javax.annotation.Nonnull;
  */
 public abstract class ModuleType<M extends IModule> extends PublicModuleType<M> {
 
-    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
+    static Logger logger = Logger.get( ModuleType.class );
+
     public static final ModuleType<ExtractorModule>   EXTRACTOR   = //
             new ModuleType<ExtractorModule>( ExtractorModule.class, PublicModuleType.EXTRACTOR.getStandardCost() ) {};
     @SuppressWarnings("FieldNameHidesFieldInSuperclass")
@@ -45,5 +50,25 @@ public abstract class ModuleType<M extends IModule> extends PublicModuleType<M> 
 
     private ModuleType(@Nonnull final Class<M> moduleType, @Nonnull final ImmutableResourceCost standardCost) {
         super( moduleType, standardCost );
+    }
+
+    public static <M extends IModule> ModuleType<M> of(final PublicModuleType<M> moduleType) {
+        if (moduleType instanceof ModuleType)
+            return (ModuleType<M>) moduleType;
+
+        for (final Field field : ModuleType.class.getFields())
+            if (Modifier.isStatic( field.getModifiers() ))
+                if (ModuleType.class.isAssignableFrom( field.getType() ))
+                    try {
+                        ModuleType<?> coreModuleType = (ModuleType<?>) field.get( null );
+                        if (moduleType.getModuleType().isAssignableFrom( coreModuleType.getModuleType() ))
+                            //noinspection unchecked
+                            return (ModuleType<M>) coreModuleType;
+                    }
+                    catch (final IllegalAccessException e) {
+                        throw new InternalInconsistencyException( "Expected field to contain a core module: " + field, e );
+                    }
+
+        throw new InternalInconsistencyException( "No core module field found for module type: " + moduleType );
     }
 }

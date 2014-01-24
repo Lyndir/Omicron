@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.util.PathUtils.*;
 
+import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.Authenticated;
 
 
@@ -86,7 +87,7 @@ public class PublicMobilityModule extends PublicModule implements IMobilityModul
         return PublicModuleType.MOBILITY;
     }
 
-    public class Leveling implements IMobilityModule.ILeveling {
+    public class Leveling extends MetaObject implements IMobilityModule.ILeveling {
 
         private final IMobilityModule.ILeveling core;
 
@@ -132,7 +133,7 @@ public class PublicMobilityModule extends PublicModule implements IMobilityModul
     }
 
 
-    public class Movement implements IMobilityModule.IMovement {
+    public class Movement extends MetaObject implements IMobilityModule.IMovement {
 
         private final IMobilityModule.IMovement core;
 
