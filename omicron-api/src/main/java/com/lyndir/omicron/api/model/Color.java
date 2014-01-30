@@ -3,7 +3,8 @@ package com.lyndir.omicron.api.model;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Objects;
+import java.util.Random;
 import javax.annotation.Nullable;
 
 
@@ -13,6 +14,15 @@ import javax.annotation.Nullable;
  * @author lhunath
  */
 public class Color extends MetaObject implements Serializable {
+
+    private static final Random RANDOM = new Random();
+
+    public static Color random() {
+        byte[] colorBytes = new byte[3];
+        RANDOM.nextBytes( colorBytes );
+
+        return new Color( colorBytes[0], colorBytes[1], colorBytes[2] );
+    }
 
     public enum Template {
 

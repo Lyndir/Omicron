@@ -2,8 +2,7 @@ package com.lyndir.omicron.cli;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import com.google.common.base.*;
 import com.lyndir.lanterna.view.OmicronWindow;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.GameListener;
@@ -32,7 +31,6 @@ public class OmicronCLI {
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments)
             throws Exception {
-
         // Attach the omicron command log appender to logback.
         LoggerContext logbackFactory = (LoggerContext) LoggerFactory.getILoggerFactory();
         OmicronCLIAppender newAppender = new OmicronCLIAppender();

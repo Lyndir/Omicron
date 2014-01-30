@@ -46,19 +46,13 @@
         <module>omicron-api</module>
         <module>omicron-core</module>
         <module>omicron-cli</module>
+        <module>omicron-web</module>
         <module>omicron-wiki</module>
     </modules>
 
     <!-- BUILD CONFIGURATION -->
     <build>
         <plugins>
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-            </plugin>
-            -->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

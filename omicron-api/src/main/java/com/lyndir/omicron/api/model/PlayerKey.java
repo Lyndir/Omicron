@@ -1,11 +1,12 @@
 package com.lyndir.omicron.api.model;
 
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
 
-public class PlayerKey {
+public class PlayerKey implements Serializable {
 
     private static final Random RANDOM = new SecureRandom();
 

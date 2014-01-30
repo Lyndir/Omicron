@@ -1,9 +1,13 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import com.lyndir.omicron.api.GameListener;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -19,6 +23,16 @@ public class PublicGame extends MetaObject implements IGame {
     static final Logger logger = Logger.get( IGame.class );
 
     private final IGame core;
+
+    public static IBuilder builder() {
+        try {
+            return new Builder( (IBuilder) TypeUtils.loadClass( "com.lyndir.omicron.api.model.Game" ) //
+                    .getMethod( "builder" ).invoke( null ) );
+        }
+        catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new InternalInconsistencyException( "Failed to create core builder", e );
+        }
+    }
 
     PublicGame(final IGame core) {
 
@@ -97,13 +111,18 @@ public class PublicGame extends MetaObject implements IGame {
         }
 
         @Override
-        public List<IPlayer> getPlayers() {
+        public Collection<IPlayer> getPlayers() {
             return core.getPlayers();
         }
 
         @Override
         public IBuilder addPlayer(final IPlayer player) {
             return core.addPlayer( player );
+        }
+
+        @Override
+        public IBuilder setPlayer(final PlayerKey playerKey, final String name, final Color primaryColor, final Color secondaryColor) {
+            return core.setPlayer( playerKey, name, primaryColor, secondaryColor );
         }
 
         @Override

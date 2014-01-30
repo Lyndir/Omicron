@@ -1,7 +1,10 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.system.util.EnumUtils;
+import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import com.lyndir.omicron.api.GameListener;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -36,7 +39,9 @@ public interface IGame {
 
         IBuilder setLevelSize(final Size levelSize);
 
-        List<IPlayer> getPlayers();
+        Collection<IPlayer> getPlayers();
+
+        IBuilder setPlayer(final PlayerKey playerKey, final String name, final Color primaryColor, final Color secondaryColor);
 
         IBuilder addPlayer(final IPlayer player);
 
@@ -120,6 +125,11 @@ public interface IGame {
 
     enum PublicGameUnitConfigs {
         NONE,
-        BASIC
+        BASIC;
+
+        public GameUnitConfig get() {
+            return (GameUnitConfig) EnumUtils.unsafeEnumNamed( TypeUtils.loadClass( "com.lyndir.omicron.api.model.Game.GameUnitConfigs" ),
+                                                               name() );
+        }
     }
 }

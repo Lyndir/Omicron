@@ -48,7 +48,7 @@ public class AddGameCommand extends Command {
 
         IPlayer newPlayer = new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, //
                                         Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
-        gameBuilder.getPlayers().add( newPlayer );
+        gameBuilder.addPlayer( newPlayer );
         getOmicron().setLocalPlayer( newPlayer );
 
         Security.authenticate( newPlayer, getOmicron().getLocalKey() );

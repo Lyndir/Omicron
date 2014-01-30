@@ -2,8 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.model.CoreUtils.*;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
+import com.google.common.base.*;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
@@ -36,6 +35,10 @@ public class Game extends MetaObject implements IGame {
     private final ImmutableList<Player> players;
     private final Set<Player> readyPlayers = Collections.synchronizedSet( new HashSet<Player>() );
     private boolean running;
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     private Game(final Size levelSize, final List<Player> players, final List<VictoryConditionType> victoryConditions,
                  final List<GameListener> gameListeners, final IGame.GameResourceConfig resourceConfig,
@@ -129,10 +132,6 @@ public class Game extends MetaObject implements IGame {
         return obj == this;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     @Override
     public GameController getController() {
         return gameController;
@@ -188,7 +187,7 @@ public class Game extends MetaObject implements IGame {
     public static class Builder implements IGame.IBuilder {
 
         private final List<GameListener>               gameListeners     = Lists.newLinkedList();
-        private final List<IPlayer>                    players           = Lists.newArrayList();
+        private final List<IPlayer>                    players           = Lists.newLinkedList();
         private final List<PublicVictoryConditionType> victoryConditions = Lists.newArrayList( PublicVictoryConditionType.values() );
 
         private Size                     levelSize      = new Size( 200, 200 );
@@ -224,12 +223,35 @@ public class Game extends MetaObject implements IGame {
         }
 
         @Override
-        public List<IPlayer> getPlayers() {
+        public Collection<IPlayer> getPlayers() {
             return players;
         }
 
         @Override
+        public Builder setPlayer(final PlayerKey playerKey, final String name, final Color primaryColor, final Color secondaryColor) {
+            IPlayer existingPlayer = Iterables.find( players, new PredicateNN<IPlayer>() {
+                @Override
+                public boolean apply(@Nonnull final IPlayer input) {
+                    return input.hasKey( playerKey );
+                }
+            }, null );
+            if (existingPlayer != null)
+                players.remove( existingPlayer );
+            players.add( new Player( nextPlayerID(), playerKey, name, primaryColor, secondaryColor ) );
+
+            return this;
+        }
+
+        @Override
         public Builder addPlayer(final IPlayer player) {
+            IPlayer existingPlayer = Iterables.find( players, new PredicateNN<IPlayer>() {
+                @Override
+                public boolean apply(@Nonnull final IPlayer input) {
+                    return input.getPlayerID() == player.getPlayerID();
+                }
+            }, null );
+            Preconditions.checkState( existingPlayer == null, "A player with this player's ID has already been added: %s", existingPlayer );
+
             players.add( player );
 
             return this;

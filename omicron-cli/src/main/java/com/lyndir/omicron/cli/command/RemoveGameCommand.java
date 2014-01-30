@@ -32,12 +32,12 @@ public class RemoveGameCommand extends Command {
         super.evaluate( tokens );
     }
 
-    @SubCommand(abbr = "p", desc = "The players that will compete in this game.")
+    @SubCommand(abbr = "p", desc = "Remove a player from the game.")
     public void player(final Iterator<String> tokens) {
 
         String value = Iterators.getOnlyElement( tokens, null );
         if (value == null) {
-            err( "Missing definition of player to add.  Syntax: name,primary color,secondary color" );
+            err( "Missing name of player to remove." );
             return;
         }
 
