@@ -10,6 +10,8 @@ import com.lyndir.lhunath.opal.system.util.URLUtils;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.webapp.data.User;
 import com.lyndir.omicron.webapp.data.service.*;
+import edu.umd.cs.findbugs.annotations.*;
+import java.lang.SuppressWarnings;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -38,8 +40,6 @@ public class GameBuilderResource {
     public Response get(@PathParam("gameBuilderID") final long gameBuilderID)
             throws EmailAddressUnavailableException {
         IGame.IBuilder gameBuilder = stateManager.getGameBuilder( gameBuilderID );
-        if (gameBuilder == null)
-            return Response.serverError().entity( str( "No game builder for ID: {0}", gameBuilderID ) ).build();
 
         // Response.
         return Response.ok( new GetResponse( gameBuilder ) ).build();
@@ -55,7 +55,7 @@ public class GameBuilderResource {
         input.handle( Preconditions.checkNotNull( stateManager.getGameBuilder( gameBuilderID ) ), sessionManager.getUser() );
 
         // Response.
-        return Response.created( UriBuilder.fromPath( "./%l" ).build( gameBuilderID ) ).build();
+        return Response.created( UriBuilder.fromPath( "{gameBuilderID}" ).build( gameBuilderID ) ).build();
     }
 
     @PUT
@@ -64,8 +64,6 @@ public class GameBuilderResource {
     public Response put(@PathParam("gameBuilderID") final long gameBuilderID, final GameBuilderRequest input)
             throws EmailAddressUnavailableException {
         IGame.IBuilder gameBuilder = stateManager.getGameBuilder( gameBuilderID );
-        if (gameBuilder == null)
-            return Response.serverError().entity( str( "No game builder for ID: {0}", gameBuilderID ) ).build();
 
         // Handle.
         input.handle( gameBuilder, sessionManager.getUser() );
@@ -74,6 +72,7 @@ public class GameBuilderResource {
         return Response.ok().build();
     }
 
+    @SuppressFBWarnings({ "URF_UNREAD_FIELD" })
     public static class GetResponse {
 
         Size                             levelSize;

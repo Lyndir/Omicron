@@ -2,13 +2,13 @@ package com.lyndir.omicron.webapp.resource;
 
 import static com.lyndir.lhunath.opal.system.util.StringUtils.*;
 
-import com.google.gson.annotations.Expose;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.system.util.URLUtils;
 import com.lyndir.omicron.api.model.Color;
 import com.lyndir.omicron.webapp.data.User;
 import com.lyndir.omicron.webapp.data.service.EmailAddressUnavailableException;
 import com.lyndir.omicron.webapp.data.service.UserDAO;
+import edu.umd.cs.findbugs.annotations.*;
 import java.util.Collection;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -73,45 +73,28 @@ public class UserResource {
             return Response.status( Response.Status.NOT_FOUND ).entity( str( "No user with `emailAddress`: {0}", emailAddress ) ).build();
 
         // Handle.
-        user.setName( input.name );
-        user.setColor( input.color.toColor() );
+        if (input.name != null)
+            user.setName( input.name );
+        user.setPrimaryColor( input.primaryColor );
+        user.setPrimaryColor( input.secondaryColor );
 
         // Response.
         return Response.ok( user ).build();
     }
 
+    @SuppressFBWarnings({ "UWF_UNWRITTEN_FIELD" })
     public static class PostObject {
 
-        @Expose
         String emailAddress;
-
-        @Expose
         String name;
     }
 
 
+    @SuppressFBWarnings({ "UWF_UNWRITTEN_FIELD" })
     public static class PutObject {
 
-        @Expose
         String name;
-
-        @Expose
-        PutObjectColor color;
-    }
-
-    public static class PutObjectColor {
-
-        @Expose
-        int red;
-
-        @Expose
-        int green;
-
-        @Expose
-        int blue;
-
-        public Color toColor() {
-            return new Color( red, green, blue );
-        }
+        Color  primaryColor;
+        Color  secondaryColor;
     }
 }

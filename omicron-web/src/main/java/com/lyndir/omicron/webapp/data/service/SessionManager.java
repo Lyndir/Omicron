@@ -1,9 +1,12 @@
 package com.lyndir.omicron.webapp.data.service;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.lyndir.omicron.api.model.IGame;
 import com.lyndir.omicron.webapp.data.User;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
 
 
@@ -21,7 +24,13 @@ public class SessionManager {
         this.httpSessionProvider = httpSessionProvider;
     }
 
+    @Nonnull
     public User getUser() {
+        return Preconditions.checkNotNull( findUser(), "No user.  Please first authenticate." );
+    }
+
+    @Nullable
+    public User findUser() {
         return (User) httpSessionProvider.get().getAttribute( USER );
     }
 

@@ -26,6 +26,8 @@ import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.PathUtils;
+import edu.umd.cs.findbugs.annotations.*;
+import java.lang.SuppressWarnings;
 import java.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -222,6 +224,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
      * A construction site is a unit that is under construction.  Its controller manages its construction progress and it turns into the
      * constructed unit upon completion.
      */
+    @SuppressFBWarnings({ "EQ_DOESNT_OVERRIDE_EQUALS" })
     public static class ConstructionSite extends GameObject implements IConstructionSite {
 
         private final UnitType constructionUnitType;

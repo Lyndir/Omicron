@@ -47,9 +47,11 @@ public class User extends MetaObject implements Localized {
     private final PlayerKey          playerKey      = new PlayerKey();
 
     @Nonnull
-    private String name;
+    private String name = "";
     @Nonnull
-    private Color  color;
+    private Color  primaryColor = Color.random();
+    @Nonnull
+    private Color  secondaryColor= Color.random();
 
     @Deprecated
     public User() {
@@ -58,7 +60,6 @@ public class User extends MetaObject implements Localized {
     public User(@Nonnull final EmailAddress emailAddress, @Nonnull final String name) {
         emailAddress.setUser( this );
         this.name = name;
-        color = Color.random();
     }
 
     public long getId() {
@@ -85,12 +86,21 @@ public class User extends MetaObject implements Localized {
     }
 
     @Nonnull
-    public Color getColor() {
-        return color;
+    public Color getPrimaryColor() {
+        return primaryColor;
     }
 
-    public void setColor(@Nonnull final Color color) {
-        this.color = color;
+    public void setPrimaryColor(@Nonnull final Color primaryColor) {
+        this.primaryColor = primaryColor;
+    }
+
+    @Nonnull
+    public Color getSecondaryColor() {
+        return secondaryColor;
+    }
+
+    public void setSecondaryColor(@Nonnull final Color secondaryColor) {
+        this.secondaryColor = secondaryColor;
     }
 
     @Override

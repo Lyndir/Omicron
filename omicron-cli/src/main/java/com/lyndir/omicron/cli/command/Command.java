@@ -137,7 +137,7 @@ public abstract class Command {
             commandDescriptions.put( String.format( "%s/%s", annotation.name(), annotation.abbr() ), annotation.desc() );
         }
 
-        for (final String name : commandDescriptions.keySet())
-            inf( "    %s: %s", name, commandDescriptions.get( name ) );
+        for (final Map.Entry<String, String> commandDescriptionEntry : commandDescriptions.entrySet())
+            inf( "    %s: %s", commandDescriptionEntry.getKey(), commandDescriptions.get( commandDescriptionEntry.getValue() ) );
     }
 }

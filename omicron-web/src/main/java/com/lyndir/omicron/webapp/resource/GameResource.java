@@ -10,6 +10,8 @@ import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.webapp.data.service.SessionManager;
 import com.lyndir.omicron.webapp.data.service.StateManager;
+import edu.umd.cs.findbugs.annotations.*;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -34,27 +36,23 @@ public class GameResource {
     @Path("{gameID}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED })
     public Response get(@PathParam("gameID") final long gameID) {
-        IGame game = stateManager.getGame( gameID );
-        if (game == null)
-            return Response.serverError().entity( str( "No game for ID: {0}", gameID ) ).build();
-
         // Response.
-        return Response.ok( new GetResponse( game ) ).build();
+        return Response.ok( new GetResponse( stateManager.getGame( gameID ) ) ).build();
     }
 
     @POST
     public Response post(@QueryParam( "gameBuilderID" ) final long gameBuilderID, final UriInfo uriInfo) {
         IGame.IBuilder gameBuilder = stateManager.getGameBuilder(gameBuilderID);
-        if (gameBuilder == null)
-            return Response.serverError().entity( str( "No game builder for ID: {0}", gameBuilderID ) ).build();
 
+        // Handle.
         long gameID = stateManager.addGame( gameBuilder.build() );
-        stateManager.dropAndRedirectGameBuilder( gameBuilderID, uriInfo.getAbsolutePathBuilder().path( "./%l" ).build( gameID ) );
+        stateManager.dropAndRedirectGameBuilder( gameBuilderID, uriInfo.getAbsolutePathBuilder().path( "{gameID}" ).build( gameID ) );
 
         // Response.
-        return Response.created( UriBuilder.fromPath( "./%l" ).build( gameID ) ).build();
+        return Response.created( UriBuilder.fromPath( "{gameID}" ).build( gameID ) ).build();
     }
 
+    @SuppressFBWarnings({ "URF_UNREAD_FIELD" })
     public static class GetResponse {
 
         Turn                     turn;

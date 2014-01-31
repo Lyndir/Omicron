@@ -20,6 +20,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.model.error.OmicronException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.annotation.Nonnull;
 
 
@@ -117,6 +118,7 @@ public class PublicConstructorModule extends PublicModule implements IConstructo
      * A construction site is a unit that is under construction.  Its controller manages its construction progress and it turns into the
      * constructed unit upon completion.
      */
+    @SuppressFBWarnings({ "EQ_DOESNT_OVERRIDE_EQUALS" })
     public static class PublicConstructionSite extends PublicGameObject implements IConstructionSite {
 
         private final IConstructionSite core;

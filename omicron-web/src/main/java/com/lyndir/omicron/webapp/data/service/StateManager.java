@@ -1,5 +1,6 @@
 package com.lyndir.omicron.webapp.data.service;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.lyndir.omicron.api.model.IGame;
 import java.net.URI;
@@ -23,8 +24,13 @@ public class StateManager {
     private static final Map<Long, IGame.IBuilder>      gameBuilders = Maps.newConcurrentMap();
     private static final Table<Map<Long, ?>, Long, URI> redirections = HashBasedTable.create();
 
-    @Nullable
+    @Nonnull
     public IGame getGame(final long gameID) {
+        return Preconditions.checkNotNull( findGame( gameID ), "Game not found: %s", gameID );
+    }
+
+    @Nullable
+    public IGame findGame(final long gameID) {
         return get( games, gameID );
     }
 
@@ -32,8 +38,13 @@ public class StateManager {
         return add( games, game );
     }
 
-    @Nullable
+    @Nonnull
     public IGame.IBuilder getGameBuilder(final long gameBuilderID) {
+        return Preconditions.checkNotNull( findGameBuilder( gameBuilderID ), "Game builder not found: %s", gameBuilderID );
+    }
+
+    @Nullable
+    public IGame.IBuilder findGameBuilder(final long gameBuilderID) {
         return get( gameBuilders, gameBuilderID );
     }
 
@@ -58,7 +69,7 @@ public class StateManager {
         long id;
         synchronized (map) {
             do {
-                id = RANDOM.nextLong();
+                id = RANDOM.nextInt( Integer.MAX_VALUE );
             }
             while (map.containsKey( id ));
             map.put( id, value );
