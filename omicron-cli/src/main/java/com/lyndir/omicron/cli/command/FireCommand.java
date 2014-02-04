@@ -5,6 +5,7 @@ import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybe;
@@ -27,29 +28,29 @@ public class FireCommand extends Command {
     @Override
     public void evaluate(final Iterator<String> tokens) {
 
-        final Optional<IGameController> gameController = getOmicron().getGameController();
+        Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final IPlayer localPlayer = localPlayerOptional.get();
+        IPlayer localPlayer = localPlayerOptional.get();
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
-            err( "Missing objectID.  Syntax: objectID dU dV [level]" );
+            err( "Missing objectID.  Syntax: objectID dX dY [level]" );
             return;
         }
         if ("help".equals( objectIDArgument )) {
-            inf( "Usage: objectID dU dV [level]" );
+            inf( "Usage: objectID dX dY [level]" );
             inf( "    objectID: The ID of the object to fire with (see list objects)." );
-            inf( "          dU: The delta from the current position's u to the target u." );
-            inf( "          dV: The delta from the current position's v to the target v." );
+            inf( "          dU: The delta from the current position's x to the target x." );
+            inf( "          dV: The delta from the current position's y to the target y." );
             inf( "      weapon: The index of the weapon to fire with (optional, default=0 (primary))." );
             inf( "       level: The level into which to target the weapon (optional, default=current)." );
             return;
@@ -57,18 +58,18 @@ public class FireCommand extends Command {
 
         String duArgument = Iterators.getNext( tokens, null );
         if (duArgument == null) {
-            err( "Missing dU.  Syntax: objectID dU dV [level]" );
+            err( "Missing dU.  Syntax: objectID dX dY [level]" );
             return;
         }
         String dvArgument = Iterators.getNext( tokens, null );
         if (dvArgument == null) {
-            err( "Missing dV.  Syntax: objectID dU dV [level]" );
+            err( "Missing dV.  Syntax: objectID dX dY [level]" );
             return;
         }
 
         int objectId = ConversionUtils.toIntegerNN( objectIDArgument );
-        int du = ConversionUtils.toIntegerNN( duArgument );
-        int dv = ConversionUtils.toIntegerNN( dvArgument );
+        int dx = ConversionUtils.toIntegerNN( duArgument );
+        int dy = ConversionUtils.toIntegerNN( dvArgument );
 
         // Find the game object for the given ID.
         Maybe<? extends IGameObject> maybeObject = localPlayer.getController().getObject( objectId );
@@ -112,9 +113,9 @@ public class FireCommand extends Command {
         IWeaponModule weaponModule = optionalWeapon.get();
 
         // Find the target tile.
-        Coordinate targetCoordinate = location.getPosition().delta( du, dv );
+        Vec2 targetCoordinate = location.getPosition().translate( dx, dy );
         Optional<? extends ITile> target = level.get().getTile( targetCoordinate );
-        if (!(target.isPresent())) {
+        if (!target.isPresent()) {
             err( "No tile in level: %s, at position: %s", level.get().getType().getName(), targetCoordinate );
             return;
         }
@@ -128,13 +129,13 @@ public class FireCommand extends Command {
 
             inf( "Fired at: %s", target.get().checkContents() );
         }
-        catch (IWeaponModule.OutOfRangeException ignored) {
+        catch (final IWeaponModule.OutOfRangeException ignored) {
             err( "Couldn't fire, target out of range: %s", target.get() );
         }
-        catch (IWeaponModule.OutOfRepeatsException ignored) {
+        catch (final IWeaponModule.OutOfRepeatsException ignored) {
             err( "Couldn't fire, weapon out of repeats." );
         }
-        catch (IWeaponModule.OutOfAmmunitionException ignored) {
+        catch (final IWeaponModule.OutOfAmmunitionException ignored) {
             err( "Couldn't fire, weapon out of ammunition." );
         }
     }

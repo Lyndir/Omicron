@@ -30,8 +30,8 @@ public interface IPlayerController extends GameObserver {
      *
      * @return An iterable of game objects owned by this controller's player.
      */
-    Iterable<? extends IGameObject> iterateObservableObjects(final GameObserver observer);
+    Iterable<? extends IGameObject> iterateObservableObjects(GameObserver observer);
 
-    Maybe<? extends IGameObject> getObject(final int objectId)
+    Maybe<? extends IGameObject> getObject(int objectId)
             throws NotAuthenticatedException;
 }

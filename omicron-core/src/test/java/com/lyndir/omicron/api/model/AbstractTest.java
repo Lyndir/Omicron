@@ -3,6 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.StringUtils;
 import java.util.*;
@@ -49,8 +50,8 @@ public abstract class AbstractTest {
 
                             char contentsChar = contents.get().getType().getTypeName().charAt( 0 );
                             int levelIndex = levelIndexes.indexOf( tile.getLevel().getType() );
-                            int v = tile.getPosition().getV();
-                            int u = (tile.getPosition().getU() + v / 2) % size.getWidth();
+                            int v = tile.getPosition().getY();
+                            int u = (tile.getPosition().getX() + v / 2) % size.getWidth();
                             String tileString = grid.get( v, u );
                             StringBuilder newTileString = new StringBuilder( tileString.replace( ' ', '.' ) );
                             newTileString.setCharAt( levelIndex, contentsChar );

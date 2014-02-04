@@ -88,7 +88,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Authenticated
     public boolean isOwnedByCurrentPlayer()
             throws NotAuthenticatedException {
-        return Security.isAuthenticated() && ObjectUtils.isEqual( owner, Security.currentPlayer() );
+        return isAuthenticated() && ObjectUtils.isEqual( owner, currentPlayer() );
     }
 
     void setOwner(@Nullable final Player owner) {
@@ -140,7 +140,7 @@ public class GameObject extends MetaObject implements IGameObject {
     }
 
     void setLocation(@Nonnull final Tile location) {
-        final Change.From<ITile> locationChange = Change.<ITile>from( this.location );
+        Change.From<ITile> locationChange = Change.<ITile>from( this.location );
         this.location = location;
 
         getGame().getController().fireIfObservable( location ) //

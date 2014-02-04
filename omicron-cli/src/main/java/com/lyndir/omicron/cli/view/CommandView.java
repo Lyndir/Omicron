@@ -28,21 +28,21 @@ import javax.annotation.Nonnull;
  */
 public class CommandView extends TitledView {
 
-    private final TextView  logView;
-    private final InputView commandInputView;
-
     public CommandView() {
         super( "Command Log" );
 
         LinearView content = new LinearView( LinearView.Orientation.VERTICAL );
-        content.addChild( logView = new TextView() {
+        TextView logView = new TextView() {
             @Override
             public String getText() {
                 return Joiner.on( '\n' ).join( OmicronCLI.get().getLog() );
             }
-        } );
-        content.addChild( commandInputView = new CommandInputView() );
+        };
+        CommandInputView commandInputView = new CommandInputView();
         commandInputView.setControlTextView( logView );
+
+        content.addChild( logView );
+        content.addChild( commandInputView );
         addChild( content );
     }
 

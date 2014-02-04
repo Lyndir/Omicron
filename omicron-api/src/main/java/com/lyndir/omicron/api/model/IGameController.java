@@ -9,7 +9,7 @@ public interface IGameController {
 
     IGame getGame();
 
-    void addGameListener(final GameListener gameListener)
+    void addGameListener(GameListener gameListener)
             throws Security.NotAuthenticatedException;
 
     /**
@@ -19,7 +19,7 @@ public interface IGameController {
      *
      * @return Information visible to the current player about the given player.
      */
-    PlayerGameInfo getPlayerGameInfo(final IPlayer player)
+    PlayerGameInfo getPlayerGameInfo(IPlayer player)
             throws Security.NotAuthenticatedException;
 
     ImmutableCollection<PlayerGameInfo> listPlayerGameInfo()

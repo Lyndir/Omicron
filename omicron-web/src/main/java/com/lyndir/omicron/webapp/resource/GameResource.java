@@ -5,13 +5,12 @@ import static com.lyndir.lhunath.opal.system.util.StringUtils.*;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
-import com.lyndir.lhunath.opal.system.util.URLUtils;
+import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.webapp.data.service.SessionManager;
 import com.lyndir.omicron.webapp.data.service.StateManager;
 import edu.umd.cs.findbugs.annotations.*;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -23,12 +22,10 @@ import javax.ws.rs.core.*;
 @Path("/game")
 public class GameResource {
 
-    private final SessionManager sessionManager;
     private final StateManager   stateManager;
 
     @Inject
-    public GameResource(final SessionManager sessionManager, final StateManager stateManager) {
-        this.sessionManager = sessionManager;
+    public GameResource(final StateManager stateManager) {
         this.stateManager = stateManager;
     }
 

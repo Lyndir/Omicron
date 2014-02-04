@@ -232,7 +232,7 @@ public class GameController implements IGameController {
      *
      * @param location The location that should be observable.
      */
-    GameListener fireIfObservable(@Nonnull final Tile location) {
+    GameListener fireIfObservable(@Nonnull final ITile location) {
         return fireIfPlayer( new PredicateNN<IPlayer>() {
             @Override
             public boolean apply(@Nonnull final IPlayer input) {

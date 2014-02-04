@@ -29,7 +29,7 @@
         <!-- Opal -->
         <dependency>
             <groupId>com.lyndir.lhunath.opal</groupId>
-            <artifactId>opal-system</artifactId>
+            <artifactId>opal-math</artifactId>
             <version>GIT-SNAPSHOT</version>
         </dependency>
 

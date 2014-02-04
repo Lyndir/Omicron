@@ -148,7 +148,7 @@ public abstract class InputView extends View {
         return nextWordOffset == -1? getInputText().length(): getCursorOffset() + nextWordOffset;
     }
 
-    protected abstract void onEnterText(final String text);
+    protected abstract void onEnterText(String text);
 
     private void clearInputText() {
         inputText.delete( 0, inputText.length() );

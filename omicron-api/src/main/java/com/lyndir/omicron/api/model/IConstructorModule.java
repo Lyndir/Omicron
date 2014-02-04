@@ -41,7 +41,7 @@ public interface IConstructorModule extends IModule {
     IGameObject getTarget()
             throws Security.NotAuthenticatedException, Security.NotObservableException;
 
-    void setTarget(final IGameObject target)
+    void setTarget(IGameObject target)
             throws Security.NotOwnedException, Security.NotAuthenticatedException, Security.NotObservableException;
 
     ImmutableSet<? extends IUnitType> blueprints();
@@ -54,7 +54,7 @@ public interface IConstructorModule extends IModule {
      *
      * @return The job that will be created for the construction of the new unit.
      */
-    IConstructionSite schedule(final IUnitType unitType, final ITile location)
+    IConstructionSite schedule(IUnitType unitType, ITile location)
             throws Security.NotOwnedException, Security.NotAuthenticatedException, Security.NotObservableException, InaccessibleException,
                    IncompatibleLevelException, OutOfRangeException;
 
@@ -64,11 +64,11 @@ public interface IConstructorModule extends IModule {
      */
     interface IConstructionSite extends IGameObject {
 
-        int getRemainingWork(final PublicModuleType<?> moduleType);
+        int getRemainingWork(PublicModuleType<?> moduleType);
 
         ImmutableResourceCost getRemainingResourceCost();
 
-        Optional<ImmutableResourceCost> getResourceCostToPerformWork(final PublicModuleType<?> moduleType);
+        Optional<ImmutableResourceCost> getResourceCostToPerformWork(PublicModuleType<?> moduleType);
     }
 
 

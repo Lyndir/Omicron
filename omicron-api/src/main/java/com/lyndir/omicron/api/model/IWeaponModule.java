@@ -35,7 +35,7 @@ public interface IWeaponModule extends IModule {
     int getAmmunition()
             throws NotAuthenticatedException, NotObservableException;
 
-    boolean fireAt(final ITile target)
+    boolean fireAt(ITile target)
             throws NotAuthenticatedException, NotOwnedException, NotObservableException, OutOfRangeException, OutOfRepeatsException,
                    OutOfAmmunitionException;
 

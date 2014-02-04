@@ -3,6 +3,9 @@ package com.lyndir.omicron.api.model;
 import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.collect.ImmutableSet;
+import com.lyndir.omicron.api.model.IWeaponModule.OutOfAmmunitionException;
+import com.lyndir.omicron.api.model.IWeaponModule.OutOfRangeException;
+import com.lyndir.omicron.api.model.IWeaponModule.OutOfRepeatsException;
 
 
 public class PublicWeaponModule extends PublicModule implements IWeaponModule {
@@ -81,8 +84,8 @@ public class PublicWeaponModule extends PublicModule implements IWeaponModule {
 
     @Override
     public boolean fireAt(final ITile target)
-            throws NotObservableException, IWeaponModule.OutOfRepeatsException, IWeaponModule.OutOfAmmunitionException,
-                   IWeaponModule.OutOfRangeException, NotOwnedException, NotAuthenticatedException {
+            throws NotObservableException, OutOfRepeatsException, OutOfAmmunitionException,
+                   OutOfRangeException, NotOwnedException, NotAuthenticatedException {
 
         return core.fireAt( target );
     }

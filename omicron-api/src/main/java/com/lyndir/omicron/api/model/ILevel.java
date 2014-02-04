@@ -1,6 +1,8 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
+import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.math.Vec2;
 import java.util.Map;
 
 
@@ -17,7 +19,7 @@ public interface ILevel {
 
     IGame getGame();
 
-    Map<Coordinate, ? extends ITile> getTiles();
+    Map<Vec2, ? extends ITile> getTiles();
 
     /**
      * Get the tile at the given position in this level.
@@ -28,16 +30,16 @@ public interface ILevel {
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    Optional<? extends ITile> getTile(final Coordinate position);
+    Optional<? extends ITile> getTile(Vec2 position);
 
     /**
      * Get the tile at the given position in this level.
      *
      *
-     * @param u The u coordinate of the position of the tile to get.
-     * @param v The v coordinate of the position of the tile to get.
+     * @param x The x coordinate of the position of the tile to get.
+     * @param y The y coordinate of the position of the tile to get.
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
-    Optional<? extends ITile> getTile(final int u, final int v);
+    Optional<? extends ITile> getTile(int x, int y);
 }

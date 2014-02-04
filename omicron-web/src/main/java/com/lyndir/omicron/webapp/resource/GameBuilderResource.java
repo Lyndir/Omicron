@@ -5,6 +5,7 @@ import static com.lyndir.lhunath.opal.system.util.StringUtils.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
+import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.URLUtils;
 import com.lyndir.omicron.api.model.*;

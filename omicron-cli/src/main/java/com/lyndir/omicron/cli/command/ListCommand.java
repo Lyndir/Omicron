@@ -25,7 +25,7 @@ public class ListCommand extends Command {
     @SubCommand(abbr = "p", desc = "Enumerate all players in the game.")
     public void players(final Iterator<String> tokens) {
 
-        final Optional<IGameController> gameController = getOmicron().getGameController();
+        Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
@@ -49,29 +49,29 @@ public class ListCommand extends Command {
     @SubCommand(abbr = "o", desc = "Enumerate all types of game objects the player can detect.")
     public void objects(final Iterator<String> tokens) {
 
-        final Optional<IGameController> gameController = getOmicron().getGameController();
+        Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final IPlayer localPlayer = localPlayerOptional.get();
+        IPlayer localPlayer = localPlayerOptional.get();
 
         ImmutableList.Builder<IGameObject> gameObjectBuilder = ImmutableList.builder();
         for (final IPlayer player : gameController.get().listPlayers())
             gameObjectBuilder.addAll( player.getController().iterateObservableObjects( localPlayer ) );
 
-        inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "u", "v", "type" );
+        inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "x", "y", "type" );
         for (final IGameObject gameObject : gameObjectBuilder.build()) {
             ITile location = gameObject.checkLocation().get();
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
                  gameObject.getObjectID(), ifNotNullElse( IPlayer.class, gameObject.getOwner().orNull(), "-" ).getName(),
-                 location.getLevel().getType().getName(), location.getPosition().getU(), location.getPosition().getV(),
+                 location.getLevel().getType().getName(), location.getPosition().getX(), location.getPosition().getY(),
                  gameObject.getType().getTypeName() );
         }
     }

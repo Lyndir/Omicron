@@ -71,7 +71,7 @@ public abstract class PublicModuleType<M extends IModule> extends MetaObject {
         if (!(obj instanceof PublicModuleType))
             return false;
 
-        PublicModuleType<?> o = ((PublicModuleType<?>) obj);
+        PublicModuleType<?> o = (PublicModuleType<?>) obj;
         return moduleType.equals( o.moduleType ) && standardCost.equals( o.standardCost );
     }
 }

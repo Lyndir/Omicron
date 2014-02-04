@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
+import com.lyndir.omicron.api.model.Security.NotObservableException;
 import com.lyndir.omicron.api.util.Maybool;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -62,7 +64,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     }
 
     void setLocation(@Nonnull final Tile location) {
-        final Tile oldLocation = getGameObject().getLocation();
+        Tile oldLocation = getGameObject().getLocation();
         if (oldLocation != null && ObjectUtils.isEqual( oldLocation, location ))
             // Object already at location.
             return;
@@ -72,7 +74,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
         getGameObject().setLocation( location );
 
-        final Tile newLocation = getGameObject().getLocation();
+        Tile newLocation = getGameObject().getLocation();
         if (newLocation != null)
             newLocation.setContents( getGameObject() );
     }
@@ -80,7 +82,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     @Override
     @Authenticated
     public Maybool canObserve(@Nonnull final ITile location)
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         if (isGod() || (getGameObject().isOwnedByCurrentPlayer() && ObjectUtils.equals( location, getGameObject().getLocation() )))
             return Maybool.YES;
 
@@ -91,7 +93,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     @Override
     @Authenticated
     public Iterable<Tile> listObservableTiles()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles();
     }
 

@@ -4,6 +4,8 @@ import static com.lyndir.omicron.api.util.PathUtils.*;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.Authenticated;
+import com.lyndir.omicron.api.model.IMobilityModule.ILeveling;
+import com.lyndir.omicron.api.model.IMobilityModule.IMovement;
 
 
 public class PublicMobilityModule extends PublicModule implements IMobilityModule {
@@ -61,7 +63,7 @@ public class PublicMobilityModule extends PublicModule implements IMobilityModul
      */
     @Override
     @Authenticated
-    public IMobilityModule.ILeveling leveling(final LevelType levelType)
+    public ILeveling leveling(final LevelType levelType)
             throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException {
         assertOwned();
 
@@ -75,7 +77,7 @@ public class PublicMobilityModule extends PublicModule implements IMobilityModul
      */
     @Override
     @Authenticated
-    public IMobilityModule.IMovement movement(final ITile target)
+    public IMovement movement(final ITile target)
             throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException {
         assertOwned();
 
@@ -87,11 +89,11 @@ public class PublicMobilityModule extends PublicModule implements IMobilityModul
         return PublicModuleType.MOBILITY;
     }
 
-    public class Leveling extends MetaObject implements IMobilityModule.ILeveling {
+    public class Leveling extends MetaObject implements ILeveling {
 
-        private final IMobilityModule.ILeveling core;
+        private final ILeveling core;
 
-        Leveling(final IMobilityModule.ILeveling core) {
+        Leveling(final ILeveling core) {
             this.core = core;
         }
 
@@ -133,11 +135,11 @@ public class PublicMobilityModule extends PublicModule implements IMobilityModul
     }
 
 
-    public class Movement extends MetaObject implements IMobilityModule.IMovement {
+    public class Movement extends MetaObject implements IMovement {
 
-        private final IMobilityModule.IMovement core;
+        private final IMovement core;
 
-        Movement(final IMobilityModule.IMovement core) {
+        Movement(final IMovement core) {
             this.core = core;
         }
 

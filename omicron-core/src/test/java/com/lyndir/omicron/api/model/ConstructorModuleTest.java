@@ -20,6 +20,7 @@ import static org.testng.Assert.*;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.lyndir.lhunath.opal.math.Side;
 import com.lyndir.lhunath.opal.system.util.CollectionUtils;
 import org.testng.annotations.Test;
 
@@ -69,7 +70,7 @@ public class ConstructorModuleTest extends AbstractTest {
         // Build a BASE unit, initially without resources.
         ConstructorModule baseConstructorModule = baseMobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         ConstructorModule mobilityConstructorModule = baseMobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 1 ).get();
-        Tile location1 = baseMobilityConstructorUnit.getLocation().neighbour( Coordinate.Side.E );
+        Tile location1 = baseMobilityConstructorUnit.getLocation().neighbour( Side.E );
         ConstructorModule.ConstructionSite site1 = baseConstructorModule.schedule( baseUnit, location1 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
@@ -121,7 +122,7 @@ public class ConstructorModuleTest extends AbstractTest {
                                                            ModuleType.MOBILITY.getStandardCost().get( ResourceType.METALS ));
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
         staticGame.getController().setReady();
-        Tile location2 = baseMobilityConstructorUnit.getLocation().neighbour( Coordinate.Side.W );
+        Tile location2 = baseMobilityConstructorUnit.getLocation().neighbour( Side.W );
         ConstructorModule.ConstructionSite site2 = baseConstructorModule.schedule( baseMobilityUnit, location2 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
@@ -190,7 +191,7 @@ public class ConstructorModuleTest extends AbstractTest {
                                                            ModuleType.MOBILITY.getStandardCost().get( ResourceType.METALS ));
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
         staticGame.getController().setReady();
-        Tile location3 = baseConstructorUnit.getLocation().neighbour( Coordinate.Side.E );
+        Tile location3 = baseConstructorUnit.getLocation().neighbour( Side.E );
         ConstructorModule.ConstructionSite site3 = baseConstructorModule.schedule( baseMobilityUnit, location3 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 7 );

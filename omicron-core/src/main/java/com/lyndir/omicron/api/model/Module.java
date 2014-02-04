@@ -20,8 +20,6 @@ import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import com.lyndir.omicron.api.model.error.OmicronException;
-import com.lyndir.omicron.api.util.PathUtils;
 import javax.annotation.Nullable;
 
 

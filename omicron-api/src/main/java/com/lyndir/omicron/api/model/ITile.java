@@ -1,6 +1,8 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableCollection;
+import com.lyndir.lhunath.opal.math.Side;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.omicron.api.util.Maybe;
 import javax.annotation.Nonnull;
 
@@ -16,21 +18,21 @@ public interface ITile {
     Maybe<? extends IGameObject> checkContents()
             throws Security.NotAuthenticatedException;
 
-    Coordinate getPosition();
+    Vec2 getPosition();
 
     ILevel getLevel();
 
-    Maybe<Integer> checkResourceQuantity(final ResourceType resourceType)
+    Maybe<Integer> checkResourceQuantity(ResourceType resourceType)
             throws Security.NotAuthenticatedException;
 
     @Nonnull
-    ITile neighbour(final Coordinate.Side side);
+    ITile neighbour(Side side);
 
     ImmutableCollection<? extends ITile> neighbours();
 
-    ImmutableCollection<? extends ITile> neighbours(final int distance);
+    ImmutableCollection<? extends ITile> neighbours(int distance);
 
-    Maybe<Boolean> checkContains(@Nonnull final IGameObject target)
+    Maybe<Boolean> checkContains(@Nonnull IGameObject target)
             throws Security.NotAuthenticatedException;
 
     /**

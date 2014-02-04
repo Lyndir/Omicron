@@ -18,7 +18,7 @@ public interface IMobilityModule extends IModule {
      *
      * @return The speed cost.
      */
-    double costForMovingInLevel(final LevelType levelType)
+    double costForMovingInLevel(LevelType levelType)
             throws Security.NotAuthenticatedException, Security.NotObservableException;
 
     /**
@@ -28,7 +28,7 @@ public interface IMobilityModule extends IModule {
      *
      * @return The speed cost.
      */
-    double costForLevelingToLevel(final LevelType levelType)
+    double costForLevelingToLevel(LevelType levelType)
             throws Security.NotAuthenticatedException, Security.NotObservableException;
 
     /**
@@ -36,7 +36,7 @@ public interface IMobilityModule extends IModule {
      *
      * @param levelType The side of the adjacent tile relative to the current.
      */
-    ILeveling leveling(final LevelType levelType)
+    ILeveling leveling(LevelType levelType)
             throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException;
 
     /**
@@ -44,7 +44,7 @@ public interface IMobilityModule extends IModule {
      *
      * @param target The side of the adjacent tile relative to the current.
      */
-    IMovement movement(final ITile target)
+    IMovement movement(ITile target)
             throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException;
 
     interface ILeveling {

@@ -23,7 +23,7 @@ public class EndCommand extends Command {
     @SubCommand(abbr = "t", desc = "The current turn.")
     public void turn(final Iterator<String> tokens) {
 
-        final Optional<IGameController> gameController = getOmicron().getGameController();
+        Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;

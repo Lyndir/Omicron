@@ -8,6 +8,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
+import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
@@ -42,7 +43,7 @@ public class BaseModule extends Module implements IBaseModule {
 
     @Override
     public Maybool canObserve(@Nonnull final ITile location)
-            throws Security.NotAuthenticatedException {
+            throws NotAuthenticatedException {
         if (!isGod() && !getGameObject().isOwnedByCurrentPlayer())
             if (!currentPlayer().canObserve( location ).isTrue() || !currentPlayer().canObserve( getGameObject().getLocation() ).isTrue())
                 return Maybool.UNKNOWN;
@@ -58,7 +59,7 @@ public class BaseModule extends Module implements IBaseModule {
     @Override
     @Authenticated
     public Iterable<Tile> listObservableTiles()
-            throws Security.NotAuthenticatedException {
+            throws NotAuthenticatedException {
         return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
             public boolean apply(final Tile input) {

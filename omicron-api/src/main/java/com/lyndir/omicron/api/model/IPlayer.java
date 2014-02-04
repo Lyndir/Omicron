@@ -15,12 +15,12 @@ public interface IPlayer extends GameObserver {
     IPlayerController getController();
 
     @Override
-    Maybool canObserve(@Nonnull final ITile location)
+    Maybool canObserve(@Nonnull ITile location)
             throws Security.NotAuthenticatedException;
 
     int getPlayerID();
 
-    boolean hasKey(final PlayerKey playerKey);
+    boolean hasKey(PlayerKey playerKey);
 
     String getName();
 

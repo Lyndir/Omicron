@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import org.reflections.Reflections;
+import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMarkerFactory;
 
 
@@ -18,10 +19,10 @@ import org.slf4j.helpers.BasicMarkerFactory;
  */
 public abstract class Command {
 
-    static final         Logger             logger             = Logger.get( Command.class );
-    static final         Reflections        packageReflections = new Reflections( Command.class.getPackage().getName() );
+    static final Logger      logger             = Logger.get( Command.class );
+    static final Reflections packageReflections = new Reflections( Command.class.getPackage().getName() );
 
-    private static final BasicMarkerFactory markers            = new BasicMarkerFactory();
+    private static final IMarkerFactory markers = new BasicMarkerFactory();
 
     private final OmicronCLI omicron;
 

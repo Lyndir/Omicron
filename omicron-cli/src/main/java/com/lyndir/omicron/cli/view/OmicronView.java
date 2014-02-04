@@ -26,14 +26,11 @@ import com.lyndir.omicron.cli.view.DashboardView;
  */
 public class OmicronView extends LinearView {
 
-    private final DashboardView dashboardView;
-    private final CommandView   commandView;
-
     public OmicronView() {
 
         super( Orientation.VERTICAL );
 
-        addChild( dashboardView = new DashboardView() );
-        addChild( commandView = new CommandView() );
+        addChild( new DashboardView() );
+        addChild( new CommandView() );
     }
 }

@@ -114,7 +114,7 @@ public abstract class ResourceCost extends MetaObject {
      * @param resourceType The type of resources to reduce the cost of.
      * @param term         The amount with which to reduce the resource cost of the given type.
      */
-    public abstract ResourceCost reduce(final ResourceType resourceType, final int term);
+    public abstract ResourceCost reduce(ResourceType resourceType, int term);
 
     /**
      * Add the given term to the resource cost of the given type.
@@ -122,28 +122,28 @@ public abstract class ResourceCost extends MetaObject {
      * @param resourceType The type of resources to increase the cost of.
      * @param term         The amount with which to increase the resource cost of the given type.
      */
-    public abstract ResourceCost add(final ResourceType resourceType, final int term);
+    public abstract ResourceCost add(ResourceType resourceType, int term);
 
     /**
      * Add the cost of all resources given to this resource cost.
      *
      * @param resourceCost The resource cost to add to this resource cost.
      */
-    public abstract ResourceCost add(final ResourceCost resourceCost);
+    public abstract ResourceCost add(ResourceCost resourceCost);
 
     /**
      * Multiply the cost of the resources of the given type by the given factor.
      *
      * @param factor The factor to multiply with.
      */
-    public abstract ResourceCost multiply(final ResourceType resourceType, final int factor);
+    public abstract ResourceCost multiply(ResourceType resourceType, int factor);
 
     /**
      * Multiply the cost of all resources by the given factor.
      *
      * @param factor The factor to multiply with.
      */
-    public abstract ResourceCost multiply(final int factor);
+    public abstract ResourceCost multiply(int factor);
 
     public boolean isZero() {
         return FluentIterable.from( getResourceQuantities().values() ).filter( new PredicateNN<Integer>() {
@@ -156,7 +156,7 @@ public abstract class ResourceCost extends MetaObject {
 
     @Override
     public String toString() {
-        return String.format( "{%s: %s}", getClass().getSimpleName(), ObjectUtils.describe( getResourceQuantities() ) );
+        return String.format( "{%s: %s}", getClass().getSimpleName(), describe( getResourceQuantities() ) );
     }
 
     @Override

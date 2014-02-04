@@ -14,14 +14,14 @@ import java.util.Set;
 public class WeaponModule extends Module implements IWeaponModule {
 
     private static final Random RANDOM = new Random();
-    private final int            firePower;
-    private final int            variance;
-    private final int            range;
-    private final int            repeat;
-    private final int            ammunitionLoad;
-    private final Set<LevelType> supportedLayers;
-    private       int            repeated;
-    private       int            ammunition;
+    private final int                     firePower;
+    private final int                     variance;
+    private final int                     range;
+    private final int                     repeat;
+    private final int                     ammunitionLoad;
+    private final ImmutableSet<LevelType> supportedLayers;
+    private       int                     repeated;
+    private       int                     ammunition;
 
     protected WeaponModule(final ImmutableResourceCost resourceCost, final int firePower, final int variance, final int range,
                            final int repeat, final int ammunitionLoad, final Set<LevelType> supportedLayers) {
@@ -32,7 +32,7 @@ public class WeaponModule extends Module implements IWeaponModule {
         this.range = range;
         this.repeat = repeat;
         this.ammunitionLoad = ammunitionLoad;
-        this.supportedLayers = supportedLayers;
+        this.supportedLayers = ImmutableSet.copyOf( supportedLayers );
 
         ammunition = ammunitionLoad;
     }
@@ -95,14 +95,13 @@ public class WeaponModule extends Module implements IWeaponModule {
 
     @Override
     public boolean fireAt(final ITile target)
-            throws NotAuthenticatedException, NotOwnedException, NotObservableException, IWeaponModule.OutOfRangeException,
-                   IWeaponModule.OutOfRepeatsException, IWeaponModule.OutOfAmmunitionException {
+            throws NotAuthenticatedException, NotOwnedException, NotObservableException, OutOfRangeException, OutOfRepeatsException,
+                   OutOfAmmunitionException {
         assertOwned();
         Security.assertObservable( target );
-        assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range,
-                     IWeaponModule.OutOfRangeException.class );
-        assertState( repeated < repeat, IWeaponModule.OutOfRepeatsException.class );
-        assertState( ammunition > 0, IWeaponModule.OutOfAmmunitionException.class );
+        assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, OutOfRangeException.class );
+        assertState( repeated < repeat, OutOfRepeatsException.class );
+        assertState( ammunition > 0, OutOfAmmunitionException.class );
 
         ChangeInt.From repeatedChange = ChangeInt.from( repeated );
         ChangeInt.From ammunitionChange = ChangeInt.from( ammunition );
@@ -111,7 +110,7 @@ public class WeaponModule extends Module implements IWeaponModule {
         --ammunition;
 
         getGameController().fireIfObservable( getGameObject().getLocation() )
-                .onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
+                           .onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
 
         Tile coreTarget = coreT( target );
         Optional<GameObject> targetGameObject = coreTarget.getContents();

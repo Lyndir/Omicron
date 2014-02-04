@@ -4,6 +4,8 @@ import static com.lyndir.omicron.api.model.CoreUtils.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.math.Side;
+import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.GameListener;
@@ -40,9 +42,9 @@ public class Game extends MetaObject implements IGame {
         return new Builder();
     }
 
-    private Game(final Size levelSize, final List<Player> players, final List<VictoryConditionType> victoryConditions,
-                 final List<GameListener> gameListeners, final IGame.GameResourceConfig resourceConfig,
-                 final IGame.GameUnitConfig unitConfig)
+    private Game(final Size levelSize, final Iterable<Player> players, final Iterable<VictoryConditionType> victoryConditions,
+                 final Iterable<GameListener> gameListeners, final GameResourceConfig resourceConfig,
+                 final GameUnitConfig unitConfig)
             throws Security.NotAuthenticatedException {
         this.levelSize = levelSize;
         levels = ImmutableList.of( new Level( levelSize, LevelType.GROUND, this ), new Level( levelSize, LevelType.SKY, this ),
@@ -184,7 +186,7 @@ public class Game extends MetaObject implements IGame {
         return levelSize;
     }
 
-    public static class Builder implements IGame.IBuilder {
+    public static class Builder implements IBuilder {
 
         private final List<GameListener>               gameListeners     = Lists.newLinkedList();
         private final List<IPlayer>                    players           = Lists.newLinkedList();
@@ -193,8 +195,8 @@ public class Game extends MetaObject implements IGame {
         private Size                     levelSize      = new Size( 200, 200 );
         private int                      nextPlayerID   = 1;
         private int                      totalPlayers   = 4;
-        private IGame.GameResourceConfig resourceConfig = IGame.GameResourceConfigs.PLENTY;
-        private IGame.GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
+        private GameResourceConfig resourceConfig = GameResourceConfigs.PLENTY;
+        private GameUnitConfig     unitConfig     = GameUnitConfigs.BASIC;
 
         private Builder() {
         }
@@ -289,24 +291,24 @@ public class Game extends MetaObject implements IGame {
         }
 
         @Override
-        public IGame.GameResourceConfig getResourceConfig() {
+        public GameResourceConfig getResourceConfig() {
             return resourceConfig;
         }
 
         @Override
-        public Builder setResourceConfig(final IGame.GameResourceConfig resourceConfig) {
+        public Builder setResourceConfig(final GameResourceConfig resourceConfig) {
             this.resourceConfig = resourceConfig;
 
             return this;
         }
 
         @Override
-        public IGame.GameUnitConfig getUnitConfig() {
+        public GameUnitConfig getUnitConfig() {
             return unitConfig;
         }
 
         @Override
-        public Builder setUnitConfig(final IGame.GameUnitConfig unitConfig) {
+        public Builder setUnitConfig(final GameUnitConfig unitConfig) {
             this.unitConfig = unitConfig;
 
             return this;
@@ -319,15 +321,15 @@ public class Game extends MetaObject implements IGame {
     }
 
 
-    enum GameUnitConfigs implements IGame.GameUnitConfig {
+    enum GameUnitConfigs implements GameUnitConfig {
         NONE {
             @Override
-            public void addUnits(final IGame game, final IPlayer player, final IGame.UnitAdder unitAdder) {
+            public void addUnits(final IGame game, final IPlayer player, final UnitAdder unitAdder) {
             }
         },
         BASIC {
             @Override
-            public void addUnits(final IGame game, final IPlayer player, final IGame.UnitAdder unitAdder) {
+            public void addUnits(final IGame game, final IPlayer player, final UnitAdder unitAdder) {
                 Game coreGame = coreG( game );
 
                 // Find tiles for the units.
@@ -338,10 +340,10 @@ public class Game extends MetaObject implements IGame {
                                                         RANDOM.nextInt( ground.getSize().getHeight() ) ).get();
 
                     Level sky = coreGame.getLevel( LevelType.SKY );
-                    Coordinate.Side randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
+                    Side randomSide = Side.values()[RANDOM.nextInt( Side.values().length )];
                     startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
 
-                    randomSide = Coordinate.Side.values()[RANDOM.nextInt( Coordinate.Side.values().length )];
+                    randomSide = Side.values()[RANDOM.nextInt( Side.values().length )];
                     startTileScout = startTileEngineer.neighbour( randomSide );
                 }
                 while (startTileEngineer.getContents().isPresent() || //

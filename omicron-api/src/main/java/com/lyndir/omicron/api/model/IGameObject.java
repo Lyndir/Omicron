@@ -42,7 +42,7 @@ public interface IGameObject extends GameObserver {
      *
      * @return The module of the given type at the given index.
      */
-    <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final int index)
+    <M extends IModule> Optional<M> getModule(PublicModuleType<M> moduleType, int index)
             throws NotAuthenticatedException, NotObservableException;
 
     /**
@@ -54,7 +54,7 @@ public interface IGameObject extends GameObserver {
      * @return A list of modules of the given type or an empty list if there are none.
      */
     @SuppressWarnings("unchecked")
-    <M extends IModule> List<M> getModules(final PublicModuleType<M> moduleType)
+    <M extends IModule> List<M> getModules(PublicModuleType<M> moduleType)
             throws NotAuthenticatedException, NotObservableException;
 
     /**
@@ -66,7 +66,7 @@ public interface IGameObject extends GameObserver {
      *
      * @return A proxy object that you can run your method on.
      */
-    <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final int index, @Nullable final Object elseValue)
+    <M extends IModule> M onModuleElse(PublicModuleType<M> moduleType, int index, @Nullable Object elseValue)
             throws NotAuthenticatedException, NotObservableException;
 
     /**
@@ -78,7 +78,7 @@ public interface IGameObject extends GameObserver {
      *
      * @return A proxy object that you can run your method on.
      */
-    <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final int index)
+    <M extends IModule> M onModule(PublicModuleType<M> moduleType, int index)
             throws NotAuthenticatedException, NotObservableException;
 
     ImmutableCollection<? extends IModule> listModules()

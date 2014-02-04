@@ -169,7 +169,7 @@ public class MobilityModule extends Module implements IMobilityModule {
         PredicateNN<Tile> foundFunction = new PredicateNN<Tile>() {
             @Override
             public boolean apply(@Nonnull final Tile input) {
-                return ObjectUtils.isEqual( input, target );
+                return isEqual( input, target );
             }
         };
         NNFunctionNN<Step<Tile>, Double> costFunction = new NNFunctionNN<Step<Tile>, Double>() {
@@ -333,7 +333,7 @@ public class MobilityModule extends Module implements IMobilityModule {
             Path<Tile> tracePath = path.get();
             do {
                 assertState( tracePath.getTarget().checkAccessible() || //
-                             ObjectUtils.isEqual( getGameObject().getLocation(), tracePath.getTarget() ), PathInvalidatedException.class,
+                             isEqual( getGameObject().getLocation(), tracePath.getTarget() ), PathInvalidatedException.class,
                              tracePath );
 
                 Optional<Path<Tile>> parent = tracePath.getParent();

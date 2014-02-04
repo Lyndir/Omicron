@@ -3,6 +3,8 @@ package com.lyndir.omicron.api.model;
 import static org.testng.AssertJUnit.*;
 
 import com.google.common.collect.ImmutableMap;
+import com.lyndir.lhunath.opal.math.Side;
+import com.lyndir.lhunath.opal.math.Vec2;
 import org.testng.annotations.Test;
 
 
@@ -72,7 +74,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( leveling.getCost(), 0d );
         leveling.execute();
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.GROUND );
-        assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
+        assertEquals( leveler.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 7d );
 
         leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.SPACE );
@@ -81,7 +83,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( leveling.getCost(), 5d );
         leveling.execute();
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.SPACE );
-        assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
+        assertEquals( leveler.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 2d );
 
         leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.SKY );
@@ -90,7 +92,7 @@ public class MobilityModuleTest extends AbstractTest {
         assertEquals( leveling.getCost(), 2d );
         leveling.execute();
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.SKY );
-        assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
+        assertEquals( leveler.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 0d );
 
         leveling = leveler.onModule( ModuleType.MOBILITY, 0 ).leveling( LevelType.GROUND );
@@ -99,10 +101,10 @@ public class MobilityModuleTest extends AbstractTest {
         try {
             leveling.execute();
             assertFalse( true );
-        } catch (Module.ImpossibleException ignored) {
+        } catch (final Module.ImpossibleException ignored) {
         }
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.SKY );
-        assertEquals( leveler.getLocation().getPosition(), new Coordinate( 0, 0, staticGame.getLevelSize() ) );
+        assertEquals( leveler.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
         assertEquals( leveler.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 0d );
     }
 
@@ -125,19 +127,19 @@ public class MobilityModuleTest extends AbstractTest {
 
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 17d );
         MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 )
-                                                .movement( mover.getLocation().neighbour( Coordinate.Side.E ) );
+                                                .movement( mover.getLocation().neighbour( Side.E ) );
         assertTrue( movement.isPossible() );
         assertEquals( movement.getCost(), 1d );
         movement.execute();
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
-        assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 0, staticGame.getLevelSize() ) );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 1, 0, staticGame.getLevelSize() ) );
 
         movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( staticGame.getLevel( LevelType.SPACE ).getTile( 1, 5 ).get() );
         assertTrue( movement.isPossible() );
         assertEquals( movement.getCost(), 15d );
         movement.execute();
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.SPACE );
-        assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 1, 5, staticGame.getLevelSize() ) );
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 1d );
 
         movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( staticGame.getLevel( LevelType.GROUND ).getTile( 0, 5 ).get() );
@@ -145,10 +147,10 @@ public class MobilityModuleTest extends AbstractTest {
         try {
             movement.execute();
             assertFalse( true );
-        } catch (Module.ImpossibleException ignored) {
+        } catch (final Module.ImpossibleException ignored) {
         }
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.SPACE );
-        assertEquals( mover.getLocation().getPosition(), new Coordinate( 1, 5, staticGame.getLevelSize() ) );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 1, 5, staticGame.getLevelSize() ) );
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 1d );
     }
 }

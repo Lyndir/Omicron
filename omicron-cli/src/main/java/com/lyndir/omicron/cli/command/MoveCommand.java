@@ -2,6 +2,8 @@ package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.math.Side;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybe;
@@ -24,12 +26,12 @@ public class MoveCommand extends Command {
     @Override
     public void evaluate(final Iterator<String> tokens) {
 
-        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final IPlayer localPlayer = localPlayerOptional.get();
+        IPlayer localPlayer = localPlayerOptional.get();
 
         String objectIDArgument = Iterators.getNext( tokens, null );
         if (objectIDArgument == null) {
@@ -50,13 +52,13 @@ public class MoveCommand extends Command {
             return;
         }
 
-        Optional<Coordinate.Side> side = Coordinate.Side.forName( sideArgument );
+        Optional<Side> side = Side.forName( sideArgument );
         if (!side.isPresent()) {
             err( "No such side/level: %s.  Valid sides are: %s, valid levels are: %s", side, //
-                 FluentIterable.from( ImmutableList.copyOf( Coordinate.Side.values() ) )
-                               .transform( new Function<Coordinate.Side, String>() {
+                 FluentIterable.from( ImmutableList.copyOf( Side.values() ) )
+                               .transform( new Function<Side, String>() {
                                    @Override
-                                   public String apply(final Coordinate.Side input) {
+                                   public String apply(final Side input) {
 
                                        return input.name();
                                    }
@@ -94,7 +96,7 @@ public class MoveCommand extends Command {
         }
         ITile location = maybeLocation.get();
 
-        Coordinate targetPosition = side.get().delta( location.getPosition() );
+        Vec2 targetPosition = side.get().delta( location.getPosition() );
         Optional<? extends ITile> targetLocation = location.getLevel().getTile( targetPosition );
         if (!targetLocation.isPresent()) {
             err( "No tile at that side for position: %s.", targetPosition );

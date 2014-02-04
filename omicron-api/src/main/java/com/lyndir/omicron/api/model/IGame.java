@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.util.EnumUtils;
 import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import com.lyndir.omicron.api.GameListener;
@@ -18,7 +19,7 @@ public interface IGame {
 
     IGameController getController();
 
-    ILevel getLevel(final LevelType levelType);
+    ILevel getLevel(LevelType levelType);
 
     Turn getCurrentTurn();
 
@@ -37,31 +38,31 @@ public interface IGame {
 
         Size getLevelSize();
 
-        IBuilder setLevelSize(final Size levelSize);
+        IBuilder setLevelSize(Size levelSize);
 
         Collection<IPlayer> getPlayers();
 
-        IBuilder setPlayer(final PlayerKey playerKey, final String name, final Color primaryColor, final Color secondaryColor);
+        IBuilder setPlayer(PlayerKey playerKey, String name, Color primaryColor, Color secondaryColor);
 
-        IBuilder addPlayer(final IPlayer player);
+        IBuilder addPlayer(IPlayer player);
 
         List<PublicVictoryConditionType> getVictoryConditions();
 
-        IBuilder addVictoryCondition(final PublicVictoryConditionType victoryCondition);
+        IBuilder addVictoryCondition(PublicVictoryConditionType victoryCondition);
 
         Integer getTotalPlayers();
 
-        IBuilder setTotalPlayers(final Integer totalPlayers);
+        IBuilder setTotalPlayers(Integer totalPlayers);
 
-        IBuilder addGameListener(final GameListener gameListener);
+        IBuilder addGameListener(GameListener gameListener);
 
-        IGame.GameResourceConfig getResourceConfig();
+        GameResourceConfig getResourceConfig();
 
-        IBuilder setResourceConfig(final IGame.GameResourceConfig resourceConfig);
+        IBuilder setResourceConfig(GameResourceConfig resourceConfig);
 
-        IGame.GameUnitConfig getUnitConfig();
+        GameUnitConfig getUnitConfig();
 
-        IBuilder setUnitConfig(final IGame.GameUnitConfig unitConfig);
+        IBuilder setUnitConfig(GameUnitConfig unitConfig);
 
         int nextPlayerID();
     }
@@ -79,7 +80,7 @@ public interface IGame {
 
     interface GameUnitConfig {
 
-        void addUnits(IGame game, IPlayer player, final UnitAdder unitAdder);
+        void addUnits(IGame game, IPlayer player, UnitAdder unitAdder);
     }
 
 

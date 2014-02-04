@@ -1,6 +1,8 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableCollection;
+import com.lyndir.lhunath.opal.math.Side;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
@@ -43,7 +45,7 @@ public class PublicTile extends MetaObject implements ITile {
     }
 
     @Override
-    public Coordinate getPosition() {
+    public Vec2 getPosition() {
         return core.getPosition();
     }
 
@@ -61,7 +63,7 @@ public class PublicTile extends MetaObject implements ITile {
 
     @Override
     @Nonnull
-    public ITile neighbour(final Coordinate.Side side) {
+    public ITile neighbour(final Side side) {
         return core.neighbour( side );
     }
 

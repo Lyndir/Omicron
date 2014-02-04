@@ -7,8 +7,11 @@ import com.google.common.base.Objects;
 import com.google.common.base.*;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.lyndir.lhunath.opal.math.Side;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
+import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
 import com.lyndir.omicron.api.util.Maybe;
 import java.util.*;
 import javax.annotation.Nonnull;
@@ -26,20 +29,20 @@ public class Tile extends MetaObject implements ITile {
     @Nullable
     private       GameObject contents;
     @ObjectMeta(useFor = ObjectMeta.For.all)
-    private final Coordinate position;
+    private final Vec2       position;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Level      level;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Map<ResourceType, Integer> resourceQuantities = Collections.synchronizedMap(
             new EnumMap<ResourceType, Integer>( ResourceType.class ) );
 
-    Tile(final Coordinate position, final Level level) {
+    Tile(final Vec2 position, final Level level) {
         this.position = position;
         this.level = level;
     }
 
-    Tile(final int u, final int v, final Level level) {
-        this( new Coordinate( u, v, level.getSize() ), level );
+    Tile(final int x, final int y, final Level level) {
+        this( new Vec2( x, y, level.getSize() ), level );
     }
 
     @Override
@@ -55,7 +58,7 @@ public class Tile extends MetaObject implements ITile {
             return false;
 
         Tile o = (Tile) obj;
-        return ObjectUtils.isEqual( position, o.position ) && ObjectUtils.isEqual( level, o.level );
+        return isEqual( position, o.position ) && isEqual( level, o.level );
     }
 
     @Nonnull
@@ -66,7 +69,7 @@ public class Tile extends MetaObject implements ITile {
     @Override
     @Nonnull
     public Maybe<GameObject> checkContents()
-            throws Security.NotAuthenticatedException {
+    throws NotAuthenticatedException {
         if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
             // Cannot observe tile.
             return Maybe.unknown();
@@ -86,7 +89,7 @@ public class Tile extends MetaObject implements ITile {
     }
 
     @Override
-    public Coordinate getPosition() {
+    public Vec2 getPosition() {
         return position;
     }
 
@@ -118,7 +121,7 @@ public class Tile extends MetaObject implements ITile {
     @Override
     @Authenticated
     public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType)
-            throws Security.NotAuthenticatedException {
+            throws NotAuthenticatedException {
         if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
             // Cannot observe location.
             return Maybe.unknown();
@@ -128,14 +131,14 @@ public class Tile extends MetaObject implements ITile {
 
     @Override
     @Nonnull
-    public Tile neighbour(final Coordinate.Side side) {
-        return level.getTile( getPosition().neighbour( side ) ).get();
+    public Tile neighbour(final Side side) {
+        return level.getTile( side.delta( getPosition() ) ).get();
     }
 
     @Override
     public ImmutableCollection<Tile> neighbours() {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
-        for (final Coordinate.Side side : Coordinate.Side.values())
+        for (final Side side : Side.values())
             neighbours.add( neighbour( side ) );
 
         return neighbours.build();
@@ -145,23 +148,23 @@ public class Tile extends MetaObject implements ITile {
     public ImmutableCollection<Tile> neighbours(final int distance) {
         ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
         // FIXME: Not correct.
-        for (int du = -distance; du <= distance; ++du)
-            for (int dv = Math.max( -distance, -du - distance ); dv <= Math.min( distance, -du + distance ); ++dv)
-                neighbours.add( level.getTile( getPosition().delta( du, dv ) ).get() );
+        for (int dx = -distance; dx <= distance; ++dx)
+            for (int dy = Math.max( -distance, -dx - distance ); dy <= Math.min( distance, -dx + distance ); ++dy)
+                neighbours.add( level.getTile( getPosition().translate( dx, dy ) ).get() );
 
         return neighbours.build();
     }
 
     @Override
     public Maybe<Boolean> checkContains(@Nonnull final IGameObject target)
-            throws Security.NotAuthenticatedException {
+            throws NotAuthenticatedException {
         Maybe<GameObject> contents = checkContents();
         if (contents.presence() == Maybe.Presence.ABSENT)
             return Maybe.of( false );
         if (contents.presence() == Maybe.Presence.UNKNOWN)
             return Maybe.unknown();
 
-        return Maybe.of( ObjectUtils.isEqual( contents.get(), target ) );
+        return Maybe.of( isEqual( contents.get(), target ) );
     }
 
     /**
@@ -177,7 +180,7 @@ public class Tile extends MetaObject implements ITile {
     @Override
     @Authenticated
     public boolean checkAccessible()
-            throws Security.NotAuthenticatedException {
+            throws NotAuthenticatedException {
         return checkContents().presence() == Maybe.Presence.ABSENT;
     }
 }

@@ -3,6 +3,7 @@ package com.lyndir.omicron.cli.command;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
@@ -29,18 +30,18 @@ public class PrintCommand extends Command {
     @SubCommand(abbr = "f", desc = "A view of all observable tiles.")
     public void field(final Iterator<String> tokens) {
 
-        final Optional<IGameController> gameController = getOmicron().getGameController();
+        Optional<IGameController> gameController = getOmicron().getGameController();
         if (!gameController.isPresent()) {
             err( "No game is running.  Create one with the 'create' command." );
             return;
         }
 
-        final Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = getOmicron().getLocalPlayer();
         if (!localPlayerOptional.isPresent()) {
             err( "No local player in the game." );
             return;
         }
-        final IPlayer localPlayer = localPlayerOptional.get();
+        IPlayer localPlayer = localPlayerOptional.get();
 
         // Create an empty grid.
         Size maxSize = null;
@@ -48,9 +49,9 @@ public class PrintCommand extends Command {
             maxSize = Size.max( maxSize, level.getSize() );
         assert maxSize != null;
         Table<Integer, Integer, StringBuilder> grid = HashBasedTable.create( maxSize.getHeight(), maxSize.getWidth() );
-        for (int u = 0; u < maxSize.getWidth(); ++u)
-            for (int v = 0; v < maxSize.getHeight(); ++v)
-                grid.put( v, u, new StringBuilder( "   " ) );
+        for (int x = 0; x < maxSize.getWidth(); ++x)
+            for (int y = 0; y < maxSize.getHeight(); ++y)
+                grid.put( y, x, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
         for (final ITile tile : localPlayer.listObservableTiles()) {
@@ -62,15 +63,15 @@ public class PrintCommand extends Command {
                 contentsChar = levelCharacters.get( tile.getLevel().getType() );
 
             int levelIndex = levelIndexes.indexOf( tile.getLevel().getType() );
-            int v = tile.getPosition().getV();
-            int u = (tile.getPosition().getU() + v / 2) % maxSize.getWidth();
-            grid.get( v, u ).setCharAt( levelIndex, contentsChar );
+            int y = tile.getPosition().getY();
+            int x = (tile.getPosition().getX() + y / 2) % maxSize.getWidth();
+            grid.get( y, x ).setCharAt( levelIndex, contentsChar );
         }
 
-        for (int v = 0; v < maxSize.getHeight(); ++v) {
+        for (int y = 0; y < maxSize.getHeight(); ++y) {
             Map<Integer, StringBuilder> row = new TreeMap<>( Ordering.natural() );
-            row.putAll( grid.row( v ) );
-            inf( "%s|%s|", v % 2 == 0? "": "  ", Joiner.on( ' ' ).join( row.values() ) );
+            row.putAll( grid.row( y ) );
+            inf( "%s|%s|", y % 2 == 0? "": "  ", Joiner.on( ' ' ).join( row.values() ) );
         }
     }
 }

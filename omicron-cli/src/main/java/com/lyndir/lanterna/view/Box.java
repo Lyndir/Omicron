@@ -16,6 +16,10 @@
 
 package com.lyndir.lanterna.view;
 
+import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.math.Vec2;
+
+
 /**
  * @author lhunath, 2013-07-23
  */
@@ -28,12 +32,12 @@ public class Box extends Rectangle {
         super( top, right, bottom, left );
     }
 
-    public Coordinate getOrigin() {
-        return new Coordinate( getLeft(), getTop() );
+    public Vec2 getOrigin() {
+        return new Vec2( getLeft(), getTop() );
     }
 
-    public Coordinate getCenter() {
-        return new Coordinate( getLeft() + getSize().getWidth() / 2, getTop() + getSize().getHeight() / 2 );
+    public Vec2 getCenter() {
+        return new Vec2( getLeft() + getSize().getWidth() / 2, getTop() + getSize().getHeight() / 2 );
     }
 
     public Size getSize() {
@@ -44,7 +48,7 @@ public class Box extends Rectangle {
         return new Box( getTop() + y, getRight() + x, getBottom() + y, getLeft() + x );
     }
 
-    public Box translate(final Coordinate offset) {
+    public Box translate(final Vec2 offset) {
         return translate( offset.getX(), offset.getY() );
     }
 

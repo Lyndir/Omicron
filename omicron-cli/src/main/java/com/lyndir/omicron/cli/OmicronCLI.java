@@ -23,7 +23,7 @@ public class OmicronCLI {
     private final Builders          builders      = new Builders();
     private final PlayerKey         localKey      = new PlayerKey();
     private final List<String>      log           = new LinkedList<>();
-    private final Set<GameListener> gameListeners = new HashSet<>();
+    private final Collection<GameListener> gameListeners = new HashSet<>();
     private       boolean           running       = true;
     private IGameController gameController;
     private IPlayer         localPlayer;
@@ -89,7 +89,7 @@ public class OmicronCLI {
         return localKey;
     }
 
-    public List<String> getLog() {
+    public Collection<String> getLog() {
         return log;
     }
 

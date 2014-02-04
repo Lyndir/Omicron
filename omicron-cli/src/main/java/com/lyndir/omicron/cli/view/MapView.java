@@ -26,12 +26,12 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.lyndir.lanterna.view.*;
-import com.lyndir.lanterna.view.Coordinate;
+import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.GameListener;
 import com.lyndir.omicron.api.model.*;
-import com.lyndir.omicron.api.model.Size;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class MapView extends View {
             ImmutableMap.of( ResourceType.FUEL, Terminal.Color.RED, ResourceType.METALS, Terminal.Color.WHITE, ResourceType.SILICON,
                              Terminal.Color.YELLOW, ResourceType.RARE_ELEMENTS, Terminal.Color.MAGENTA );
 
-    private Coordinate offset = new Coordinate( 0, 0 );
+    private Vec2 offset = new Vec2();
     private LevelType      levelType;
     private Terminal.Color mapColor;
     private String         backgroundPattern;
@@ -80,10 +80,10 @@ public class MapView extends View {
         if (!gameController.isPresent())
             return;
 
-        final Optional<IPlayer> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
+        Optional<IPlayer> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
         if (!localPlayerOptional.isPresent())
             return;
-        final IPlayer localPlayer = localPlayerOptional.get();
+        IPlayer localPlayer = localPlayerOptional.get();
 
         // Create an empty grid.
         Size levelSize = gameController.get().getGame().getLevel( getLevelType() ).getSize();
@@ -91,21 +91,21 @@ public class MapView extends View {
 
         // Iterate observable tiles and populate the grid.
         for (final ITile tile : localPlayer.listObservableTiles()) {
-            Coordinate coordinate = positionToMapCoordinate( tile.getPosition() );
+            Vec2 coordinate = positionToMapCoordinate( tile.getPosition() );
             grid.put( coordinate.getY(), coordinate.getX(), tile );
         }
 
         // Draw grid in view.
         Box contentBox = getContentBoxOnScreen();
-        com.lyndir.lanterna.view.Size contentSize = contentBox.getSize();
-        for (int x = contentBox.getLeft(); x <= contentBox.getRight(); ++x)
-            for (int y = contentBox.getTop(); y <= contentBox.getBottom(); ++y) {
-                int v = y - contentBox.getTop() + getOffset().getY();
-                int u = x - contentBox.getLeft() + getOffset().getX();
-                if (!levelSize.isInBounds( new com.lyndir.omicron.api.model.Coordinate( u, v, levelSize ) ))
+        Size contentSize = contentBox.getSize();
+        for (int screenX = contentBox.getLeft(); screenX <= contentBox.getRight(); ++screenX)
+            for (int screenY = contentBox.getTop(); screenY <= contentBox.getBottom(); ++screenY) {
+                int tileY = screenY - contentBox.getTop() + getOffset().getY();
+                int tileX = screenX - contentBox.getLeft() + getOffset().getX();
+                if (!levelSize.isInBounds( new Vec2( tileX, tileY, levelSize ) ))
                     continue;
 
-                ITile tile = grid.get( v, u );
+                ITile tile = grid.get( tileY, tileX );
                 Maybe<? extends IGameObject> contents;
                 Terminal.Color bgColor = getBackgroundColor();
                 if (tile == null)
@@ -121,7 +121,7 @@ public class MapView extends View {
                     }
                 }
 
-                screen.putString( x + (y % 2 == 0? 0: 1), y,
+                screen.putString( screenX + (screenY % 2 == 0? 0: 1), screenY,
                                   contents.presence() == Maybe.Presence.PRESENT? contents.get().getType().getTypeName().substring( 0, 1 )
                                           : " ", getMapColor(), bgColor, ScreenCharacterStyle.Bold );
                 // Draw off-screen warning labels.
@@ -190,31 +190,31 @@ public class MapView extends View {
                 // Only game objects in this map's displayed level.
                 return input.checkLocation().get().getLevel().getType() == getLevelType();
             }
-        } ).transform( new NNFunctionNN<IGameObject, Coordinate>() {
+        } ).transform( new NNFunctionNN<IGameObject, Vec2>() {
             @Nonnull
             @Override
-            public Coordinate apply(@Nonnull final IGameObject input) {
+            public Vec2 apply(@Nonnull final IGameObject input) {
                 // Transform game objects into their offset from the center of the map.
                 hasUnits = true;
                 Box contentBox = getContentBoxOnScreen();
                 return positionToMapCoordinate( input.checkLocation().get().getPosition() ) //
                         .translate( -contentBox.getSize().getWidth() / 2, -contentBox.getSize().getHeight() / 2 );
             }
-        } ).first().or( new Supplier<Coordinate>() {
+        } ).first().or( new Supplier<Vec2>() {
             @Override
-            public Coordinate get() {
+            public Vec2 get() {
                 // If there is no game object in this level, go to the map's center.
                 hasUnits = false;
                 Box contentBox = getContentBoxOnScreen();
-                return new Coordinate( contentBox.getSize().getWidth() / 2, contentBox.getSize().getHeight() / 2 );
+                return new Vec2( contentBox.getSize().getWidth() / 2, contentBox.getSize().getHeight() / 2 );
             }
         } ) );
     }
 
-    private static Coordinate positionToMapCoordinate(final com.lyndir.omicron.api.model.Coordinate position) {
-        int v = position.getV();
-        int u = (position.getU() + v / 2) % position.getWrapSize().getWidth();
-        return new Coordinate( u, v );
+    private static Vec2 positionToMapCoordinate(final Vec2 position) {
+        int y = position.getY();
+        int x = (position.getX() + y / 2) % position.getWrapSize().getWidth();
+        return new Vec2( x, y );
     }
 
     @Override
@@ -244,11 +244,11 @@ public class MapView extends View {
     }
 
     @Nonnull
-    public Coordinate getOffset() {
+    public Vec2 getOffset() {
         return offset;
     }
 
-    public void setOffset(@Nonnull final Coordinate offset) {
+    public void setOffset(@Nonnull final Vec2 offset) {
         this.offset = offset;
     }
 }

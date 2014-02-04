@@ -2,6 +2,8 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.Map;
 import java.util.Objects;
@@ -19,20 +21,20 @@ public class Level extends MetaObject implements ILevel {
     private final Size      size;
     private final LevelType type;
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final Game     game;
+    private final Game      game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final ImmutableMap<Coordinate, Tile> tileMap;
+    private final ImmutableMap<Vec2, Tile> tileMap;
 
     Level(final Size size, final LevelType type, final Game game) {
         this.size = size;
         this.type = type;
         this.game = game;
 
-        ImmutableMap.Builder<Coordinate, Tile> tileMapBuilder = ImmutableMap.builder();
-        for (int u = 0; u < size.getWidth(); ++u)
-            for (int v = 0; v < size.getHeight(); ++v) {
-                Coordinate coordinate = new Coordinate( u, v, size );
+        ImmutableMap.Builder<Vec2, Tile> tileMapBuilder = ImmutableMap.builder();
+        for (int x = 0; x < size.getWidth(); ++x)
+            for (int y = 0; y < size.getHeight(); ++y) {
+                Vec2 coordinate = new Vec2( x, y, size );
                 tileMapBuilder.put( coordinate, new Tile( coordinate, this ) );
             }
         tileMap = tileMapBuilder.build();
@@ -54,7 +56,7 @@ public class Level extends MetaObject implements ILevel {
     }
 
     @Override
-    public Map<Coordinate, Tile> getTiles() {
+    public Map<Vec2, Tile> getTiles() {
         return tileMap;
     }
 
@@ -66,7 +68,7 @@ public class Level extends MetaObject implements ILevel {
      * @return {@code null} if the position is outside of the bounds of this level.
      */
     @Override
-    public Optional<Tile> getTile(final Coordinate position) {
+    public Optional<Tile> getTile(final Vec2 position) {
         if (!size.isInBounds( position ))
             return Optional.absent();
 
@@ -76,14 +78,14 @@ public class Level extends MetaObject implements ILevel {
     /**
      * Get the tile at the given position in this level.
      *
-     * @param u The u coordinate of the position of the tile to get.
-     * @param v The v coordinate of the position of the tile to get.
+     * @param x The x coordinate of the position of the tile to get.
+     * @param y The y coordinate of the position of the tile to get.
      *
      * @return {@code null} if the position is outside of the bounds of this level.
      */
     @Override
-    public Optional<Tile> getTile(final int u, final int v) {
-        return getTile( new Coordinate( u, v, getSize() ) );
+    public Optional<Tile> getTile(final int x, final int y) {
+        return getTile( new Vec2( x, y, getSize() ) );
     }
 
     @Override
