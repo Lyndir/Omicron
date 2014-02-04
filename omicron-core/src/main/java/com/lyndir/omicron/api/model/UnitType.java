@@ -17,7 +17,6 @@
 package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
-import com.lyndir.omicron.api.model.IModule;
 
 
 /**

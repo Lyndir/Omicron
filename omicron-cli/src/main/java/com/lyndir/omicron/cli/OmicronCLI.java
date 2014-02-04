@@ -29,8 +29,7 @@ public class OmicronCLI {
     private IPlayer         localPlayer;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
-    public static void main(final String... arguments)
-            throws Exception {
+    public static void main(final String... arguments) {
         // Attach the omicron command log appender to logback.
         LoggerContext logbackFactory = (LoggerContext) LoggerFactory.getILoggerFactory();
         OmicronCLIAppender newAppender = new OmicronCLIAppender();

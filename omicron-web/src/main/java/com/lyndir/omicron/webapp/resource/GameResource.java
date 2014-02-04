@@ -1,14 +1,11 @@
 package com.lyndir.omicron.webapp.resource;
 
-import static com.lyndir.lhunath.opal.system.util.StringUtils.*;
-
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
-import com.lyndir.omicron.webapp.data.service.SessionManager;
 import com.lyndir.omicron.webapp.data.service.StateManager;
 import edu.umd.cs.findbugs.annotations.*;
 import javax.annotation.Nullable;
@@ -52,9 +49,9 @@ public class GameResource {
     @SuppressFBWarnings({ "URF_UNREAD_FIELD" })
     public static class GetResponse {
 
-        Turn                     turn;
-        Size                     levelSize;
-        Iterable<PlayerGameInfo> playersInfo;
+        final Turn                     turn;
+        final Size                     levelSize;
+        final Iterable<PlayerGameInfo> playersInfo;
 
         public GetResponse(final IGame game) {
             turn = game.getCurrentTurn();

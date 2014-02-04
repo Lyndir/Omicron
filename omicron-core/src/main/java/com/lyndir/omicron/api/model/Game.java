@@ -83,8 +83,7 @@ public class Game extends MetaObject implements IGame {
         } ) );
         while (true) {
             // Do we have remaining undistributed resources left?
-            while (remainingResources.values().remove( 0 ))
-                continue;
+            while (remainingResources.values().remove( 0 ));
             if (remainingResources.isEmpty())
                 break;
 

@@ -5,7 +5,6 @@ import static com.lyndir.omicron.api.model.Security.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableCollection;
 import com.lyndir.omicron.api.util.Maybe;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

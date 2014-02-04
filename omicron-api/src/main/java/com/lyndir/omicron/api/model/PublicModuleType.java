@@ -17,7 +17,6 @@
 package com.lyndir.omicron.api.model;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

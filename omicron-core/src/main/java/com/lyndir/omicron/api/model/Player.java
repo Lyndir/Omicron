@@ -3,7 +3,6 @@ package com.lyndir.omicron.api.model;
 import static com.lyndir.omicron.api.model.CoreUtils.*;
 
 import com.google.common.base.*;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;

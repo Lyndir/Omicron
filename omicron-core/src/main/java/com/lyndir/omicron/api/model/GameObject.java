@@ -11,9 +11,7 @@ import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.Change;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

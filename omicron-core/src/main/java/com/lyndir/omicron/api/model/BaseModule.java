@@ -10,6 +10,7 @@ import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
 import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
 import com.lyndir.omicron.api.util.Maybool;
+import java.util.Set;
 import javax.annotation.Nonnull;
 
 
@@ -24,13 +25,13 @@ public class BaseModule extends Module implements IBaseModule {
     private       int                     damage;
 
     protected BaseModule(final ImmutableResourceCost resourceCost, final int maxHealth, final int armor, final int viewRange,
-                         final ImmutableSet<LevelType> supportedLayers) {
+                         final Set<LevelType> supportedLayers) {
         super( resourceCost );
 
         this.maxHealth = maxHealth;
         this.armor = armor;
         this.viewRange = viewRange;
-        this.supportedLayers = supportedLayers;
+        this.supportedLayers = ImmutableSet.copyOf( supportedLayers );
     }
 
     static Builder0 createWithStandardResourceCost() {

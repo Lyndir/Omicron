@@ -15,7 +15,6 @@
  */
 package com.lyndir.omicron.webapp.data;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.Expose;
 import com.lyndir.lhunath.opal.system.i18n.Localized;

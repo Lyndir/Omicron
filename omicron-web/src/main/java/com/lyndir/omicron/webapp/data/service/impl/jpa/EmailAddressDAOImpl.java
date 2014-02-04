@@ -7,7 +7,6 @@ import com.lyndir.omicron.webapp.data.EmailAddress;
 import com.lyndir.omicron.webapp.data.service.EmailAddressDAO;
 import com.lyndir.omicron.webapp.data.service.EmailAddressUnavailableException;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
 
 
 /**

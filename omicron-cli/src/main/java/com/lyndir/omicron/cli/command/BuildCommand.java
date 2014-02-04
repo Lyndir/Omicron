@@ -1,7 +1,6 @@
 package com.lyndir.omicron.cli.command;
 
 import com.lyndir.omicron.api.model.Game;
-import com.lyndir.omicron.api.model.IGame;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 

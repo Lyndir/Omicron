@@ -3,7 +3,6 @@ package com.lyndir.omicron.webapp.data.service.impl.jpa;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.jpa.Persist;
-import com.lyndir.lhunath.opal.system.error.AlreadyCheckedException;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.omicron.webapp.data.*;
 import com.lyndir.omicron.webapp.data.service.*;

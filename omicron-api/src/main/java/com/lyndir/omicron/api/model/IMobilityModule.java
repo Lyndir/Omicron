@@ -92,7 +92,7 @@ public interface IMobilityModule extends IModule {
         boolean isPossible();
 
         void execute()
-                throws Security.NotAuthenticatedException, Security.NotOwnedException, ImpossibleException, InvalidatedException,
+                throws Security.NotAuthenticatedException, Security.NotOwnedException, InvalidatedException,
                        Security.NotObservableException, ImpossibleException;
     }
 }

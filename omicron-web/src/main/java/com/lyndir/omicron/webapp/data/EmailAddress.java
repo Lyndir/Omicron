@@ -4,6 +4,8 @@ import com.google.gson.annotations.Expose;
 import com.lyndir.lhunath.opal.system.i18n.Localized;
 import com.lyndir.lhunath.opal.system.i18n.MessagesFactory;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.*;
 
 
@@ -18,6 +20,7 @@ public class EmailAddress extends MetaObject implements Localized {
     @Id
     @Expose
     private final String  address;
+    @Nullable
     @ManyToOne
     private       User    user;
     @Expose
@@ -32,11 +35,12 @@ public class EmailAddress extends MetaObject implements Localized {
         this.address = address;
     }
 
+    @Nullable
     public User getUser() {
         return user;
     }
 
-    public void setUser(final User user) {
+    public void setUser(@Nonnull final User user) {
         this.user = user;
         user.getEmailAddresses().add( this );
     }

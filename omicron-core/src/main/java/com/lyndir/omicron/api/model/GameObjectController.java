@@ -7,8 +7,6 @@ import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
-import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
-import com.lyndir.omicron.api.model.Security.NotObservableException;
 import com.lyndir.omicron.api.util.Maybool;
 import java.util.Objects;
 import javax.annotation.Nonnull;

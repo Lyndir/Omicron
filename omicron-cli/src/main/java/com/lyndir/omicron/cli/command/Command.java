@@ -2,7 +2,6 @@ package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Throwables;
 import com.lyndir.lhunath.opal.system.logging.Logger;
-import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

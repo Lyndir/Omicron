@@ -3,7 +3,6 @@ package com.lyndir.omicron.webapp.data.service;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.lyndir.omicron.api.model.IGame;
 import com.lyndir.omicron.webapp.data.User;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

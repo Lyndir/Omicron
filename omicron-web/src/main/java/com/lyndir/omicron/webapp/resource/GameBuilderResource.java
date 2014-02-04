@@ -1,13 +1,10 @@
 package com.lyndir.omicron.webapp.resource;
 
-import static com.lyndir.lhunath.opal.system.util.StringUtils.*;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
-import com.lyndir.lhunath.opal.system.util.URLUtils;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.webapp.data.User;
 import com.lyndir.omicron.webapp.data.service.*;
@@ -38,8 +35,7 @@ public class GameBuilderResource {
     @GET
     @Path("{gameBuilderID}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED })
-    public Response get(@PathParam("gameBuilderID") final long gameBuilderID)
-            throws EmailAddressUnavailableException {
+    public Response get(@PathParam("gameBuilderID") final long gameBuilderID) {
         IGame.IBuilder gameBuilder = stateManager.getGameBuilder( gameBuilderID );
 
         // Response.
@@ -48,8 +44,7 @@ public class GameBuilderResource {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED })
-    public Response post(final GameBuilderRequest input)
-            throws EmailAddressUnavailableException {
+    public Response post(final GameBuilderRequest input) {
         long gameBuilderID = stateManager.addGameBuilder( PublicGame.builder() );
 
         // Handle.
@@ -62,8 +57,7 @@ public class GameBuilderResource {
     @PUT
     @Path("{gameBuilderID}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED })
-    public Response put(@PathParam("gameBuilderID") final long gameBuilderID, final GameBuilderRequest input)
-            throws EmailAddressUnavailableException {
+    public Response put(@PathParam("gameBuilderID") final long gameBuilderID, final GameBuilderRequest input) {
         IGame.IBuilder gameBuilder = stateManager.getGameBuilder( gameBuilderID );
 
         // Handle.
@@ -76,11 +70,11 @@ public class GameBuilderResource {
     @SuppressFBWarnings({ "URF_UNREAD_FIELD" })
     public static class GetResponse {
 
-        Size                             levelSize;
-        Collection<HumanPlayer>          players;
-        List<PublicVictoryConditionType> victoryConditions;
-        IGame.GameResourceConfig         resourceConfig;
-        IGame.GameUnitConfig             unitConfig;
+        final Size                             levelSize;
+        final Collection<HumanPlayer>          players;
+        final List<PublicVictoryConditionType> victoryConditions;
+        final IGame.GameResourceConfig         resourceConfig;
+        final IGame.GameUnitConfig             unitConfig;
 
         public GetResponse(final IGame.IBuilder gameBuilder) {
             levelSize = gameBuilder.getLevelSize();
@@ -98,6 +92,7 @@ public class GameBuilderResource {
     }
 
 
+    @SuppressWarnings("InstanceVariableMayNotBeInitialized")
     public static class GameBuilderRequest {
 
         Size                         levelSize;

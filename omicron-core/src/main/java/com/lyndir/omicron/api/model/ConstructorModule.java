@@ -40,6 +40,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
 
     private boolean    resourceConstrained;
     private int        remainingSpeed;
+
+    @Nullable
     private GameObject target;
 
     protected ConstructorModule(final ImmutableResourceCost resourceCost, final int buildSpeed, final ModuleType<?> buildsModule) {
@@ -171,6 +173,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
         return remainingSpeed;
     }
 
+    @Nullable
     @Override
     public IGameObject getTarget() {
         return target;
@@ -178,7 +181,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
 
     @Override
     @Authenticated
-    public void setTarget(final IGameObject target) {
+    public void setTarget(@Nullable final IGameObject target) {
         Change.From<IGameObject> targetChange = Change.<IGameObject>from( this.target );
 
         this.target = coreGO( target );
