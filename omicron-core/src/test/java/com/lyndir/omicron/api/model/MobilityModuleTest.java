@@ -11,6 +11,51 @@ import org.testng.annotations.Test;
 public class MobilityModuleTest extends AbstractTest {
 
     @Test
+    public void testWrapping()
+            throws Exception {
+
+        int levelWidth = staticGame.getLevelSize().getWidth();
+        int levelHeight = staticGame.getLevelSize().getHeight();
+        GameObject mover = createUnit( testUnitType( "Mover", BaseModule.createWithStandardResourceCost()
+                                                                        .maxHealth( 1 )
+                                                                        .armor( 1 )
+                                                                        .viewRange( 10 )
+                                                                        .supportedLayers( LevelType.values() ),
+                                                     MobilityModule.createWithStandardResourceCost()
+                                                                   .movementSpeed( levelWidth + levelHeight )
+                                                                   .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
+                                                                   .levelingCost( ImmutableMap.<LevelType, Double>of() ) ) );
+        staticGame.getController().setReady();
+
+        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), (double) (levelWidth + levelHeight) );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
+        for (int x = 1; x <= levelWidth; ++x) {
+            MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( mover.getLocation().neighbour( Side.E ) );
+            assertTrue( movement.isPossible() );
+            assertEquals( movement.getCost(), 1d );
+            movement.execute();
+            assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
+            assertEquals( mover.getLocation().getPosition(), new Vec2( x % levelWidth, 0, staticGame.getLevelSize() ) );
+            printWorldMap();
+        }
+
+        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), (double) levelHeight );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
+        for (int y = 1; y <= levelHeight; ++y) {
+            MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( mover.getLocation().neighbour( Side.SE ) );
+            assertTrue( movement.isPossible() );
+            assertEquals( movement.getCost(), 1d );
+            movement.execute();
+            assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
+            assertEquals( mover.getLocation().getPosition(), new Vec2( 0, y % levelHeight, staticGame.getLevelSize() ) );
+            printWorldMap();
+        }
+
+        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 0d );
+        assertFalse( "Doesn't wrap right yet.", true );
+    }
+
+    @Test
     public void testCostForMovingInLevel()
             throws Exception {
 
@@ -56,7 +101,7 @@ public class MobilityModuleTest extends AbstractTest {
     }
 
     @Test
-    public void testLevel()
+    public void testLevelling()
             throws Exception {
 
         GameObject leveler = createUnit( testUnitType( "Leveler", MobilityModule.createWithStandardResourceCost()
@@ -101,7 +146,8 @@ public class MobilityModuleTest extends AbstractTest {
         try {
             leveling.execute();
             assertFalse( true );
-        } catch (final Module.ImpossibleException ignored) {
+        }
+        catch (final Module.ImpossibleException ignored) {
         }
         assertEquals( leveler.getLocation().getLevel().getType(), LevelType.SKY );
         assertEquals( leveler.getLocation().getPosition(), new Vec2( 0, 0, staticGame.getLevelSize() ) );
@@ -109,7 +155,7 @@ public class MobilityModuleTest extends AbstractTest {
     }
 
     @Test
-    public void testMovement()
+    public void testBasicMovement()
             throws Exception {
 
         GameObject mover = createUnit( testUnitType( "Mover", BaseModule.createWithStandardResourceCost()
@@ -126,8 +172,7 @@ public class MobilityModuleTest extends AbstractTest {
         staticGame.getController().setReady();
 
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 17d );
-        MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 )
-                                                .movement( mover.getLocation().neighbour( Side.E ) );
+        MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( mover.getLocation().neighbour( Side.E ) );
         assertTrue( movement.isPossible() );
         assertEquals( movement.getCost(), 1d );
         movement.execute();
@@ -147,7 +192,8 @@ public class MobilityModuleTest extends AbstractTest {
         try {
             movement.execute();
             assertFalse( true );
-        } catch (final Module.ImpossibleException ignored) {
+        }
+        catch (final Module.ImpossibleException ignored) {
         }
         assertEquals( mover.getLocation().getLevel().getType(), LevelType.SPACE );
         assertEquals( mover.getLocation().getPosition(), new Vec2( 1, 5, staticGame.getLevelSize() ) );

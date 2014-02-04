@@ -13,6 +13,7 @@ import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
 import com.lyndir.omicron.api.util.Maybe;
 import java.util.*;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -46,7 +47,7 @@ public class Tile extends MetaObject implements ITile {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode( position, level );
+        return Objects.hash( position, level );
     }
 
     @Override

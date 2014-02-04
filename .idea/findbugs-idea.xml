@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="org.twodividedbyzero.idea.findbugs">
+    <option name="annotationSuppressWarningsClass" value="edu.umd.cs.findbugs.annotations.SuppressFBWarnings" />
     <option name="annotationTypeSettings">
       <map>
         <entry key="ExpPriority" value="-4473925;-12828863;-8355712;WAVE_UNDERSCORE;0;" />
@@ -15,7 +16,7 @@
         <entry key="property.analysisEffortLevel" value="default" />
         <entry key="property.analyzeAfterCompile" value="true" />
         <entry key="property.annotationGutterIconEnabled" value="true" />
-        <entry key="property.annotationSuppressWarningsClass" value="edu.umd.cs.findbugs.annotations.SuppressWarnings" />
+        <entry key="property.annotationSuppressWarningsClass" value="edu.umd.cs.findbugs.annotations.SuppressFBWarnings" />
         <entry key="property.annotationTextRangeMarkupEnabled" value="true" />
         <entry key="property.exportAsHtml" value="true" />
         <entry key="property.exportAsXml" value="true" />
@@ -23,7 +24,7 @@
         <entry key="property.exportCreateArchiveDir" value="false" />
         <entry key="property.exportOpenBrowser" value="true" />
         <entry key="property.minPriorityToReport" value="Medium" />
-        <entry key="property.runAnalysisInBackground" value="false" />
+        <entry key="property.runAnalysisInBackground" value="true" />
         <entry key="property.showHiddenDetectors" value="false" />
         <entry key="property.toolWindowEditorPreview" value="false" />
         <entry key="property.toolWindowScrollToSource" value="true" />
@@ -203,6 +204,7 @@
         <entry key="STYLE" value="true" />
       </map>
     </option>
+    <option name="_annotationSuppressWarningsClass" value="edu.umd.cs.findbugs.annotations.SuppressFBWarnings" />
     <option name="_annotationTypeSettings">
       <map>
         <entry key="ExpPriority" value="-4473925;-12828863;-8355712;WAVE_UNDERSCORE;0;" />

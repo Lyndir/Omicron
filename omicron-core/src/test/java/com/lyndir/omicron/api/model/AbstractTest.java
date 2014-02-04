@@ -34,38 +34,7 @@ public abstract class AbstractTest {
                 protected void onNewTurn() {
                     super.onNewTurn();
 
-                    Size size = getGameController().getGame().getLevelSize();
-                    Table<Integer, Integer, String> grid = HashBasedTable.create( size.getHeight(), size.getWidth() );
-                    for (int u = 0; u < size.getWidth(); ++u)
-                        for (int v = 0; v < size.getHeight(); ++v)
-                            grid.put( v, u, "   " );
-
-                    // Iterate observable tiles and populate the grid.
-                    for (final LevelType levelType : LevelType.values()) {
-                        Level level = staticGame.getLevel( levelType );
-                        for (final Tile tile : level.getTiles().values()) {
-                            Optional<GameObject> contents = tile.getContents();
-                            if (!contents.isPresent())
-                                continue;
-
-                            char contentsChar = contents.get().getType().getTypeName().charAt( 0 );
-                            int levelIndex = levelIndexes.indexOf( tile.getLevel().getType() );
-                            int v = tile.getPosition().getY();
-                            int u = (tile.getPosition().getX() + v / 2) % size.getWidth();
-                            String tileString = grid.get( v, u );
-                            StringBuilder newTileString = new StringBuilder( tileString.replace( ' ', '.' ) );
-                            newTileString.setCharAt( levelIndex, contentsChar );
-                            grid.put( v, u, newTileString.toString() );
-                        }
-                    }
-
-                    logger.inf( "▄▄▄" + StringUtils.repeat( "▄", size.getWidth() * 4 ) );
-                    for (int v = 0; v < size.getHeight(); ++v) {
-                        Map<Integer, String> row = new TreeMap<>( Ordering.natural() );
-                        row.putAll( grid.row( v ) );
-                        logger.inf( "%s▌%s▐%s", v % 2 == 0? "": "██", Joiner.on( ' ' ).join( row.values() ), v % 2 == 0? "██": "" );
-                    }
-                    logger.inf( "▀▀▀" + StringUtils.repeat( "▀", size.getWidth() * 4 ) );
+                    printWorldMap();
                 }
             };
 
@@ -82,6 +51,41 @@ public abstract class AbstractTest {
         staticGame = builder.build();
 
         Security.authenticate( staticPlayer, key );
+    }
+
+    protected void printWorldMap() {
+        Size size = staticPlayer.getController().getGameController().getGame().getLevelSize();
+        Table<Integer, Integer, String> grid = HashBasedTable.create( size.getHeight(), size.getWidth() );
+        for (int u = 0; u < size.getWidth(); ++u)
+            for (int v = 0; v < size.getHeight(); ++v)
+                grid.put( v, u, "   " );
+
+        // Iterate observable tiles and populate the grid.
+        for (final LevelType levelType : LevelType.values()) {
+            Level level = staticGame.getLevel( levelType );
+            for (final Tile tile : level.getTiles().values()) {
+                Optional<GameObject> contents = tile.getContents();
+                if (!contents.isPresent())
+                    continue;
+
+                char contentsChar = contents.get().getType().getTypeName().charAt( 0 );
+                int levelIndex = levelIndexes.indexOf( tile.getLevel().getType() );
+                int v = tile.getPosition().getY();
+                int u = (tile.getPosition().getX() + v / 2) % size.getWidth();
+                String tileString = grid.get( v, u );
+                StringBuilder newTileString = new StringBuilder( tileString.replace( ' ', '.' ) );
+                newTileString.setCharAt( levelIndex, contentsChar );
+                grid.put( v, u, newTileString.toString() );
+            }
+        }
+
+        logger.inf( "▄▄▄" + StringUtils.repeat( "▄", size.getWidth() * 4 ) );
+        for (int v = 0; v < size.getHeight(); ++v) {
+            Map<Integer, String> row = new TreeMap<>( Ordering.natural() );
+            row.putAll( grid.row( v ) );
+            logger.inf( "%s▌%s▐%s", v % 2 == 0? "": "██", Joiner.on( ' ' ).join( row.values() ), v % 2 == 0? "██": "" );
+        }
+        logger.inf( "▀▀▀" + StringUtils.repeat( "▀", size.getWidth() * 4 ) );
     }
 
     protected UnitType testUnitType(final String typeName, final Module... modules) {
