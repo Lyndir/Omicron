@@ -43,7 +43,7 @@ public class Game extends MetaObject implements IGame {
     }
 
     private Game(final Size levelSize, final Iterable<Player> players, final Iterable<VictoryConditionType> victoryConditions,
-                 final Iterable<GameListener> gameListeners, final GameResourceConfig resourceConfig,
+                 final Map<GameListener, IPlayer> gameListeners, final GameResourceConfig resourceConfig,
                  final GameUnitConfig unitConfig)
             throws Security.NotAuthenticatedException {
         this.levelSize = levelSize;
@@ -55,8 +55,7 @@ public class Game extends MetaObject implements IGame {
 
         for (final VictoryConditionType victoryCondition : victoryConditions)
             victoryCondition.install( this );
-        for (final GameListener gameListener : gameListeners)
-            gameController.addGameListener( gameListener );
+        gameController.addGameListeners( gameListeners );
 
         // Give each player some units.
         for (final Player player : players)
@@ -187,7 +186,7 @@ public class Game extends MetaObject implements IGame {
 
     public static class Builder implements IBuilder {
 
-        private final List<GameListener>               gameListeners     = Lists.newLinkedList();
+        private final Map<GameListener, IPlayer>               gameListeners     = Maps.newLinkedHashMap();
         private final List<IPlayer>                    players           = Lists.newLinkedList();
         private final List<PublicVictoryConditionType> victoryConditions = Lists.newArrayList( PublicVictoryConditionType.values() );
 
@@ -284,7 +283,7 @@ public class Game extends MetaObject implements IGame {
 
         @Override
         public Builder addGameListener(final GameListener gameListener) {
-            gameListeners.add( gameListener );
+            gameListeners.put( gameListener, Security.currentPlayer() );
 
             return this;
         }
