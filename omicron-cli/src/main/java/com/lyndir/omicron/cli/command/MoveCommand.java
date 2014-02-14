@@ -2,8 +2,7 @@ package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.math.Side;
-import com.lyndir.lhunath.opal.math.Vec2;
+import com.lyndir.lhunath.opal.math.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybe;
@@ -55,21 +54,21 @@ public class MoveCommand extends Command {
         Optional<Side> side = Side.forName( sideArgument );
         if (!side.isPresent()) {
             err( "No such side/level: %s.  Valid sides are: %s, valid levels are: %s", side, //
-                 FluentIterable.from( ImmutableList.copyOf( Side.values() ) )
-                               .transform( new Function<Side, String>() {
-                                   @Override
-                                   public String apply(final Side input) {
+                 FluentIterable.from( ImmutableList.copyOf( Side.values() ) ).transform( new Function<Side, String>() {
+                     @Override
+                     public String apply(final Side input) {
 
-                                       return input.name();
-                                   }
-                               } ), //
+                         return input.name();
+                     }
+                 } ), //
                  FluentIterable.from( ImmutableList.copyOf( LevelType.values() ) ).transform( new Function<LevelType, String>() {
                      @Override
                      public String apply(final LevelType input) {
 
                          return input.name();
                      }
-                 } ) );
+                 } )
+            );
             return;
         }
 
@@ -96,7 +95,7 @@ public class MoveCommand extends Command {
         }
         ITile location = maybeLocation.get();
 
-        Vec2 targetPosition = side.get().delta( location.getPosition() );
+        Vec2Hex targetPosition = location.getPosition().translate( side.get().getDelta() );
         Optional<? extends ITile> targetLocation = location.getLevel().getTile( targetPosition );
         if (!targetLocation.isPresent()) {
             err( "No tile at that side for position: %s.", targetPosition );

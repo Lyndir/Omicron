@@ -2,7 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableCollection;
 import com.lyndir.lhunath.opal.math.Side;
-import com.lyndir.lhunath.opal.math.Vec2;
+import com.lyndir.lhunath.opal.math.Vec2Hex;
 import com.lyndir.omicron.api.util.Maybe;
 import javax.annotation.Nonnull;
 
@@ -18,7 +18,7 @@ public interface ITile {
     Maybe<? extends IGameObject> checkContents()
             throws Security.NotAuthenticatedException;
 
-    Vec2 getPosition();
+    Vec2Hex getPosition();
 
     ILevel getLevel();
 

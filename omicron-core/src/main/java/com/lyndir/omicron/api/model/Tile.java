@@ -7,7 +7,7 @@ import com.google.common.base.*;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.math.Side;
-import com.lyndir.lhunath.opal.math.Vec2;
+import com.lyndir.lhunath.opal.math.Vec2Hex;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
@@ -29,20 +29,20 @@ public class Tile extends MetaObject implements ITile {
     @Nullable
     private       GameObject contents;
     @ObjectMeta(useFor = ObjectMeta.For.all)
-    private final Vec2       position;
+    private final Vec2Hex       position;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Level      level;
     @ObjectMeta(useFor = ObjectMeta.For.all)
     private final Map<ResourceType, Integer> resourceQuantities = Collections.synchronizedMap(
             new EnumMap<ResourceType, Integer>( ResourceType.class ) );
 
-    Tile(final Vec2 position, final Level level) {
+    Tile(final Vec2Hex position, final Level level) {
         this.position = position;
         this.level = level;
     }
 
     Tile(final int x, final int y, final Level level) {
-        this( new Vec2( x, y, level.getSize() ), level );
+        this( new Vec2Hex( x, y, level.getSize() ), level );
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Tile extends MetaObject implements ITile {
     }
 
     @Override
-    public Vec2 getPosition() {
+    public Vec2Hex getPosition() {
         return position;
     }
 
@@ -132,7 +132,7 @@ public class Tile extends MetaObject implements ITile {
     @Override
     @Nonnull
     public Tile neighbour(final Side side) {
-        return level.getTile( side.delta( getPosition() ) ).get();
+        return level.getTile( getPosition().translate( side.getDelta() ) ).get();
     }
 
     @Override

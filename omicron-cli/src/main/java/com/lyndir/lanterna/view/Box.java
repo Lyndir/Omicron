@@ -16,8 +16,7 @@
 
 package com.lyndir.lanterna.view;
 
-import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.lhunath.opal.math.Vec2;
+import com.lyndir.lhunath.opal.math.*;
 
 
 /**

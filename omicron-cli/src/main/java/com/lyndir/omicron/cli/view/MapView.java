@@ -26,8 +26,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.lyndir.lanterna.view.*;
-import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.lhunath.opal.math.Vec2;
+import com.lyndir.lhunath.opal.math.*;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.GameListener;
@@ -102,7 +101,7 @@ public class MapView extends View {
             for (int screenY = contentBox.getTop(); screenY <= contentBox.getBottom(); ++screenY) {
                 int tileY = screenY - contentBox.getTop() + getOffset().getY();
                 int tileX = screenX - contentBox.getLeft() + getOffset().getX();
-                if (!levelSize.isInBounds( new Vec2( tileX, tileY, levelSize ) ))
+                if (!levelSize.isInBounds( new Vec2( tileX, tileY ) ))
                     continue;
 
                 ITile tile = grid.get( tileY, tileX );
@@ -211,7 +210,7 @@ public class MapView extends View {
         } ) );
     }
 
-    private static Vec2 positionToMapCoordinate(final Vec2 position) {
+    private static Vec2 positionToMapCoordinate(final Vec2Hex position) {
         int y = position.getY();
         int x = (position.getX() + y / 2) % position.getWrapSize().getWidth();
         return new Vec2( x, y );

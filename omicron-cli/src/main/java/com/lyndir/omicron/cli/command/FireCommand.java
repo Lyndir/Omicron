@@ -6,6 +6,7 @@ import com.google.common.base.*;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.math.Vec2;
+import com.lyndir.lhunath.opal.math.Vec2Hex;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybe;
@@ -113,7 +114,7 @@ public class FireCommand extends Command {
         IWeaponModule weaponModule = optionalWeapon.get();
 
         // Find the target tile.
-        Vec2 targetCoordinate = location.getPosition().translate( dx, dy );
+        Vec2Hex targetCoordinate = location.getPosition().translate( dx, dy );
         Optional<? extends ITile> target = level.get().getTile( targetCoordinate );
         if (!target.isPresent()) {
             err( "No tile in level: %s, at position: %s", level.get().getType().getName(), targetCoordinate );
