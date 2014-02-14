@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 public class GameController implements IGameController {
 
     private final Game game;
-    private final Map<GameListener, IPlayer> gameListeners = Collections.synchronizedMap( Maps.<GameListener, IPlayer>newHashMap() );
+    private final Map<GameListener, IPlayer> gameListeners = Collections.synchronizedMap( Maps.<GameListener, IPlayer>newLinkedHashMap() );
 
     GameController(final Game game) {
         this.game = game;
@@ -44,6 +44,10 @@ public class GameController implements IGameController {
 
     void addInternalGameListener(final GameListener gameListener) {
         gameListeners.put( gameListener, null );
+    }
+
+    void addGameListeners(final Map<GameListener, IPlayer> gameListeners) {
+        this.gameListeners.putAll( gameListeners );
     }
 
     @Override

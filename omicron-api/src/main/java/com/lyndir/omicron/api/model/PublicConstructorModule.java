@@ -150,28 +150,4 @@ public class PublicConstructorModule extends PublicModule implements IConstructo
             return core.getController();
         }
     }
-
-
-    public static class InaccessibleException extends OmicronException {
-
-        InaccessibleException() {
-            super( "Location is inaccessible." );
-        }
-    }
-
-
-    public static class IncompatibleLevelException extends OmicronException {
-
-        IncompatibleLevelException() {
-            super( "Target location's level is incompatible with the current state." );
-        }
-    }
-
-
-    public static class OutOfRangeException extends OmicronException {
-
-        OutOfRangeException() {
-            super( "Target location is out of range." );
-        }
-    }
 }
