@@ -21,13 +21,13 @@ public class MobilityModuleTest extends AbstractTest {
                                                                         .viewRange( 10 )
                                                                         .supportedLayers( LevelType.values() ),
                                                      MobilityModule.createWithStandardResourceCost()
-                                                                   .movementSpeed( levelWidth + levelHeight )
+                                                                   .movementSpeed( levelWidth + levelHeight + 1 )
                                                                    .movementCost( ImmutableMap.of( LevelType.GROUND, 1d ) )
                                                                    .levelingCost( ImmutableMap.<LevelType, Double>of() ) ) );
         staticGame.getController().setReady();
 
-        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), (double) (levelWidth + levelHeight) );
-        assertEquals( mover.getLocation().getPosition(), new Vec2Hex( 0, 0, staticGame.getLevelSize() ) );
+        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), (double) (levelWidth + levelHeight + 1) );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 0, 0 ) );
         for (int x = 1; x <= levelWidth; ++x) {
             MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( mover.getLocation().neighbour( Side.E ) );
             assertTrue( movement.isPossible() );
@@ -36,11 +36,11 @@ public class MobilityModuleTest extends AbstractTest {
             logger.dbg( "position: %s", mover.getLocation().getPosition() );
             printWorldMap();
             assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
-            assertEquals( mover.getLocation().getPosition(), new Vec2Hex( x % levelWidth, 0, staticGame.getLevelSize() ) );
+            assertEquals( mover.getLocation().getPosition(), new Vec2( x % levelWidth, 0 ) );
         }
 
-        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), (double) levelHeight );
-        assertEquals( mover.getLocation().getPosition(), new Vec2Hex( 0, 0, staticGame.getLevelSize() ) );
+        assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), (double) levelHeight + 1 );
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 0, 0 ) );
         for (int y = 1; y <= levelHeight; ++y) {
             MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( mover.getLocation().neighbour( Side.SE ) );
             assertTrue( movement.isPossible() );
@@ -51,10 +51,16 @@ public class MobilityModuleTest extends AbstractTest {
             assertEquals( mover.getLocation().getLevel().getType(), LevelType.GROUND );
 
             if (y < levelHeight)
-                assertEquals( mover.getLocation().getPosition(), new Vec2Hex( 0, y, staticGame.getLevelSize() ) );
+                assertEquals( mover.getLocation().getPosition(), new Vec2( 0, y ) );
         }
+        assertEquals( mover.getLocation().getPosition(), new Vec2( levelWidth / 2, 0 ) );
 
-        assertEquals( mover.getLocation().getPosition(), new Vec2Hex( 5, 0, staticGame.getLevelSize() ) );
+        MobilityModule.Movement movement = mover.onModule( ModuleType.MOBILITY, 0 ).movement( mover.getLocation().neighbour( Side.NW ) );
+        assertTrue( movement.isPossible() );
+        assertEquals( movement.getCost(), 1d );
+        movement.execute();
+        assertEquals( mover.getLocation().getPosition(), new Vec2( 0, levelHeight - 1 ) );
+
         assertEquals( mover.onModule( ModuleType.MOBILITY, 0 ).getRemainingSpeed(), 0d );
     }
 
