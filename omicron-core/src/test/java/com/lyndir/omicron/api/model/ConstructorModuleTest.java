@@ -47,8 +47,8 @@ public class ConstructorModuleTest extends AbstractTest {
                                                                                      .armor( 1 )
                                                                                      .viewRange( 1 )
                                                                                      .supportedLayers( LevelType.values() ),
-                                                                           initBaseConstructorModule, initMobilityConstructorModule ), 0,
-                                                             0 );
+                                                                           initBaseConstructorModule, initMobilityConstructorModule ), //
+                                                             5, 5 );
         staticGame.getController().setReady();
 
         // Create a BASE unit type and a BASE & MOBILITY unit type.
@@ -70,7 +70,7 @@ public class ConstructorModuleTest extends AbstractTest {
         // Build a BASE unit, initially without resources.
         ConstructorModule baseConstructorModule = baseMobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 0 ).get();
         ConstructorModule mobilityConstructorModule = baseMobilityConstructorUnit.getModule( ModuleType.CONSTRUCTOR, 1 ).get();
-        Tile location1 = baseMobilityConstructorUnit.getLocation().neighbour( Side.E );
+        Tile location1 = baseMobilityConstructorUnit.getLocation().neighbour( Side.E ).get();
         ConstructorModule.ConstructionSite site1 = baseConstructorModule.schedule( baseUnit, location1 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
@@ -90,7 +90,7 @@ public class ConstructorModuleTest extends AbstractTest {
         // Now provide resources, work = 5 so should take 2 turns at a speed of 3.
         GameObject containerUnit = createUnit( testUnitType( "Metal Container", ContainerModule.createWithStandardResourceCost()
                                                                                                .resourceType( ResourceType.METALS )
-                                                                                               .capacity( 100 ) ), 0, 1 );
+                                                                                               .capacity( 100 ) ), 5, 6 );
         int metals = baseUnit.getConstructionWork() * ModuleType.BASE.getStandardCost().get( ResourceType.METALS );
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
         staticGame.getController().setReady();
@@ -122,7 +122,7 @@ public class ConstructorModuleTest extends AbstractTest {
                                                            ModuleType.MOBILITY.getStandardCost().get( ResourceType.METALS ));
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
         staticGame.getController().setReady();
-        Tile location2 = baseMobilityConstructorUnit.getLocation().neighbour( Side.W );
+        Tile location2 = baseMobilityConstructorUnit.getLocation().neighbour( Side.W ).get();
         ConstructorModule.ConstructionSite site2 = baseConstructorModule.schedule( baseMobilityUnit, location2 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( mobilityConstructorModule.getRemainingSpeed(), 2 );
@@ -191,7 +191,7 @@ public class ConstructorModuleTest extends AbstractTest {
                                                            ModuleType.MOBILITY.getStandardCost().get( ResourceType.METALS ));
         containerUnit.onModule( ModuleType.CONTAINER, 0 ).addStock( metals );
         staticGame.getController().setReady();
-        Tile location3 = baseConstructorUnit.getLocation().neighbour( Side.E );
+        Tile location3 = baseConstructorUnit.getLocation().neighbour( Side.E ).get();
         ConstructorModule.ConstructionSite site3 = baseConstructorModule.schedule( baseMobilityUnit, location3 );
         assertEquals( baseConstructorModule.getRemainingSpeed(), 3 );
         assertEquals( site3.getRemainingWork( ModuleType.BASE ), 7 );

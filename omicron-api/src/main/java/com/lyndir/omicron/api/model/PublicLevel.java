@@ -2,7 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.lhunath.opal.math.Vec2Hex;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -50,7 +50,7 @@ public class PublicLevel extends MetaObject implements ILevel {
     }
 
     @Override
-    public Map<Vec2Hex, ? extends ITile> getTiles() {
+    public Map<Vec2, ? extends ITile> getTiles() {
         return core.getTiles();
     }
 
@@ -64,7 +64,7 @@ public class PublicLevel extends MetaObject implements ILevel {
      * @return {@code null} if the position is outside of the bounds of this level.
      */
     @Override
-    public Optional<? extends ITile> getTile(final Vec2Hex position) {
+    public Optional<? extends ITile> getTile(final Vec2 position) {
         return core.getTile( position );
     }
 

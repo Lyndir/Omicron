@@ -49,7 +49,7 @@ public class MapView extends View {
             ImmutableMap.of( ResourceType.FUEL, Terminal.Color.RED, ResourceType.METALS, Terminal.Color.WHITE, ResourceType.SILICON,
                              Terminal.Color.YELLOW, ResourceType.RARE_ELEMENTS, Terminal.Color.MAGENTA );
 
-    private Vec2 offset = new Vec2();
+    private Vec2 offset = Vec2.create();
     private LevelType      levelType;
     private Terminal.Color mapColor;
     private String         backgroundPattern;
@@ -101,7 +101,7 @@ public class MapView extends View {
             for (int screenY = contentBox.getTop(); screenY <= contentBox.getBottom(); ++screenY) {
                 int tileY = screenY - contentBox.getTop() + getOffset().getY();
                 int tileX = screenX - contentBox.getLeft() + getOffset().getX();
-                if (!levelSize.isInBounds( new Vec2( tileX, tileY ) ))
+                if (!levelSize.isInBounds( Vec2.create( tileX, tileY ) ))
                     continue;
 
                 ITile tile = grid.get( tileY, tileX );
@@ -205,15 +205,15 @@ public class MapView extends View {
                 // If there is no game object in this level, go to the map's center.
                 hasUnits = false;
                 Box contentBox = getContentBoxOnScreen();
-                return new Vec2( contentBox.getSize().getWidth() / 2, contentBox.getSize().getHeight() / 2 );
+                return Vec2.create( contentBox.getSize().getWidth() / 2, contentBox.getSize().getHeight() / 2 );
             }
         } ) );
     }
 
-    private static Vec2 positionToMapCoordinate(final Vec2Hex position) {
+    private static Vec2 positionToMapCoordinate(final Vec2 position) {
         int y = position.getY();
-        int x = (position.getX() + y / 2) % position.getWrapSize().getWidth();
-        return new Vec2( x, y );
+        int x = position.getX() + y / 2;
+        return Vec2.create( x, y );
     }
 
     @Override

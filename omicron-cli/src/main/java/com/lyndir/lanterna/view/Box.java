@@ -32,11 +32,11 @@ public class Box extends Rectangle {
     }
 
     public Vec2 getOrigin() {
-        return new Vec2( getLeft(), getTop() );
+        return Vec2.create( getLeft(), getTop() );
     }
 
     public Vec2 getCenter() {
-        return new Vec2( getLeft() + getSize().getWidth() / 2, getTop() + getSize().getHeight() / 2 );
+        return Vec2.create( getLeft() + getSize().getWidth() / 2, getTop() + getSize().getHeight() / 2 );
     }
 
     public Size getSize() {

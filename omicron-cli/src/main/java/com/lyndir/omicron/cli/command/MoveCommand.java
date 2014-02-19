@@ -95,7 +95,7 @@ public class MoveCommand extends Command {
         }
         ITile location = maybeLocation.get();
 
-        Vec2Hex targetPosition = location.getPosition().translate( side.get().getDelta() );
+        Vec2 targetPosition = location.getPosition().translate( side.get().getDelta() );
         Optional<? extends ITile> targetLocation = location.getLevel().getTile( targetPosition );
         if (!targetLocation.isPresent()) {
             err( "No tile at that side for position: %s.", targetPosition );

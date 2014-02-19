@@ -3,7 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.lhunath.opal.math.Vec2Hex;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.*;
 import java.util.Map;
 import java.util.Objects;
@@ -24,17 +24,17 @@ public class Level extends MetaObject implements ILevel {
     private final Game      game;
 
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final ImmutableMap<Vec2Hex, Tile> tileMap;
+    private final ImmutableMap<Vec2, Tile> tileMap;
 
     Level(final Size size, final LevelType type, final Game game) {
         this.size = size;
         this.type = type;
         this.game = game;
 
-        ImmutableMap.Builder<Vec2Hex, Tile> tileMapBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<Vec2, Tile> tileMapBuilder = ImmutableMap.builder();
         for (int x = 0; x < size.getWidth(); ++x)
             for (int y = 0; y < size.getHeight(); ++y) {
-                Vec2Hex coordinate = new Vec2Hex( x, y, size );
+                Vec2 coordinate = Vec2.create( x, y );
                 tileMapBuilder.put( coordinate, new Tile( coordinate, this ) );
             }
         tileMap = tileMapBuilder.build();
@@ -56,7 +56,7 @@ public class Level extends MetaObject implements ILevel {
     }
 
     @Override
-    public Map<Vec2Hex, Tile> getTiles() {
+    public Map<Vec2, Tile> getTiles() {
         return tileMap;
     }
 
@@ -68,7 +68,7 @@ public class Level extends MetaObject implements ILevel {
      * @return {@code null} if the position is outside of the bounds of this level.
      */
     @Override
-    public Optional<Tile> getTile(final Vec2Hex position) {
+    public Optional<Tile> getTile(final Vec2 position) {
         if (!size.isInBounds( position ))
             return Optional.absent();
 
@@ -85,7 +85,7 @@ public class Level extends MetaObject implements ILevel {
      */
     @Override
     public Optional<Tile> getTile(final int x, final int y) {
-        return getTile( new Vec2Hex( x, y, getSize() ) );
+        return getTile( Vec2.create( x, y ) );
     }
 
     @Override

@@ -4,8 +4,7 @@ import static com.lyndir.omicron.api.model.CoreUtils.*;
 
 import com.google.common.base.*;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.math.Side;
-import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.math.*;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.GameListener;
@@ -56,15 +55,6 @@ public class Game extends MetaObject implements IGame {
         for (final VictoryConditionType victoryCondition : victoryConditions)
             victoryCondition.install( this );
         gameController.addGameListeners( gameListeners );
-
-        // Give each player some units.
-        for (final Player player : players)
-            unitConfig.addUnits( this, player, new UnitAdder() {
-                @Override
-                public void add(final IUnitType unitType, final ITile location) {
-                    player.addObject( new GameObject( coreUT( unitType ), Game.this, player, coreT( location ) ) );
-                }
-            } );
 
         // Add resources to the tiles.
         // Figure out how many resources we're distributing for each of the resource types supported by our levels.
@@ -120,6 +110,15 @@ public class Game extends MetaObject implements IGame {
                 }
             }
         }
+
+        // Give each player some units.
+        for (final Player player : players)
+            unitConfig.addUnits( this, player, new UnitAdder() {
+                @Override
+                public void add(final IUnitType unitType, final ITile location) {
+                    player.addObject( new GameObject( coreUT( unitType ), Game.this, player, coreT( location ) ) );
+                }
+            } );
     }
 
     @Override
@@ -331,27 +330,37 @@ public class Game extends MetaObject implements IGame {
                 Game coreGame = coreG( game );
 
                 // Find tiles for the units.
-                Tile startTileEngineer, startTileAirship, startTileScout;
-                do {
-                    Level ground = coreGame.getLevel( LevelType.GROUND );
-                    startTileEngineer = ground.getTile( RANDOM.nextInt( ground.getSize().getWidth() ),
-                                                        RANDOM.nextInt( ground.getSize().getHeight() ) ).get();
+                Level ground = coreGame.getLevel( LevelType.GROUND );
+                Level sky = coreGame.getLevel( LevelType.SKY );
+                Optional<Tile> engineerTile, airshipTile, scoutTile;
+                while (true) {
+                    Vec2 engineerPosition = Vec2.create( RANDOM.nextInt( ground.getSize().getWidth() ),
+                                                         RANDOM.nextInt( ground.getSize().getHeight() ) );
 
-                    Level sky = coreGame.getLevel( LevelType.SKY );
                     Side randomSide = Side.values()[RANDOM.nextInt( Side.values().length )];
-                    startTileAirship = sky.getTile( startTileEngineer.neighbour( randomSide ).getPosition() ).get();
+                    Vec2 airshipPosition = engineerPosition.translate( randomSide.getDelta() );
 
                     randomSide = Side.values()[RANDOM.nextInt( Side.values().length )];
-                    startTileScout = startTileEngineer.neighbour( randomSide );
+                    Vec2 scoutPosition = engineerPosition.translate( randomSide.getDelta() );
+
+                    engineerTile = ground.getTile( engineerPosition );
+                    if (!engineerTile.isPresent() || engineerTile.get().getContents().isPresent() || //
+                        !engineerTile.get().getResourceQuantity( ResourceType.METALS ).isPresent())
+                        continue;
+                    airshipTile = sky.getTile( airshipPosition );
+                    if (!airshipTile.isPresent() || airshipTile.get().getContents().isPresent())
+                        continue;
+                    scoutTile = ground.getTile( scoutPosition );
+                    if (!scoutTile.isPresent() || scoutTile.get().getContents().isPresent())
+                        continue;
+
+                    break;
                 }
-                while (startTileEngineer.getContents().isPresent() || //
-                       startTileAirship.getContents().isPresent() || //
-                       startTileScout.getContents().isPresent());
 
                 // Add the units.
-                unitAdder.add( UnitTypes.ENGINEER, startTileEngineer );
-                unitAdder.add( UnitTypes.AIRSHIP, startTileAirship );
-                unitAdder.add( UnitTypes.SCOUT, startTileScout );
+                unitAdder.add( UnitTypes.ENGINEER, engineerTile.get() );
+                unitAdder.add( UnitTypes.AIRSHIP, airshipTile.get() );
+                unitAdder.add( UnitTypes.SCOUT, scoutTile.get() );
             }
         }
     }

@@ -1,8 +1,9 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableCollection;
 import com.lyndir.lhunath.opal.math.Side;
-import com.lyndir.lhunath.opal.math.Vec2Hex;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.omicron.api.util.Maybe;
 import javax.annotation.Nonnull;
 
@@ -18,7 +19,7 @@ public interface ITile {
     Maybe<? extends IGameObject> checkContents()
             throws Security.NotAuthenticatedException;
 
-    Vec2Hex getPosition();
+    Vec2 getPosition();
 
     ILevel getLevel();
 
@@ -26,7 +27,7 @@ public interface ITile {
             throws Security.NotAuthenticatedException;
 
     @Nonnull
-    ITile neighbour(Side side);
+    Optional<? extends ITile> neighbour(Side side);
 
     ImmutableCollection<? extends ITile> neighbours();
 
