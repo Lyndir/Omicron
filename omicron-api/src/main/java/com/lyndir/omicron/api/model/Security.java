@@ -34,7 +34,7 @@ import javax.annotation.Nonnull;
 public final class Security {
 
     private static final ThreadLocal<IPlayer>        currentPlayerTL = new ThreadLocal<>();
-    private static final ThreadLocal<IPlayer>        jobPlayerTL     = new ThreadLocal<>();
+    private static final ThreadLocal<Deque<IPlayer>> jobPlayerTL     = new ThreadLocal<>();
     private static final ThreadLocal<Deque<Boolean>> godTL           = new ThreadLocal<Deque<Boolean>>() {
         @Override
         protected Deque<Boolean> initialValue() {
@@ -43,10 +43,9 @@ public final class Security {
     };
 
     static <R> R godRun(final Job<R> job) {
-        if (isGod()) {
+        if (isGod())
             // Already god.
             return job.execute();
-        }
 
         try {
             // Become god.
@@ -62,12 +61,12 @@ public final class Security {
     static void playerRun(final IPlayer jobPlayer, final Runnable job) {
         try {
             godTL.get().push( false );
-            jobPlayerTL.set( jobPlayer );
+            jobPlayerTL.get().push( jobPlayer );
             job.run();
         }
         finally {
             Preconditions.checkState( !godTL.get().pop(), "Expected to not be god." );
-            jobPlayerTL.remove();
+            Preconditions.checkState( jobPlayerTL.get().pop() == jobPlayer, "Expected to pop player for job." );
         }
     }
 
@@ -75,6 +74,12 @@ public final class Security {
         Preconditions.checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
 
         currentPlayerTL.set( currentPlayer );
+    }
+
+    public static void authenticatedRun(final IPlayer currentPlayer, final PlayerKey playerKey, final Runnable job) {
+        Preconditions.checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
+
+        playerRun( currentPlayer, job );
     }
 
     static boolean isAuthenticated() {
@@ -88,7 +93,7 @@ public final class Security {
     @Nonnull
     static IPlayer currentPlayer()
             throws NotAuthenticatedException {
-        IPlayer jobPlayer = jobPlayerTL.get();
+        IPlayer jobPlayer = jobPlayerTL.get().peek();
         if (jobPlayer != null)
             return jobPlayer;
 
