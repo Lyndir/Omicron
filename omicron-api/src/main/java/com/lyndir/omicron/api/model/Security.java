@@ -34,7 +34,12 @@ import javax.annotation.Nonnull;
 public final class Security {
 
     private static final ThreadLocal<IPlayer>        currentPlayerTL = new ThreadLocal<>();
-    private static final ThreadLocal<Deque<IPlayer>> jobPlayerTL     = new ThreadLocal<>();
+    private static final ThreadLocal<Deque<IPlayer>> jobPlayerTL     = new ThreadLocal<Deque<IPlayer>>() {
+        @Override
+        protected Deque<IPlayer> initialValue() {
+            return new LinkedList<>();
+        }
+    };
     private static final ThreadLocal<Deque<Boolean>> godTL           = new ThreadLocal<Deque<Boolean>>() {
         @Override
         protected Deque<Boolean> initialValue() {
