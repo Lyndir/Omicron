@@ -4,6 +4,7 @@ import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableCollection;
+import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.util.Maybe;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -45,6 +46,18 @@ public interface IGameObject extends GameObserver {
             throws NotAuthenticatedException, NotObservableException;
 
     /**
+     * Get this object's module of the given type at the given index.
+     *
+     * @param moduleType The type of module to get.
+     * @param predicate  Return the first module of the given type for which the predicate holds true.
+     * @param <M>        The type of the module.
+     *
+     * @return The module of the given type at the given index.
+     */
+    <M extends IModule> Optional<M> getModule(PublicModuleType<M> moduleType, PredicateNN<M> predicate)
+            throws NotAuthenticatedException, NotObservableException;
+
+    /**
      * Get this object's modules of the given type.
      *
      * @param moduleType The type of module to get.
@@ -60,7 +73,8 @@ public interface IGameObject extends GameObserver {
      * Run a method on a module but return {@code elseValue} if this object doesn't have such a module.
      *
      * @param moduleType The type of the module to run a method on.
-     * @param elseValue  The value to return if this object doesn't have a module of the given type.
+     * @param index      The index of the module to run a method on.
+     * @param elseValue  The value to return if this object doesn't have a module of the given type at the given index.
      * @param <M>        The type of the module to run a method on.
      *
      * @return A proxy object that you can run your method on.
@@ -69,15 +83,42 @@ public interface IGameObject extends GameObserver {
             throws NotAuthenticatedException, NotObservableException;
 
     /**
+     * Run a method on a module but return {@code elseValue} if this object doesn't have such a module.
+     *
+     * @param moduleType The type of the module to run a method on.
+     * @param predicate  Run the method on the first module for which this predicate holds true.
+     * @param elseValue  The value to return if this object doesn't have a module of the given type.
+     * @param <M>        The type of the module to run a method on.
+     *
+     * @return A proxy object that you can run your method on.
+     */
+    <M extends IModule> M onModuleElse(PublicModuleType<M> moduleType, PredicateNN<M> predicate, @Nullable Object elseValue)
+            throws NotAuthenticatedException, NotObservableException;
+
+    /**
      * Run a method on a module or do nothing if this object doesn't have such a module
      * (in this case, if the method has a return value, it will return {@code null}).
      *
      * @param moduleType The type of the module to run a method on.
+     * @param index      The index of the module to run a method on.
      * @param <M>        The type of the module to run a method on.
      *
      * @return A proxy object that you can run your method on.
      */
     <M extends IModule> M onModule(PublicModuleType<M> moduleType, int index)
+            throws NotAuthenticatedException, NotObservableException;
+
+    /**
+     * Run a method on a module or do nothing if this object doesn't have such a module
+     * (in this case, if the method has a return value, it will return {@code null}).
+     *
+     * @param moduleType The type of the module to run a method on.
+     * @param predicate  Run the method on the first module for which this predicate holds true.
+     * @param <M>        The type of the module to run a method on.
+     *
+     * @return A proxy object that you can run your method on.
+     */
+    <M extends IModule> M onModule(PublicModuleType<M> moduleType, PredicateNN<M> predicate)
             throws NotAuthenticatedException, NotObservableException;
 
     ImmutableCollection<? extends IModule> listModules()

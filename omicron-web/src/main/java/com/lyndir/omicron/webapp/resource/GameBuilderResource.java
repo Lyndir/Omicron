@@ -5,6 +5,7 @@ import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
+import com.lyndir.omicron.api.Director;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.webapp.data.User;
 import com.lyndir.omicron.webapp.data.service.*;
@@ -45,7 +46,7 @@ public class GameBuilderResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED })
     public Response post(final GameBuilderRequest input) {
-        long gameBuilderID = stateManager.addGameBuilder( PublicGame.builder() );
+        long gameBuilderID = stateManager.addGameBuilder( Director.DIRECTOR.gameBuilder() );
 
         // Handle.
         input.handle( Preconditions.checkNotNull( stateManager.getGameBuilder( gameBuilderID ) ), sessionManager.getUser() );

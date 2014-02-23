@@ -17,6 +17,7 @@
 package com.lyndir.omicron.cli.view;
 
 import com.lyndir.lanterna.view.LinearView;
+import com.lyndir.omicron.cli.OmicronCLI;
 import com.lyndir.omicron.cli.view.CommandView;
 import com.lyndir.omicron.cli.view.DashboardView;
 
@@ -26,11 +27,22 @@ import com.lyndir.omicron.cli.view.DashboardView;
  */
 public class OmicronView extends LinearView {
 
+    private final DashboardView dashboard;
+    private final CommandView   command;
+
     public OmicronView() {
 
         super( Orientation.VERTICAL );
 
-        addChild( new DashboardView() );
-        addChild( new CommandView() );
+        addChild( dashboard = new DashboardView() );
+        addChild( command = new CommandView() );
+    }
+
+    public DashboardView getDashboard() {
+        return dashboard;
+    }
+
+    public CommandView getCommand() {
+        return command;
     }
 }

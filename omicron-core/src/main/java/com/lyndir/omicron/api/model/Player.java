@@ -160,7 +160,7 @@ public class Player extends MetaObject implements IPlayer {
             } ).onPlayerLostObject( this, gameObject );
     }
 
-    void addObject(final IGameObject gameObject) {
+    void addObjects(final IGameObject gameObject) {
         GameObject previousObject = objects.put( gameObject.getObjectID(), coreGO( gameObject ) );
         Preconditions.checkState( previousObject == null || previousObject == gameObject );
 
@@ -172,5 +172,10 @@ public class Player extends MetaObject implements IPlayer {
                     return ObjectUtils.isEqual( Player.this, input );
                 }
             } ).onPlayerGainedObject( this, gameObject );
+    }
+
+    void addObjects(final IGameObject... gameObjects) {
+        for (final IGameObject gameObject : gameObjects)
+            addObjects(gameObject);
     }
 }

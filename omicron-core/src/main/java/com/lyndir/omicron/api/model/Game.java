@@ -113,12 +113,7 @@ public class Game extends MetaObject implements IGame {
 
         // Give each player some units.
         for (final Player player : players)
-            unitConfig.addUnits( this, player, new UnitAdder() {
-                @Override
-                public void add(final IUnitType unitType, final ITile location) {
-                    player.addObject( new GameObject( coreUT( unitType ), Game.this, player, coreT( location ) ) );
-                }
-            } );
+            unitConfig.addUnits( this, player );
     }
 
     @Override
@@ -199,14 +194,18 @@ public class Game extends MetaObject implements IGame {
         }
 
         @Override
-        public Game build()
-                throws Security.NotAuthenticatedException {
-            // Add random players until totalPlayers count is satisfied.
-            while (players.size() < totalPlayers)
-                addPlayer( new Player( nextPlayerID(), null, Player.randomName(), Color.Template.randomColor(),
-                                       Color.Template.randomColor() ) );
+        public Game build() {
+            return Security.godRun( new Job<Game>() {
+                @Override
+                public Game execute() {
+                    // Add random players until totalPlayers count is satisfied.
+                    while (players.size() < totalPlayers)
+                        addPlayer( new Player( nextPlayerID(), null, Player.randomName(), Color.Template.randomColor(),
+                                               Color.Template.randomColor() ) );
 
-            return new Game( levelSize, coreP( players ), coreVCT( victoryConditions ), gameListeners, resourceConfig, unitConfig );
+                    return new Game( levelSize, coreP( players ), coreVCT( victoryConditions ), gameListeners, resourceConfig, unitConfig );
+                }
+            } );
         }
 
         @Override
@@ -321,13 +320,14 @@ public class Game extends MetaObject implements IGame {
     enum GameUnitConfigs implements GameUnitConfig {
         NONE {
             @Override
-            public void addUnits(final IGame game, final IPlayer player, final UnitAdder unitAdder) {
+            public void addUnits(final IGame game, final IPlayer player) {
             }
         },
         BASIC {
             @Override
-            public void addUnits(final IGame game, final IPlayer player, final UnitAdder unitAdder) {
+            public void addUnits(final IGame game, final IPlayer player) {
                 Game coreGame = coreG( game );
+                Player corePlayer = coreP( player );
 
                 // Find tiles for the units.
                 Level ground = coreGame.getLevel( LevelType.GROUND );
@@ -358,9 +358,17 @@ public class Game extends MetaObject implements IGame {
                 }
 
                 // Add the units.
-                unitAdder.add( UnitTypes.ENGINEER, engineerTile.get() );
-                unitAdder.add( UnitTypes.AIRSHIP, airshipTile.get() );
-                unitAdder.add( UnitTypes.SCOUT, scoutTile.get() );
+                GameObject engineer = new GameObject( UnitTypes.ENGINEER, coreGame, corePlayer, engineerTile.get() );
+                // - Give the engineer a full container of metal.
+                engineer.onModule( ModuleType.CONTAINER, new PredicateNN<ContainerModule>() {
+                    @Override
+                    public boolean apply(@Nonnull final ContainerModule input) {
+                        return input.getResourceType() == ResourceType.METALS;
+                    }
+                } ).addStock( Integer.MAX_VALUE );
+                GameObject airship = new GameObject( UnitTypes.AIRSHIP, coreGame, corePlayer, airshipTile.get() );
+                GameObject scout = new GameObject( UnitTypes.SCOUT, coreGame, corePlayer, scoutTile.get() );
+                corePlayer.addObjects( engineer, airship, scout );
             }
         }
     }

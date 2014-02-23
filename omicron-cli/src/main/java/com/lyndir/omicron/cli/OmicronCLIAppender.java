@@ -16,15 +16,22 @@
 
 package com.lyndir.omicron.cli;
 
-import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.*;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * @author lhunath, 2013-07-27
  */
 public class OmicronCLIAppender extends AppenderBase<ILoggingEvent> {
+
+    public OmicronCLIAppender() {
+        LoggerContext logbackFactory = (LoggerContext) LoggerFactory.getILoggerFactory();
+        logbackFactory.getLogger( Logger.ROOT_LOGGER_NAME ).addAppender( this );
+        setContext( logbackFactory );
+    }
 
     @Override
     protected void append(final ILoggingEvent eventObject) {

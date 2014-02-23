@@ -55,9 +55,23 @@ public enum UnitTypes implements UnitType {
                                                                 .buildsModule( ModuleType.MOBILITY ),
                                                ConstructorModule.createWithStandardResourceCost()
                                                                 .buildSpeed( 2 )
-                                                                .buildsModule( ModuleType.WEAPON ) );
+                                                                .buildsModule( ModuleType.WEAPON ),
+                                               ContainerModule.createWithStandardResourceCost()
+                                                              .resourceType( ResourceType.METALS )
+                                                              .capacity( 10 ), //
+                                               ContainerModule.createWithStandardResourceCost()
+                                                              .resourceType( ResourceType.FUEL )
+                                                              .capacity( 5 ), //
+                                               ContainerModule.createWithStandardResourceCost()
+                                                              .resourceType( ResourceType.RARE_ELEMENTS )
+                                                              .capacity( 5 ), //
+                                               ContainerModule.createWithStandardResourceCost()
+                                                              .resourceType( ResourceType.SILICON )
+                                                              .capacity( 5 )
+                      );
                   }
-              } ),
+              }
+    ),
     QUARRY( "Quarry", 5, //
             new SSupplier<ImmutableList<? extends Module>>() {
                 @Override
@@ -67,11 +81,11 @@ public enum UnitTypes implements UnitType {
                                                        .armor( 5 )
                                                        .viewRange( 2 )
                                                        .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
-                                             ExtractorModule.createWithStandardResourceCost()
-                                                            .resourceType( ResourceType.METALS )
-                                                            .speed( 2 ) );
+                                             ExtractorModule.createWithStandardResourceCost().resourceType( ResourceType.METALS ).speed( 2 )
+                    );
                 }
-            } ),
+            }
+    ),
     DRILL( "Drill Site", 5, //
            new SSupplier<ImmutableList<? extends Module>>() {
                @Override
@@ -81,9 +95,11 @@ public enum UnitTypes implements UnitType {
                                                       .armor( 2 )
                                                       .viewRange( 2 )
                                                       .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ),
-                                            ExtractorModule.createWithStandardResourceCost().resourceType( ResourceType.FUEL ).speed( 2 ) );
+                                            ExtractorModule.createWithStandardResourceCost().resourceType( ResourceType.FUEL ).speed( 2 )
+                   );
                }
-           } ),
+           }
+    ),
     CONTAINER( "Container", 5, //
                new SSupplier<ImmutableList<? extends Module>>() {
                    @Override
@@ -104,9 +120,11 @@ public enum UnitTypes implements UnitType {
                                                                .capacity( 20 ), //
                                                 ContainerModule.createWithStandardResourceCost()
                                                                .resourceType( ResourceType.SILICON )
-                                                               .capacity( 20 ) );
+                                                               .capacity( 20 )
+                       );
                    }
-               } ),
+               }
+    ),
     SCOUT( "Scout", 5, //
            new SSupplier<ImmutableList<? extends Module>>() {
                @Override
@@ -126,9 +144,11 @@ public enum UnitTypes implements UnitType {
                                                         .range( 5 )
                                                         .repeat( 3 )
                                                         .ammunitionLoad( 20 )
-                                                        .supportedLayers( ImmutableSet.of( LevelType.GROUND ) ) );
+                                                        .supportedLayers( ImmutableSet.of( LevelType.GROUND ) )
+                   );
                }
-           } ),
+           }
+    ),
     AIRSHIP( "Airship", 10, //
              new SSupplier<ImmutableList<? extends Module>>() {
                  @Override
@@ -141,20 +161,11 @@ public enum UnitTypes implements UnitType {
                                               MobilityModule.createWithStandardResourceCost()
                                                             .movementSpeed( 2 )
                                                             .movementCost( ImmutableMap.of( LevelType.SKY, 1d ) )
-                                                            .levelingCost( ImmutableMap.<LevelType, Double>of() ) );
+                                                            .levelingCost( ImmutableMap.<LevelType, Double>of() )
+                     );
                  }
-             } ),
-    CONSTRUCTION( "Construction Site", Integer.MAX_VALUE, //
-                  new SSupplier<ImmutableList<? extends Module>>() {
-                      @Override
-                      public ImmutableList<? extends Module> get() {
-                          return ImmutableList.of( BaseModule.createWithStandardResourceCost()
-                                                             .maxHealth( 1 )
-                                                             .armor( 1 )
-                                                             .viewRange( 1 )
-                                                             .supportedLayers( ImmutableSet.copyOf( LevelType.values() ) ) );
-                      }
-                  } );
+             }
+    );
 
     private final String                                     typeName;
     private final int                                        constructionWork;

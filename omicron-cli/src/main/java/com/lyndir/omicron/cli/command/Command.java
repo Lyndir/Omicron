@@ -37,8 +37,7 @@ public abstract class Command {
     public void evaluate(final Iterator<String> tokens) {
 
         if (!tokens.hasNext()) {
-            err( "Missing sub command." );
-            help( tokens );
+            self();
             return;
         }
 
@@ -50,7 +49,10 @@ public abstract class Command {
             if (annotation != null)
                 if (method.getName().equals( subCommand ) || annotation.abbr().equals( subCommand )) {
                     try {
-                        method.invoke( this, tokens );
+                        if (method.getParameterTypes().length == 0)
+                            method.invoke( this );
+                        else
+                            method.invoke( this, tokens );
                     }
                     catch (IllegalAccessException | InvocationTargetException e) {
                         throw logger.bug( e );
@@ -74,6 +76,11 @@ public abstract class Command {
         }
 
         err( "Don't know how to handle: %s", subCommand );
+    }
+
+    protected void self() {
+        err( "Missing sub command." );
+        help();
     }
 
     public OmicronCLI getOmicron() {
@@ -102,7 +109,7 @@ public abstract class Command {
     }
 
     @SubCommand(abbr = "h", desc = "Enumerate all the sub commands of this command.")
-    public void help(final Iterator<String> tokens) {
+    public void help() {
 
         inf( "Available sub commands are:" );
         enumerateSubCommands();
@@ -138,6 +145,6 @@ public abstract class Command {
         }
 
         for (final Map.Entry<String, String> commandDescriptionEntry : commandDescriptions.entrySet())
-            inf( "    %s: %s", commandDescriptionEntry.getKey(), commandDescriptions.get( commandDescriptionEntry.getValue() ) );
+            inf( "    %s: %s", commandDescriptionEntry.getKey(), commandDescriptionEntry.getValue() );
     }
 }

@@ -1,14 +1,12 @@
 package com.lyndir.omicron.cli;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import com.google.common.base.*;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.lyndir.lanterna.view.OmicronWindow;
-import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.GameListener;
+import com.lyndir.omicron.api.model.*;
 import java.util.*;
 import javax.annotation.Nonnull;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,42 +18,37 @@ public class OmicronCLI {
 
     private static final OmicronCLI omicron = new OmicronCLI();
 
-    private final Builders          builders      = new Builders();
-    private final PlayerKey         localKey      = new PlayerKey();
-    private final List<String>      log           = new LinkedList<>();
+    private final Builders                 builders      = new Builders();
+    private final PlayerKey                localKey      = new PlayerKey();
+    private final List<String>             log           = new LinkedList<>();
     private final Collection<GameListener> gameListeners = new HashSet<>();
-    private       boolean           running       = true;
+    private final OmicronWindow            window        = new OmicronWindow( this );
     private IGameController gameController;
     private IPlayer         localPlayer;
+    private boolean         running;
 
     @SuppressWarnings("ProhibitedExceptionDeclared")
     public static void main(final String... arguments) {
-        // Attach the omicron command log appender to logback.
-        LoggerContext logbackFactory = (LoggerContext) LoggerFactory.getILoggerFactory();
-        OmicronCLIAppender newAppender = new OmicronCLIAppender();
-        newAppender.setContext( logbackFactory );
-        Logger logger = logbackFactory.getLogger( Logger.ROOT_LOGGER_NAME );
-        logger.addAppender( newAppender );
-        newAppender.start();
-
-        new OmicronWindow().start();
-    }
-
-    private OmicronCLI() {
+        new OmicronCLIAppender().start();
+        omicron.start();
     }
 
     public static OmicronCLI get() {
         return omicron;
     }
 
-    public boolean isRunning() {
-
-        return running;
+    private OmicronCLI() {
     }
 
-    public void setRunning(final boolean running) {
+    private void start() {
+        Preconditions.checkState( !isRunning(), "This omicron CLI is already running." );
 
-        this.running = running;
+        setRunning( true );
+        window.start();
+    }
+
+    public OmicronWindow getWindow() {
+        return window;
     }
 
     public Optional<IGameController> getGameController() {
@@ -102,5 +95,13 @@ public class OmicronCLI {
 
         if (gameController != null)
             gameController.addGameListener( gameListener );
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(final boolean running) {
+        this.running = running;
     }
 }

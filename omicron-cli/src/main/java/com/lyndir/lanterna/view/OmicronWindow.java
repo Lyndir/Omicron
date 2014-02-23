@@ -27,21 +27,31 @@ import com.lyndir.omicron.cli.view.OmicronView;
  */
 public class OmicronWindow extends Window {
 
-    public OmicronWindow() {
+    private final OmicronView view;
+    private final        OmicronCLI  omicron;
+
+    public OmicronWindow(final OmicronCLI omicron) {
         super( new OmicronView() );
+
+        this.omicron = omicron;
+        view = (OmicronView) getRootView();
     }
 
     @Override
     protected void onReady() {
         super.onReady();
 
-        new BuildCommand( OmicronCLI.get() ).game( ImmutableList.<String>of().iterator() );
-        new AddGameCommand( OmicronCLI.get() ).player( ImmutableList.of( "Simon,red,red" ).iterator() );
-        new CreateCommand( OmicronCLI.get() ).game( ImmutableList.<String>of().iterator() );
+        new BuildCommand( omicron ).game( ImmutableList.<String>of().iterator() );
+        new AddGameCommand( omicron ).player( ImmutableList.of( "Simon,red,red" ).iterator() );
+        new CreateCommand( omicron ).game( ImmutableList.<String>of().iterator() );
     }
 
     @Override
     protected synchronized boolean isRunning() {
-        return OmicronCLI.get().isRunning();
+        return super.isRunning() && omicron.isRunning();
+    }
+
+    public OmicronView getView() {
+        return view;
     }
 }

@@ -98,15 +98,6 @@ public class PublicGameObject extends MetaObject implements IGameObject {
         return core.getType();
     }
 
-    /**
-     * Get this object's module of the given type at the given index.
-     *
-     * @param moduleType The type of module to get.
-     * @param index      The index of the module.
-     * @param <M>        The type of the module.
-     *
-     * @return The module of the given type at the given index.
-     */
     @Override
     public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final int index)
             throws Security.NotAuthenticatedException, Security.NotObservableException {
@@ -115,14 +106,14 @@ public class PublicGameObject extends MetaObject implements IGameObject {
         return core.getModule( moduleType, index );
     }
 
-    /**
-     * Get this object's modules of the given type.
-     *
-     * @param moduleType The type of module to get.
-     * @param <M>        The type of the module.
-     *
-     * @return A list of modules of the given type or an empty list if there are none.
-     */
+    @Override
+    public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate)
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
+        assertObservable( this );
+
+        return core.getModule( moduleType, predicate );
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public <M extends IModule> List<M> getModules(final PublicModuleType<M> moduleType)
@@ -133,15 +124,6 @@ public class PublicGameObject extends MetaObject implements IGameObject {
         return core.getModules( moduleType );
     }
 
-    /**
-     * Run a method on a module but return {@code elseValue} if this object doesn't have such a module.
-     *
-     * @param moduleType The type of the module to run a method on.
-     * @param elseValue  The value to return if this object doesn't have a module of the given type.
-     * @param <M>        The type of the module to run a method on.
-     *
-     * @return A proxy object that you can run your method on.
-     */
     @Override
     public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final int index, @Nullable final Object elseValue)
             throws Security.NotAuthenticatedException, Security.NotObservableException {
@@ -150,21 +132,29 @@ public class PublicGameObject extends MetaObject implements IGameObject {
         return core.onModuleElse( moduleType, index, elseValue );
     }
 
-    /**
-     * Run a method on a module or do nothing if this object doesn't have such a module
-     * (in this case, if the method has a return value, it will return {@code null}).
-     *
-     * @param moduleType The type of the module to run a method on.
-     * @param <M>        The type of the module to run a method on.
-     *
-     * @return A proxy object that you can run your method on.
-     */
+    @Override
+    public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate,
+                                              @Nullable final Object elseValue)
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
+        assertObservable( this );
+
+        return core.onModuleElse( moduleType, predicate, elseValue );
+    }
+
     @Override
     public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final int index)
             throws Security.NotAuthenticatedException, Security.NotObservableException {
         assertObservable( this );
 
         return core.onModule( moduleType, index );
+    }
+
+    @Override
+    public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate)
+            throws Security.NotAuthenticatedException, Security.NotObservableException {
+        assertObservable( this );
+
+        return core.onModule( moduleType, predicate );
     }
 
     @Override

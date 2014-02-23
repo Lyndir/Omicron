@@ -25,9 +25,15 @@ import com.lyndir.omicron.api.model.LevelType;
  */
 public class DashboardView extends TitledView {
 
+    private final MapView map;
+
     public DashboardView() {
         super( "Omicron - No game" );
 
-        addChild( new MapView( LevelType.GROUND ) );
+        addChild( map = new MapView( LevelType.GROUND ) );
+    }
+
+    public MapView getMap() {
+        return map;
     }
 }

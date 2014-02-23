@@ -55,16 +55,6 @@
             <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
 
-        <!-- Web -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-servlet</artifactId>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.testng</groupId>

@@ -58,7 +58,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
         Optional<Player> newOwner = getOwner();
         if (newOwner.isPresent())
-            newOwner.get().addObject( getGameObject() );
+            newOwner.get().addObjects( getGameObject() );
     }
 
     void setLocation(@Nonnull final Tile location) {

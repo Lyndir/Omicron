@@ -80,13 +80,7 @@ public interface IGame {
 
     interface GameUnitConfig {
 
-        void addUnits(IGame game, IPlayer player, UnitAdder unitAdder);
-    }
-
-
-    interface UnitAdder {
-
-        void add(IUnitType unitType, ITile location);
+        void addUnits(IGame game, IPlayer player);
     }
 
 

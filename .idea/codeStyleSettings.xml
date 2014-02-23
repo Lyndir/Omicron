@@ -157,6 +157,33 @@
           <option name="ENUM_CONSTANTS_WRAP" value="5" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
+        <codeStyleSettings language="JavaScript">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+          <option name="WHILE_ON_NEW_LINE" value="true" />
+          <option name="CATCH_ON_NEW_LINE" value="true" />
+          <option name="FINALLY_ON_NEW_LINE" value="true" />
+          <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+          <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
+          <option name="SPACE_WITHIN_METHOD_CALL_PARENTHESES" value="true" />
+          <option name="SPACE_BEFORE_QUEST" value="false" />
+          <option name="SPACE_BEFORE_COLON" value="false" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="SQL">
+          <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+          <option name="SPACE_WITHIN_METHOD_CALL_PARENTHESES" value="true" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
         <codeStyleSettings language="Scala">
           <option name="KEEP_LINE_BREAKS" value="false" />
           <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
@@ -181,6 +208,30 @@
           <option name="BINARY_OPERATION_WRAP" value="1" />
           <option name="PARAMETER_ANNOTATION_WRAP" value="1" />
           <option name="VARIABLE_ANNOTATION_WRAP" value="2" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="TypeScript">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+          <option name="WHILE_ON_NEW_LINE" value="true" />
+          <option name="CATCH_ON_NEW_LINE" value="true" />
+          <option name="FINALLY_ON_NEW_LINE" value="true" />
+          <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+          <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
+          <option name="SPACE_WITHIN_METHOD_CALL_PARENTHESES" value="true" />
+          <option name="SPACE_BEFORE_QUEST" value="false" />
+          <option name="SPACE_BEFORE_COLON" value="false" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
       </value>

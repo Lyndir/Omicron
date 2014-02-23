@@ -35,6 +35,7 @@ import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 /**
@@ -51,7 +52,9 @@ public class MapView extends View {
 
     private Vec2 offset = Vec2.create();
     private LevelType      levelType;
+    @Nullable
     private Terminal.Color mapColor;
+    @Nullable
     private String         backgroundPattern;
     private boolean        hasUnits;
 
@@ -62,6 +65,7 @@ public class MapView extends View {
     @Override
     protected void onReady() {
         super.onReady();
+
         OmicronCLI.get().addGameListener( new GameListener() {
             @Override
             public void onNewTurn(final Turn currentTurn) {
@@ -96,7 +100,6 @@ public class MapView extends View {
 
         // Draw grid in view.
         Box contentBox = getContentBoxOnScreen();
-        Size contentSize = contentBox.getSize();
         for (int screenX = contentBox.getLeft(); screenX <= contentBox.getRight(); ++screenX)
             for (int screenY = contentBox.getTop(); screenY <= contentBox.getBottom(); ++screenY) {
                 int tileY = screenY - contentBox.getTop() + getOffset().getY();
@@ -127,8 +130,8 @@ public class MapView extends View {
             }
 
         Inset offScreen = new Inset( Math.max( 0, getOffset().getY() ),
-                                     Math.max( 0, levelSize.getWidth() - contentSize.getWidth() - getOffset().getX() + 1 ),
-                                     Math.max( 0, levelSize.getHeight() - contentSize.getHeight() - getOffset().getY() - 1 ),
+                                     Math.max( 0, levelSize.getWidth() - contentBox.getSize().getWidth() - getOffset().getX() + 1 ),
+                                     Math.max( 0, levelSize.getHeight() - contentBox.getSize().getHeight() - getOffset().getY() - 1 ),
                                      Math.max( 0, getOffset().getX() ) );
         int centerX =
                 contentBox.getLeft() + (levelSize.getWidth() - offScreen.getHorizontal()) / 2 - getOffset().getX() + offScreen.getLeft();
@@ -222,7 +225,7 @@ public class MapView extends View {
     }
 
     @Override
-    public void setBackgroundPattern(final String backgroundPattern) {
+    public void setBackgroundPattern(@Nullable final String backgroundPattern) {
         this.backgroundPattern = backgroundPattern;
     }
 
@@ -230,7 +233,7 @@ public class MapView extends View {
         return ifNotNullElse( mapColor, getTheme().mapFg() );
     }
 
-    public void setMapColor(final Terminal.Color mapColor) {
+    public void setMapColor(@Nullable final Terminal.Color mapColor) {
         this.mapColor = mapColor;
     }
 
@@ -249,5 +252,10 @@ public class MapView extends View {
 
     public void setOffset(@Nonnull final Vec2 offset) {
         this.offset = offset;
+    }
+
+    public Vec2 getCenterTile() {
+        Size contentBox = getContentBoxOnScreen().getSize();
+        return offset.translate( contentBox.getWidth() / 2, contentBox.getHeight() / 2 );
     }
 }

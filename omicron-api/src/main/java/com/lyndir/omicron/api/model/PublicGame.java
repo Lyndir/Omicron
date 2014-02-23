@@ -21,19 +21,9 @@ import javax.annotation.Nullable;
 @SuppressWarnings("ParameterHidesMemberVariable") // IDEA doesn't understand setters that return this.
 public class PublicGame extends MetaObject implements IGame {
 
-    static final Logger logger = Logger.get( IGame.class );
+    static final Logger logger = Logger.get( PublicGame.class );
 
     private final IGame core;
-
-    public static IBuilder builder() {
-        try {
-            return new Builder( (IBuilder) TypeUtils.loadClass( "com.lyndir.omicron.api.model.Game" ) //
-                    .getMethod( "builder" ).invoke( null ) );
-        }
-        catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new InternalInconsistencyException( "Failed to create core builder", e );
-        }
-    }
 
     PublicGame(final IGame core) {
 

@@ -175,11 +175,11 @@ public class View {
         return measuredBoxInParent.translate( parentContentBox.getOrigin() );
     }
 
-    protected final Box getDrawBoxOnScreen() {
+    public final Box getDrawBoxOnScreen() {
         return getMeasuredBoxOnScreen().shrink( getMargin() );
     }
 
-    protected final Box getContentBoxOnScreen() {
+    public final Box getContentBoxOnScreen() {
         return getDrawBoxOnScreen().shrink( getPadding() );
     }
 

@@ -1,10 +1,12 @@
 package com.lyndir.omicron.api.model;
 
+import com.google.common.base.Splitter;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import java.util.Objects;
-import java.util.Random;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 
@@ -18,20 +20,18 @@ public class Color extends MetaObject implements Serializable {
     private static final Random RANDOM = new Random();
 
     public static Color random() {
-        byte[] colorBytes = new byte[3];
-        RANDOM.nextBytes( colorBytes );
-
-        return new Color( colorBytes[0], colorBytes[1], colorBytes[2] );
+        int bound = 0xFF + 1;
+        return new Color( RANDOM.nextInt( bound ), RANDOM.nextInt( bound ), RANDOM.nextInt( bound ) );
     }
 
     public enum Template {
 
-        RED( new Color( 0xFF, 0, 0 ) ),
-        GREEN( new Color( 0, 0xFF, 0 ) ),
-        BLUE( new Color( 0, 0, 0xFF ) ),
-        BLACK( new Color( 0, 0, 0 ) ),
-        WHITE( new Color( 0xFF, 0xFF, 0xFF ) ),
-        GRAY( new Color( 0xAA, 0xAA, 0xAA ) );
+        RED( ofHex( "FF0000" ) ),
+        GREEN( ofHex( "00FF00" ) ),
+        BLUE( ofHex( "0000FF" ) ),
+        BLACK( ofHex( "000000" ) ),
+        WHITE( ofHex( "FFFFFF" ) ),
+        GRAY( ofHex( "AAAAAA" ) );
 
         private static final Random random = new Random();
         private final Color color;
@@ -50,45 +50,43 @@ public class Color extends MetaObject implements Serializable {
     }
 
 
-    private final byte red;
-    private final byte green;
-    private final byte blue;
+    private final int red;
+    private final int green;
+    private final int blue;
 
     public Color(final int red, final int green, final int blue) {
-        this( (byte) red, (byte) green, (byte) blue );
-    }
-
-    public Color(final byte red, final byte green, final byte blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
 
-    public byte getRed() {
+    public int getRed() {
         return red;
     }
 
-    public byte getGreen() {
+    public int getGreen() {
         return green;
     }
 
-    public byte getBlue() {
+    public int getBlue() {
         return blue;
     }
 
     public static Color of(final String colorString) {
-        for (final Template template : Template.values())
-            if (template.name().equalsIgnoreCase( colorString ))
+        for (final Template template : Template.values()) {
+            if (template.name().equalsIgnoreCase( colorString )) {
                 return template.get();
+            }
+        }
 
-        int colorInteger = Integer.parseInt( colorString );
-        ByteBuffer colorBuffer = ByteBuffer.allocate( Byte.SIZE * 3 ).putInt( colorInteger );
-        colorBuffer.flip();
-        byte r = colorBuffer.get();
-        byte g = colorBuffer.get();
-        byte b = colorBuffer.get();
+        return ofHex( colorString );
+    }
 
-        return new Color( r, g, b );
+    private static Color ofHex(final String hexColorString) {
+        Iterator<String> componentIt = Splitter.fixedLength( 2 ).split( hexColorString ).iterator();
+        return new Color( Integer.parseInt( componentIt.next(), 16 ), //
+                          Integer.parseInt( componentIt.next(), 16 ), //
+                          Integer.parseInt( componentIt.next(), 16 ) );
     }
 
     @Override
@@ -98,10 +96,12 @@ public class Color extends MetaObject implements Serializable {
 
     @Override
     public boolean equals(@Nullable final Object obj) {
-        if (obj == this)
+        if (obj == this) {
             return true;
-        if (!(obj instanceof Color))
+        }
+        if (!(obj instanceof Color)) {
             return false;
+        }
 
         Color o = (Color) obj;
         return red == o.red && green == o.green && blue == o.blue;

@@ -310,7 +310,7 @@
       <option name="m_minLength" value="1" />
       <option name="m_maxLength" value="48" />
     </inspection_tool>
-    <inspection_tool class="InstanceVariableInitialization" enabled="true" level="WARNING" enabled_by_default="true">
+    <inspection_tool class="InstanceVariableInitialization" enabled="true" level="BUGGY WARNING" enabled_by_default="true">
       <option name="m_ignorePrimitives" value="true" />
     </inspection_tool>
     <inspection_tool class="InstanceVariableNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
@@ -455,7 +455,10 @@
       <option name="checkAnonymousClasses" value="true" />
       <option name="useSingleLineReferences" value="true" />
     </inspection_tool>
-    <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoreObjectMethods" value="true" />
+      <option name="ignoreAnonymousClassMethods" value="false" />
+    </inspection_tool>
     <inspection_tool class="MissortedModifiers" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_requireAnnotationsFirst" value="true" />
     </inspection_tool>
