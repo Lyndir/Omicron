@@ -217,8 +217,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
         assertState( location.getLevel().equals( getGameObject().getLocation().getLevel() ), IncompatibleLevelException.class );
         assertState( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1, OutOfRangeException.class );
 
-        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().getOwner().get(),
-                                                      coreT( location ) );
+        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().getOwner().get() );
+        coreT( location ).setContents( site );
         setTarget( site );
 
         return site;
@@ -236,9 +236,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
                 Maps.<PublicModuleType<?>, Integer>newHashMap() );
         private final List<? extends Module> constructionModules;
 
-        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner,
-                                 @Nonnull final Tile location) {
-            super( UnitTypes.CONSTRUCTION, game, owner, location );
+        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner) {
+            super( UnitTypes.CONSTRUCTION, game, owner );
 
             this.constructionUnitType = constructionUnitType;
             constructionModules = constructionUnitType.createModules();
@@ -371,7 +370,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
                             }
                         } ).isEmpty())
                             // No more work remaining; create the constructed unit.
-                            replaceWith( new GameObject( constructionUnitType, getGame(), getOwner().get(), getLocation() ) );
+                            replaceWith( new GameObject( constructionUnitType, getGame(), getOwner().get() ) );
                     }
                 }
             };

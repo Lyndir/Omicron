@@ -125,7 +125,10 @@ public abstract class AbstractTest {
     }
 
     protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final int u, final int v) {
-        return new GameObject( unitType, game, player, game.getLevel( LevelType.GROUND ).getTile( u, v ).get() );
+        GameObject gameObject = new GameObject( unitType, game, player );
+        game.getLevel( LevelType.GROUND ).getTile( u, v ).get().setContents( gameObject );
+
+        return gameObject;
     }
 
     @BeforeMethod

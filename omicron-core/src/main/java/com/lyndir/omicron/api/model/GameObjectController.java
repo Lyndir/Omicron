@@ -124,6 +124,6 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         Optional<Player> owner = currentGameObject.getOwner();
         if (owner.isPresent())
             owner.get().getController().removeObject( currentGameObject );
-        currentGameObject.getLocation().setContents( replacementObject );
+        currentGameObject.getLocation().replaceContents( replacementObject );
     }
 }

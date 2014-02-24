@@ -80,9 +80,16 @@ public class Tile extends MetaObject implements ITile {
     void setContents(@Nullable final GameObject contents) {
         if (contents != null)
             Preconditions.checkState( this.contents == null, "Cannot put object on tile that is not empty: %s", this );
+
+        replaceContents( contents );
+    }
+
+    void replaceContents(@Nullable final GameObject contents) {
         Change.From<IGameObject> contentsChange = Change.<IGameObject>from( this.contents );
 
         this.contents = contents;
+        if (contents != null)
+            contents.setLocation( this );
 
         getLevel().getGame().getController().fireIfObservable( this ) //
                 .onTileContents( this, contentsChange.to( this.contents ) );

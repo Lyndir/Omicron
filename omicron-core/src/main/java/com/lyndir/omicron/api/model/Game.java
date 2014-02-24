@@ -358,16 +358,21 @@ public class Game extends MetaObject implements IGame {
                 }
 
                 // Add the units.
-                GameObject engineer = new GameObject( UnitTypes.ENGINEER, coreGame, corePlayer, engineerTile.get() );
-                // - Give the engineer a full container of metal.
+                GameObject engineer = new GameObject( UnitTypes.ENGINEER, coreGame, corePlayer );
                 engineer.onModule( ModuleType.CONTAINER, new PredicateNN<ContainerModule>() {
                     @Override
                     public boolean apply(@Nonnull final ContainerModule input) {
                         return input.getResourceType() == ResourceType.METALS;
                     }
                 } ).addStock( Integer.MAX_VALUE );
-                GameObject airship = new GameObject( UnitTypes.AIRSHIP, coreGame, corePlayer, airshipTile.get() );
-                GameObject scout = new GameObject( UnitTypes.SCOUT, coreGame, corePlayer, scoutTile.get() );
+                engineerTile.get().setContents( engineer );
+
+                GameObject airship = new GameObject( UnitTypes.AIRSHIP, coreGame, corePlayer );
+                airshipTile.get().setContents( airship );
+
+                GameObject scout = new GameObject( UnitTypes.SCOUT, coreGame, corePlayer );
+                scoutTile.get().setContents( scout );
+
                 corePlayer.addObjects( engineer, airship, scout );
             }
         }

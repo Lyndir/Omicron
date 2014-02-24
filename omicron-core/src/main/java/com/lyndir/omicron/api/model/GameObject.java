@@ -34,17 +34,15 @@ public class GameObject extends MetaObject implements IGameObject {
     private       Player                                       owner;
     private       Tile                                         location;
 
-    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner, @Nonnull final Tile location) {
-        this( unitType, game, owner, owner.nextObjectID(), location );
+    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner) {
+        this( unitType, game, owner, owner.nextObjectID() );
     }
 
-    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final int objectID,
-               @Nonnull final Tile location) {
+    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final int objectID) {
         this.unitType = unitType;
         this.game = game;
         this.owner = owner;
         this.objectID = objectID;
-        this.location = location;
 
         ImmutableListMultimap.Builder<ModuleType<?>, Module> modulesBuilder = ImmutableListMultimap.builder();
         for (final Module module : unitType.createModules()) {
@@ -57,7 +55,6 @@ public class GameObject extends MetaObject implements IGameObject {
         // Register ourselves into the game.
         if (owner != null)
             owner.addObjects( this );
-        location.setContents( this );
     }
 
     @Override
