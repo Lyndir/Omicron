@@ -22,7 +22,7 @@ public class OmicronCLI {
     private final PlayerKey                localKey      = new PlayerKey();
     private final List<String>             log           = new LinkedList<>();
     private final Collection<GameListener> gameListeners = new HashSet<>();
-    private final OmicronWindow            window        = new OmicronWindow( this );
+    private final OmicronWindow            window        = new OmicronWindow();
     private IGameController gameController;
     private IPlayer         localPlayer;
     private boolean         running;

@@ -165,8 +165,19 @@ public enum UnitTypes implements UnitType {
                      );
                  }
              }
+    ),
+    CONSTRUCTION( "Construction Site", Integer.MAX_VALUE, //
+                  new SSupplier<ImmutableList<? extends Module>>() {
+                      @Override
+                      public ImmutableList<? extends Module> get() {
+                          return ImmutableList.of( BaseModule.createWithStandardResourceCost()
+                                                             .maxHealth( 1 )
+                                                             .armor( 1 )
+                                                             .viewRange( 1 )
+                                                             .supportedLayers( ImmutableSet.copyOf( LevelType.values() ) ) );
+                      }
+                  }
     );
-
     private final String                                     typeName;
     private final int                                        constructionWork;
     private final SSupplier<ImmutableList<? extends Module>> moduleSupplier;

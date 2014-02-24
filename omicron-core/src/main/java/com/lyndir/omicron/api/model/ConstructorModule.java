@@ -238,26 +238,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
 
         private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner,
                                  @Nonnull final Tile location) {
-            super( new UnitType() {
-                @Override
-                public String getTypeName() {
-                    return "Construction Site";
-                }
-
-                @Override
-                public int getConstructionWork() {
-                    return Integer.MAX_VALUE;
-                }
-
-                @Override
-                public ImmutableList<? extends Module> createModules() {
-                    return ImmutableList.of( BaseModule.createWithStandardResourceCost()
-                                                               .maxHealth( 1 )
-                                                               .armor( 1 )
-                                                               .viewRange( 1 )
-                                                               .supportedLayers( ImmutableSet.copyOf( LevelType.values() ) ) );
-                }
-            }, game, owner, location );
+            super( UnitTypes.CONSTRUCTION, game, owner, location );
 
             this.constructionUnitType = constructionUnitType;
             constructionModules = constructionUnitType.createModules();
