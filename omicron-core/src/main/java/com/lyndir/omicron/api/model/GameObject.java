@@ -32,6 +32,7 @@ public class GameObject extends MetaObject implements IGameObject {
     private final int                                          objectID;
     private final ImmutableListMultimap<ModuleType<?>, Module> modules;
     private       Player                                       owner;
+    @Nullable
     private       Tile                                         location;
 
     GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner) {
@@ -121,17 +122,26 @@ public class GameObject extends MetaObject implements IGameObject {
         return game;
     }
 
-    Tile getLocation() {
-        return location;
+    Optional<Tile> getLocation() {
+        return Optional.fromNullable( location );
     }
 
     @Override
     public Maybe<Tile> checkLocation()
             throws NotAuthenticatedException {
-        if (!isGod() && !currentPlayer().canObserve( getLocation() ).isTrue())
-            return Maybe.unknown();
+        Optional<Tile> location = getLocation();
+        if (!isGod()) {
+            if (location.isPresent()) {
+                if (!currentPlayer().canObserve( location.get() ).isTrue())
+                    // Has a location but current player cannot observe it.
+                    return Maybe.unknown();
+            } else if (!isOwnedByCurrentPlayer())
+                // Has no location and not owned by current player.
+                return Maybe.unknown();
+        }
 
-        return Maybe.fromNullable( getLocation() );
+        // We're either god, can be observed by or are owned by the current player.
+        return Maybe.fromOptional( location );
     }
 
     void setLocation(@Nonnull final Tile location) {

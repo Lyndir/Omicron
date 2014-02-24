@@ -16,6 +16,7 @@
 
 package com.lyndir.omicron.api.util;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -37,6 +38,10 @@ public abstract class Maybe<T> {
 
     public static <T> Maybe<T> fromNullable(@Nullable final T reference) {
         return reference == null? Maybe.<T>absent(): new Present<>( reference );
+    }
+
+    public static <T> Maybe<T> fromOptional(final Optional<T> reference) {
+        return reference.isPresent()? new Present<>( reference.get() ): Maybe.<T>absent();
     }
 
     public static <T> Maybe<T> of(@Nonnull final T reference) {
