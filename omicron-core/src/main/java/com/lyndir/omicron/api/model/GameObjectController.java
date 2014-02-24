@@ -106,10 +106,24 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     }
 
     void die() {
-        getGameObject().getLocation().setContents( null );
-        setOwner( null );
+        GameObject gameObject = getGameObject();
+        gameObject.getGame().getController().fireIfObservable( gameObject.getLocation() ) //
+                .onUnitDied( gameObject );
 
-        getGameObject().getGame().getController().fireIfObservable( getGameObject().getLocation() ) //
-                .onUnitDied( getGameObject() );
+        // Remove from the game (map & player).
+        Optional<Player> owner = gameObject.getOwner();
+        if (owner.isPresent())
+            owner.get().getController().removeObject( gameObject );
+        gameObject.getLocation().setContents( null );
+    }
+
+    void replaceWith(final GameObject replacementObject) {
+        GameObject currentGameObject = getGameObject();
+
+        // Remove from the game (map & player).
+        Optional<Player> owner = currentGameObject.getOwner();
+        if (owner.isPresent())
+            owner.get().getController().removeObject( currentGameObject );
+        currentGameObject.getLocation().setContents( replacementObject );
     }
 }

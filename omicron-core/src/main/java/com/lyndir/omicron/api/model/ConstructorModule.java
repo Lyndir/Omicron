@@ -369,12 +369,9 @@ public class ConstructorModule extends Module implements IConstructorModule {
                             public boolean apply(@Nonnull final Integer input) {
                                 return input > 0;
                             }
-                        } ).isEmpty()) {
+                        } ).isEmpty())
                             // No more work remaining; create the constructed unit.
-                            Player owner = getOwner().get();
-                            die();
-                            new GameObject( constructionUnitType, getGame(), owner, getLocation() );
-                        }
+                            replaceWith( new GameObject( constructionUnitType, getGame(), getOwner().get(), getLocation() ) );
                     }
                 }
             };
