@@ -1,5 +1,8 @@
 package com.lyndir.omicron.api.model;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
@@ -14,50 +17,48 @@ import javax.annotation.Nullable;
 @Nonnull
 public abstract class CoreUtils {
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    static GameObject coreGO(@Nullable final IGameObject object) {
+    static GameObject coreGO(final IGameObject object) {
+        return (GameObject) checkNotNull( object );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable static GameObject coreGON(@Nullable final IGameObject object) {
         return (GameObject) object;
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    static Game coreG(@Nullable final IGame object) {
-        return (Game) object;
+    static Game coreG(final IGame object) {
+        return (Game) checkNotNull( object );
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    static Player coreP(@Nullable final IPlayer object) {
-        return (Player) object;
+    static Player coreP(final IPlayer object) {
+        return (Player) checkNotNull( object );
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    static List<Player> coreP(@Nullable final List<? extends IPlayer> object) {
-        return (List<Player>) object;
+    static List<Player> coreP(final List<? extends IPlayer> object) {
+        return (List<Player>) checkNotNull( object );
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    static Tile coreT(@Nullable final ITile object) {
-        return (Tile) object;
+    static Tile coreT(final ITile object) {
+        return (Tile) checkNotNull( object );
     }
 
     static <M extends IModule> ModuleType<M> coreMT(final PublicModuleType<M> object) {
-        return ModuleType.of( object );
+        return ModuleType.of( checkNotNull( object ) );
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
-    static UnitType coreUT(@Nullable final IUnitType object) {
-        return (UnitType) object;
+    static UnitType coreUT(final IUnitType object) {
+        return (UnitType) checkNotNull( object );
     }
 
-    @Nonnull
     @SuppressWarnings("unchecked")
-    static VictoryConditionType coreVCT(@Nonnull final PublicVictoryConditionType object) {
-        switch (object) {
+    static VictoryConditionType coreVCT(final PublicVictoryConditionType object) {
+        switch (checkNotNull( object )) {
 
             case SUPREMACY:
                 return VictoryConditionType.SUPREMACY;
@@ -72,10 +73,9 @@ public abstract class CoreUtils {
         throw new InternalInconsistencyException( "Unsupported type: " + object );
     }
 
-    @Nonnull
     @SuppressWarnings("unchecked")
-    static List<VictoryConditionType> coreVCT(@Nonnull final List<PublicVictoryConditionType> object) {
-        return Lists.transform( object, new NNFunctionNN<PublicVictoryConditionType, VictoryConditionType>() {
+    static List<VictoryConditionType> coreVCT(final List<PublicVictoryConditionType> object) {
+        return Lists.transform( checkNotNull( object ), new NNFunctionNN<PublicVictoryConditionType, VictoryConditionType>() {
             @Nonnull
             @Override
             public VictoryConditionType apply(@Nonnull final PublicVictoryConditionType input) {
@@ -84,10 +84,9 @@ public abstract class CoreUtils {
         } );
     }
 
-    @Nonnull
     @SuppressWarnings("unchecked")
-    static PublicVictoryConditionType publicVCT(@Nonnull final VictoryConditionType object) {
-        switch (object) {
+    static PublicVictoryConditionType publicVCT(final VictoryConditionType object) {
+        switch (checkNotNull( object )) {
 
             case SUPREMACY:
                 return PublicVictoryConditionType.SUPREMACY;

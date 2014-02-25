@@ -16,8 +16,10 @@
 
 package com.lyndir.omicron.api.model;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.util.Job;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
@@ -76,13 +78,13 @@ public final class Security {
     }
 
     public static void authenticate(final IPlayer currentPlayer, final PlayerKey playerKey) {
-        Preconditions.checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
+        checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
 
         currentPlayerTL.set( currentPlayer );
     }
 
     public static void authenticatedRun(final IPlayer currentPlayer, final PlayerKey playerKey, final Runnable job) {
-        Preconditions.checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
+        checkArgument( currentPlayer.hasKey( playerKey ), "Cannot authenticate, key does not match player: ", currentPlayer );
 
         playerRun( currentPlayer, job );
     }
@@ -93,6 +95,15 @@ public final class Security {
 
     static boolean isGod() {
         return !godTL.get().isEmpty() && godTL.get().peek();
+    }
+
+    /**
+     * @return true if the current player is god or can observe the target.
+     *
+     * @see IPlayer#canObserve(GameObservable)
+     */
+    static boolean currentPlayerCanObserve(final GameObservable gameObservable) {
+        return isGod() || currentPlayer().canObserve( gameObservable ).isTrue();
     }
 
     @Nonnull
@@ -109,31 +120,23 @@ public final class Security {
         return currentPlayer;
     }
 
-    public static void assertOwned(final GameObserver observer)
+    public static void assertOwned(final GameObservable observable)
             throws NotAuthenticatedException, NotOwnedException {
         if (isGod())
             return;
 
-        assertSecure( observer.getOwner().isPresent() && ObjectUtils.equals( observer.getOwner().get(), currentPlayer() ), //
-                      NotOwnedException.class, observer );
+        Maybe<? extends IPlayer> owner = observable.checkOwner();
+        assertSecure( owner.presence() == Maybe.Presence.PRESENT && ObjectUtils.equals( owner.get(), currentPlayer() ), //
+                      NotOwnedException.class, observable );
     }
 
-    public static void assertObservable(final ITile location)
+    public static void assertObservable(final GameObservable observable)
             throws NotAuthenticatedException, NotObservableException {
         if (isGod())
             return;
 
-        assertSecure( currentPlayer().canObserve( location ).isTrue(), //
-                      NotObservableException.class, location );
-    }
-
-    public static void assertObservable(final IGameObject gameObject)
-            throws NotAuthenticatedException, NotObservableException {
-        if (isGod())
-            return;
-
-        assertSecure( gameObject.checkLocation().presence() == Maybe.Presence.PRESENT, //
-                      NotObservableException.class, gameObject );
+        assertSecure( currentPlayer().canObserve( observable ).isTrue(), //
+                      NotObservableException.class, observable );
     }
 
     public static class NotAuthenticatedException extends OmicronSecurityException {

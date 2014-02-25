@@ -19,7 +19,7 @@ public interface IPlayerController extends GameObserver {
      *
      * @return A list of game objects owned by this controller's player.
      */
-    ImmutableCollection<? extends IGameObject> listObjects()
+    ImmutableSet<? extends IGameObject> listObjects()
             throws NotAuthenticatedException;
 
     /**

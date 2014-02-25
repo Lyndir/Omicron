@@ -42,7 +42,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     @Nonnull
     @Override
     public Optional<Player> getOwner() {
-        return getGameObject().getOwner();
+        return getGameObject().checkOwner();
     }
 
     void setOwner(@Nullable final Player owner) {
@@ -111,7 +111,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
                 .onUnitDied( gameObject );
 
         // Remove from the game (map & player).
-        Optional<Player> owner = gameObject.getOwner();
+        Optional<Player> owner = gameObject.checkOwner();
         if (owner.isPresent())
             owner.get().getController().removeObject( gameObject );
         gameObject.getLocation().setContents( null );
@@ -121,7 +121,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         GameObject currentGameObject = getGameObject();
 
         // Remove from the game (map & player).
-        Optional<Player> owner = currentGameObject.getOwner();
+        Optional<Player> owner = currentGameObject.checkOwner();
         if (owner.isPresent())
             owner.get().getController().removeObject( currentGameObject );
         currentGameObject.getLocation().replaceContents( replacementObject );

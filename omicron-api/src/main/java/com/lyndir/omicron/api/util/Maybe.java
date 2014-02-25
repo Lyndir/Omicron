@@ -36,14 +36,23 @@ public abstract class Maybe<T> {
         return new Unknown<>();
     }
 
+    /**
+     * @return {@link Presence#ABSENT} if reference is null, otherwise {@link Presence#PRESENT}.
+     */
     public static <T> Maybe<T> fromNullable(@Nullable final T reference) {
         return reference == null? Maybe.<T>absent(): new Present<>( reference );
     }
 
+    /**
+     * @return {@link Presence#ABSENT} if reference is {@link Optional#absent()}, otherwise {@link Presence#PRESENT}.
+     */
     public static <T> Maybe<T> fromOptional(final Optional<T> reference) {
         return reference.isPresent()? new Present<>( reference.get() ): Maybe.<T>absent();
     }
 
+    /**
+     * @return Always {@link Presence#PRESENT}.
+     */
     public static <T> Maybe<T> of(@Nonnull final T reference) {
         return new Present<>( reference );
     }

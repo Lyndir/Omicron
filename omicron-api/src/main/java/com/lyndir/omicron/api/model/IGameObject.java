@@ -5,7 +5,6 @@ import static com.lyndir.omicron.api.model.Security.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableCollection;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.util.Maybe;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,7 +15,7 @@ import javax.annotation.Nullable;
  *
  * @author lhunath
  */
-public interface IGameObject extends GameObserver {
+public interface IGameObject extends GameObserver, GameObservable {
 
     @Nonnull
     IGameObjectController<? extends IGameObject> getController();
@@ -27,9 +26,6 @@ public interface IGameObject extends GameObserver {
     int getObjectID();
 
     IGame getGame();
-
-    Maybe<? extends ITile> checkLocation()
-            throws NotAuthenticatedException;
 
     IUnitType getType();
 

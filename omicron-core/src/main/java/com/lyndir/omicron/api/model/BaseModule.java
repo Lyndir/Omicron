@@ -1,14 +1,14 @@
 package com.lyndir.omicron.api.model;
 
-import static com.lyndir.omicron.api.model.Security.*;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.error.AlreadyCheckedException;
+import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
 import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
+import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -45,15 +45,36 @@ public class BaseModule extends Module implements IBaseModule {
     @Override
     public Maybool canObserve(@Nonnull final ITile location)
             throws NotAuthenticatedException {
-        if (!isGod() && !getGameObject().isOwnedByCurrentPlayer())
-            if (!currentPlayer().canObserve( location ).isTrue() || !currentPlayer().canObserve( getGameObject().getLocation() ).isTrue())
+        Maybe<Tile> ourLocation = getGameObject().checkLocation();
+        switch (ourLocation.presence()) {
+            case ABSENT:
+                return Maybool.NO;
+            case UNKNOWN:
                 return Maybool.UNKNOWN;
+            case PRESENT:
+                return Maybool.from(ourLocation.get().getPosition().distanceTo( location.getPosition() ) > viewRange);
+        }
 
-        // Game object is owned by current player, or current player can observe the location and the game object.
-        if (getGameObject().getLocation().getPosition().distanceTo( location.getPosition() ) > viewRange)
-            return Maybool.NO;
+        throw new AlreadyCheckedException( "Switch statement should handle all cases." );
+    }
 
-        return Maybool.YES;
+    @Override
+    public Maybool canObserve(@Nonnull final IGameObject gameObject)
+            throws NotAuthenticatedException {
+        if (ObjectUtils.isEqual( getGameObject(), gameObject ))
+            return Maybool.YES;
+        Maybe<? extends ITile> location = gameObject.checkLocation();
+        switch (location.presence()) {
+
+            case ABSENT:
+                return Maybool.NO;
+            case UNKNOWN:
+                return Maybool.UNKNOWN;
+            case PRESENT:
+                return canObserve( location.get() );
+        }
+
+        throw new AlreadyCheckedException( "Switch statement should handle all cases." );
     }
 
     @Nonnull
@@ -61,7 +82,11 @@ public class BaseModule extends Module implements IBaseModule {
     @Authenticated
     public Iterable<Tile> listObservableTiles()
             throws NotAuthenticatedException {
-        return FluentIterable.from( getGameObject().getLocation().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
+        Maybe<Tile> location = getGameObject().checkLocation();
+        if (location.presence() != Maybe.Presence.PRESENT)
+            return ImmutableList.of();
+
+        return FluentIterable.from( location.get().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
             public boolean apply(final Tile input) {
                 return canObserve( input ).isTrue();
@@ -72,7 +97,7 @@ public class BaseModule extends Module implements IBaseModule {
     @Nonnull
     @Override
     public Optional<Player> getOwner() {
-        return getGameObject().getOwner();
+        return getGameObject().checkOwner();
     }
 
     @Override
@@ -121,7 +146,7 @@ public class BaseModule extends Module implements IBaseModule {
         if (getRemainingHealth() <= 0)
             getGameObject().getController().die();
 
-        getGameController().fireIfObservable( getGameObject().getLocation() ) //
+        getGameController().fireIfObservable( getGameObject() ) //
                 .onBaseDamaged( this, damageChange.to( damage ) );
     }
 
@@ -171,7 +196,7 @@ public class BaseModule extends Module implements IBaseModule {
                     }
 
                     BaseModule supportedLayers(final LevelType... supportedLayers) {
-                        return supportedLayers( ImmutableSet.<LevelType>copyOf( supportedLayers ) );
+                        return supportedLayers( ImmutableSet.copyOf( supportedLayers ) );
                     }
 
                     BaseModule supportedLayers(final ImmutableSet<LevelType> supportedLayers) {

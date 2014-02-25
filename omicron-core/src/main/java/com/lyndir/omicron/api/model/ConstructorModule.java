@@ -23,7 +23,6 @@ import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.collection.SSupplier;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.PathUtils;
@@ -39,8 +38,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
     private final int           buildSpeed;
     private final ModuleType<?> buildsModule;
 
-    private boolean    resourceConstrained;
-    private int        remainingSpeed;
+    private boolean resourceConstrained;
+    private int     remainingSpeed;
 
     @Nullable
     private GameObject target;
@@ -108,12 +107,16 @@ public class ConstructorModule extends Module implements IConstructorModule {
             NNFunctionNN<GameObject, Iterable<GameObject>> neighboursFunction = new NNFunctionNN<GameObject, Iterable<GameObject>>() {
                 @Nonnull
                 @Override
-                public Iterable<GameObject> apply(@Nonnull final GameObject input) {
-                    return FluentIterable.from( input.getLocation().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
+                public Iterable<GameObject> apply(@Nonnull final GameObject gameObject) {
+                    Optional<Tile> location = gameObject.getLocation();
+                    if (!location.isPresent())
+                        return ImmutableList.of();
+
+                    return FluentIterable.from( location.get().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
                         @Nullable
                         @Override
-                        public GameObject apply(@Nonnull final Tile input) {
-                            return input.getContents().orNull();
+                        public GameObject apply(@Nonnull final Tile gameObject_) {
+                            return gameObject_.getContents().orNull();
                         }
                     } ).filter( Predicates.notNull() );
                 }
@@ -150,7 +153,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     borrowEntry.getKey().addStock( borrowEntry.getValue() );
         }
 
-        getGameController().fireIfObservable( getGameObject().getLocation() ) //
+        getGameController().fireIfObservable( getGameObject() ) //
                 .onConstructorWorked( this, remainingSpeedChange.to( remainingSpeed ) );
     }
 
@@ -185,9 +188,9 @@ public class ConstructorModule extends Module implements IConstructorModule {
     public void setTarget(@Nullable final IGameObject target) {
         Change.From<IGameObject> targetChange = Change.<IGameObject>from( this.target );
 
-        this.target = coreGO( target );
+        this.target = coreGON( target );
 
-        getGameController().fireIfObservable( getGameObject().getLocation() ) //
+        getGameController().fireIfObservable( getGameObject() ) //
                 .onConstructorTargeted( this, targetChange.to( this.target ) );
     }
 
@@ -213,11 +216,13 @@ public class ConstructorModule extends Module implements IConstructorModule {
     @Authenticated
     public ConstructionSite schedule(final IUnitType unitType, final ITile location)
             throws Security.NotAuthenticatedException, InaccessibleException, IncompatibleLevelException, OutOfRangeException {
+        Optional<Tile> ownLocation = getGameObject().getLocation();
         assertState( location.checkAccessible(), InaccessibleException.class );
-        assertState( location.getLevel().equals( getGameObject().getLocation().getLevel() ), IncompatibleLevelException.class );
-        assertState( location.getPosition().distanceTo( getGameObject().getLocation().getPosition() ) == 1, OutOfRangeException.class );
+        assertState( ownLocation.isPresent(), OutOfRangeException.class );
+        assertState( location.getLevel().equals( ownLocation.get().getLevel() ), IncompatibleLevelException.class );
+        assertState( location.getPosition().distanceTo( ownLocation.get().getPosition() ) == 1, OutOfRangeException.class );
 
-        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().getOwner().get() );
+        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().checkOwner().get() );
         coreT( location ).setContents( site );
         setTarget( site );
 
@@ -283,7 +288,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
             if (remaining > 0) {
                 ChangeInt.From remainingWorkChange = ChangeInt.from( remainingWork.put( moduleType, --remaining ) );
 
-                getGame().getController().fireIfObservable( getLocation() ) //
+                getGame().getController().fireIfObservable( this ) //
                         .onConstructionSiteWorked( this, moduleType, remainingWorkChange.to( remaining ) );
 
                 return true;
@@ -323,9 +328,12 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     NNFunctionNN<GameObject, Iterable<GameObject>> neighboursFunction = new NNFunctionNN<GameObject, Iterable<GameObject>>() {
                         @Nonnull
                         @Override
-                        public Iterable<GameObject> apply(@SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") @Nonnull
-                                                          final GameObject neighbourInput) {
-                            return FluentIterable.from( neighbourInput.getLocation().neighbours() )
+                        public Iterable<GameObject> apply(@Nonnull final GameObject neighbourInput) {
+                            Optional<Tile> location = neighbourInput.getLocation();
+                            if (!location.isPresent())
+                                return ImmutableList.of();
+
+                            return FluentIterable.from( location.get().neighbours() )
                                                  .transform( new NFunctionNN<Tile, GameObject>() {
                                                      @Nullable
                                                      @Override

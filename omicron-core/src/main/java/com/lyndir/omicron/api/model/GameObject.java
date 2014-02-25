@@ -76,8 +76,8 @@ public class GameObject extends MetaObject implements IGameObject {
 
     @Nonnull
     @Override
-    public Optional<Player> getOwner() {
-        return Optional.fromNullable( owner );
+    public Maybe<? extends Player> checkOwner() {
+        return currentPlayer() == owner || currentPlayer().canObserve( this ).isTrue()? Maybe.of( owner ): Maybe.<Player>unknown();
     }
 
     @Override

@@ -15,14 +15,14 @@ import javax.annotation.Nonnull;
 public interface GameObserver {
 
     /**
-     * Check whether the current object can observe the tile at the given location.
+     * Check whether the current object can observe given observable.
      *
-     * @param location The tile that this observer is trying to see.
+     * @param observable The observable that this observer is trying to see.
      *
-     * @return true if the current player is allowed to know and the given tile is visible to this observer.
+     * @return true if the current player is able and allowed to observe the target.
      */
     @Authenticated
-    Maybool canObserve(@Nonnull ITile location)
+    Maybool canObserve(@Nonnull GameObservable observable)
             throws Security.NotAuthenticatedException;
 
     /**
@@ -34,11 +34,4 @@ public interface GameObserver {
     @Authenticated
     Iterable<? extends ITile> listObservableTiles()
             throws Security.NotAuthenticatedException, Security.NotObservableException;
-
-    /**
-     * @return The player that has control over this observer, if any.
-     */
-    @Nonnull
-    // TODO: This should return a Maybe to avoid being able to detect ownership changes on objects that are not observable.
-    Optional<? extends IPlayer> getOwner();
 }

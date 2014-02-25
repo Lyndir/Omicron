@@ -2,6 +2,7 @@ package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.model.CoreUtils.*;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
@@ -208,7 +209,7 @@ public class GameController implements IGameController {
      *
      * @param playerCondition The predicate that should hold true for all players eligible to receive the notification.
      */
-    GameListener fireIfPlayer(@Nonnull final PredicateNN<IPlayer> playerCondition) {
+    GameListener fireIfPlayer(@Nonnull final PredicateNN<Player> playerCondition) {
         return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
             @Override
             @Nullable
@@ -217,7 +218,7 @@ public class GameController implements IGameController {
                     throws Throwable {
                 synchronized (gameListeners) {
                     for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
-                        IPlayer gameListenerOwner = gameListenerEntry.getValue();
+                        Player gameListenerOwner = coreP( gameListenerEntry.getValue() );
                         if (gameListenerOwner == null)
                             Security.godRun( newGameListenerJob( gameListenerEntry.getKey(), method, args ) );
                         else if (playerCondition.apply( gameListenerOwner ))
@@ -237,13 +238,33 @@ public class GameController implements IGameController {
      * @param location The location that should be observable.
      */
     GameListener fireIfObservable(@Nonnull final ITile location) {
-        return fireIfPlayer( new PredicateNN<IPlayer>() {
+        return fireIfPlayer( new PredicateNN<Player>() {
             @Override
-            public boolean apply(@Nonnull final IPlayer input) {
+            public boolean apply(@Nonnull final Player input) {
                 return Security.godRun( new Job<Boolean>() {
                     @Override
                     public Boolean execute() {
                         return input.canObserve( location ).isTrue();
+                    }
+                } );
+            }
+        } );
+    }
+
+    /**
+     * Get a game listener proxy to call an event on that should be fired for all game listeners that are either internal or registered by
+     * players that can observe the given object.
+     *
+     * @param gameObject The game object that should be observable.
+     */
+    GameListener fireIfObservable(@Nonnull final IGameObject gameObject) {
+        return fireIfPlayer( new PredicateNN<Player>() {
+            @Override
+            public boolean apply(@Nonnull final Player input) {
+                return Security.godRun( new Job<Boolean>() {
+                    @Override
+                    public Boolean execute() {
+                        return input.canObserve( gameObject ).isTrue();
                     }
                 } );
             }

@@ -51,8 +51,8 @@ public class PublicGameObject extends MetaObject implements IGameObject {
 
     @Nonnull
     @Override
-    public Optional<? extends IPlayer> getOwner() {
-        return core.getOwner();
+    public Optional<? extends IPlayer> checkOwner() {
+        return core.checkOwner();
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.lyndir.omicron.cli.command;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.omicron.api.model.*;
@@ -70,7 +68,7 @@ public class ListCommand extends Command {
         for (final IGameObject gameObject : gameObjectBuilder.build()) {
             ITile location = gameObject.checkLocation().get();
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
-                 gameObject.getObjectID(), ifNotNullElse( IPlayer.class, gameObject.getOwner().orNull(), "-" ).getName(),
+                 gameObject.getObjectID(), ifNotNullElse( IPlayer.class, gameObject.checkOwner().orNull(), "-" ).getName(),
                  location.getLevel().getType().getName(), location.getPosition().getX(), location.getPosition().getY(),
                  gameObject.getType().getTypeName() );
         }

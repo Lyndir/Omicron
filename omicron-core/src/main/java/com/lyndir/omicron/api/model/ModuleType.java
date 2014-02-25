@@ -26,9 +26,10 @@ import javax.annotation.Nonnull;
 /**
  * @author lhunath, 2013-08-02
  */
+@SuppressWarnings("FieldNameHidesFieldInSuperclass")
 public abstract class ModuleType<M extends IModule> extends PublicModuleType<M> {
 
-    static Logger logger = Logger.get( ModuleType.class );
+    static final Logger logger = Logger.get( ModuleType.class );
 
     public static final ModuleType<ExtractorModule>   EXTRACTOR   = //
             new ModuleType<ExtractorModule>( ExtractorModule.class, PublicModuleType.EXTRACTOR.getStandardCost() ) {};

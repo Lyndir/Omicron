@@ -1,6 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.model.CoreUtils.*;
+import static com.lyndir.omicron.api.model.Security.currentPlayer;
 
 import com.google.common.base.*;
 import com.google.common.collect.ImmutableSet;
@@ -68,11 +69,14 @@ public class Player extends MetaObject implements IPlayer {
         return controller;
     }
 
+    /**
+     * @see PlayerController#canObserve(GameObservable)
+     */
     @Authenticated
     @Override
-    public Maybool canObserve(@Nonnull final ITile location)
+    public Maybool canObserve(@Nonnull final GameObservable observable)
             throws Security.NotAuthenticatedException {
-        return getController().canObserve( location );
+        return getController().canObserve( observable );
     }
 
     @Authenticated
@@ -80,12 +84,6 @@ public class Player extends MetaObject implements IPlayer {
     @Override
     public Iterable<Tile> listObservableTiles() {
         return getController().listObservableTiles();
-    }
-
-    @Nonnull
-    @Override
-    public Optional<Player> getOwner() {
-        return Optional.of( this );
     }
 
     @Override
@@ -100,6 +98,10 @@ public class Player extends MetaObject implements IPlayer {
 
     boolean isKeyLess() {
         return key == null;
+    }
+
+    boolean isCurrentPlayer() {
+        return ObjectUtils.isEqual( this, currentPlayer() );
     }
 
     @Override
@@ -152,9 +154,9 @@ public class Player extends MetaObject implements IPlayer {
         Preconditions.checkState( lostObject == null || lostObject == gameObject );
 
         if (lostObject != null)
-            getController().getGameController().fireIfPlayer( new PredicateNN<IPlayer>() {
+            getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
                 @Override
-                public boolean apply(@Nonnull final IPlayer input) {
+                public boolean apply(@Nonnull final Player input) {
                     return ObjectUtils.isEqual( Player.this, input );
                 }
             } ).onPlayerLostObject( this, gameObject );
@@ -166,9 +168,9 @@ public class Player extends MetaObject implements IPlayer {
 
         //noinspection VariableNotUsedInsideIf
         if (previousObject == null)
-            getController().getGameController().fireIfPlayer( new PredicateNN<IPlayer>() {
+            getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
                 @Override
-                public boolean apply(@Nonnull final IPlayer input) {
+                public boolean apply(@Nonnull final Player input) {
                     return ObjectUtils.isEqual( Player.this, input );
                 }
             } ).onPlayerGainedObject( this, gameObject );
