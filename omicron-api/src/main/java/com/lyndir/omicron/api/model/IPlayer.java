@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
 
 

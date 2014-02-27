@@ -1,9 +1,12 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
+import static com.lyndir.omicron.api.model.CoreUtils.*;
+import static com.lyndir.omicron.api.model.Security.currentPlayer;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.error.AlreadyCheckedException;
+import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
@@ -42,9 +45,16 @@ public class BaseModule extends Module implements IBaseModule {
         return new Builder0( ModuleType.BASE.getStandardCost().add( resourceCost ) );
     }
 
+    /**
+     * @see Player#canObserve(GameObservable)
+     * @see GameObservable#checkLocation()
+     */
     @Override
-    public Maybool canObserve(@Nonnull final ITile location)
+    public Maybool canObserve(@Nonnull final GameObservable observable)
             throws NotAuthenticatedException {
+        if (ObjectUtils.isEqual( getGameObject(), observable ))
+            return Maybool.YES;
+
         Maybe<Tile> ourLocation = getGameObject().checkLocation();
         switch (ourLocation.presence()) {
             case ABSENT:
@@ -52,26 +62,29 @@ public class BaseModule extends Module implements IBaseModule {
             case UNKNOWN:
                 return Maybool.UNKNOWN;
             case PRESENT:
-                return Maybool.from(ourLocation.get().getPosition().distanceTo( location.getPosition() ) > viewRange);
-        }
+                ITile observableLocation = null;
+                if (getGameObject().isOwnedByCurrentPlayer()) {
+                    // FIXME: HACKS!  Get rid of the instanceof.
+                    if (observable instanceof ITile)
+                        observableLocation = (ITile) observable;
+                    else if (observable instanceof IGameObject)
+                        observableLocation = coreGO( (IGameObject) observable ).getLocation().get();
+                    else
+                        throw new InternalInconsistencyException( "This hack failed.  We seem to have an unexpected kind of observable." );
+                }
+                else {
+                    Maybe <? extends ITile> location = observable.checkLocation();
+                    switch (location.presence()) {
+                        case ABSENT:
+                            return Maybool.NO;
+                        case UNKNOWN:
+                            return Maybool.UNKNOWN;
+                        case PRESENT:
+                            observableLocation = location.get();
+                    }
+                }
 
-        throw new AlreadyCheckedException( "Switch statement should handle all cases." );
-    }
-
-    @Override
-    public Maybool canObserve(@Nonnull final IGameObject gameObject)
-            throws NotAuthenticatedException {
-        if (ObjectUtils.isEqual( getGameObject(), gameObject ))
-            return Maybool.YES;
-        Maybe<? extends ITile> location = gameObject.checkLocation();
-        switch (location.presence()) {
-
-            case ABSENT:
-                return Maybool.NO;
-            case UNKNOWN:
-                return Maybool.UNKNOWN;
-            case PRESENT:
-                return canObserve( location.get() );
+                return Maybool.from(ourLocation.get().getPosition().distanceTo( observableLocation.getPosition() ) > viewRange);
         }
 
         throw new AlreadyCheckedException( "Switch statement should handle all cases." );
@@ -80,7 +93,7 @@ public class BaseModule extends Module implements IBaseModule {
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<Tile> listObservableTiles()
+    public Iterable<Tile> iterateObservableTiles()
             throws NotAuthenticatedException {
         Maybe<Tile> location = getGameObject().checkLocation();
         if (location.presence() != Maybe.Presence.PRESENT)
@@ -88,16 +101,10 @@ public class BaseModule extends Module implements IBaseModule {
 
         return FluentIterable.from( location.get().getLevel().getTiles().values() ).filter( new Predicate<Tile>() {
             @Override
-            public boolean apply(final Tile input) {
-                return canObserve( input ).isTrue();
+            public boolean apply(final Tile tile) {
+                return canObserve( tile ).isTrue();
             }
         } );
-    }
-
-    @Nonnull
-    @Override
-    public Optional<Player> getOwner() {
-        return getGameObject().checkOwner();
     }
 
     @Override

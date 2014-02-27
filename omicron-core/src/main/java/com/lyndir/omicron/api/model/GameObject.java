@@ -23,14 +23,15 @@ import javax.annotation.Nullable;
  */
 public class GameObject extends MetaObject implements IGameObject {
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    final Logger logger = Logger.get( getClass() );
+    @SuppressWarnings("UnusedDeclaration")
+    private static final Logger logger = Logger.get( GameObject.class );
 
     private final GameObjectController<? extends GameObject>   controller;
     private final UnitType                                     unitType;
     private final Game                                         game;
     private final int                                          objectID;
     private final ImmutableListMultimap<ModuleType<?>, Module> modules;
+    @Nullable
     private       Player                                       owner;
     @Nullable
     private       Tile                                         location;
@@ -75,9 +76,14 @@ public class GameObject extends MetaObject implements IGameObject {
     }
 
     @Nonnull
+    Optional<Player> getOwner() {
+        return Optional.fromNullable( owner );
+    }
+
+    @Nonnull
     @Override
-    public Maybe<? extends Player> checkOwner() {
-        return currentPlayer() == owner || currentPlayer().canObserve( this ).isTrue()? Maybe.of( owner ): Maybe.<Player>unknown();
+    public Maybe<Player> checkOwner() {
+        return currentPlayer() == owner || currentPlayer().canObserve( this ).isTrue()? Maybe.fromNullable( owner ): Maybe.<Player>unknown();
     }
 
     @Override
@@ -92,24 +98,23 @@ public class GameObject extends MetaObject implements IGameObject {
 
         this.owner = owner;
 
-        getGame().getController().fireIfObservable( getLocation() ) //
+        getGame().getController().fireIfObservable( this ) //
                 .onUnitCaptured( this, ownerChange.to( this.owner ) );
     }
 
     @Authenticated
     @Override
-    @SuppressWarnings("ParameterHidesMemberVariable")
-    public Maybool canObserve(@Nonnull final ITile location)
+    public Maybool canObserve(@Nonnull final GameObservable observable)
             throws NotAuthenticatedException {
-        return getController().canObserve( location );
+        return getController().canObserve( observable );
     }
 
     @Authenticated
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles()
+    public Iterable<Tile> iterateObservableTiles()
             throws NotAuthenticatedException, NotObservableException {
-        return getController().listObservableTiles();
+        return getController().iterateObservableTiles();
     }
 
     @Override
@@ -130,7 +135,7 @@ public class GameObject extends MetaObject implements IGameObject {
     public Maybe<Tile> checkLocation()
             throws NotAuthenticatedException {
         Optional<Tile> location = getLocation();
-        if (!isGod()) {
+        if (!isGod() && !isOwnedByCurrentPlayer()) {
             if (location.isPresent()) {
                 if (!currentPlayer().canObserve( location.get() ).isTrue())
                     // Has a location but current player cannot observe it.
@@ -160,7 +165,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final int index)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return Optional.fromNullable( Iterables.get( getModules( moduleType ), index, null ) );
     }
@@ -168,7 +173,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return FluentIterable.from( getModules( moduleType ) ).firstMatch( predicate );
     }
@@ -176,7 +181,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public <M extends IModule> List<M> getModules(final PublicModuleType<M> moduleType)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         // Checked by Module's constructor.
         //noinspection unchecked
@@ -186,7 +191,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final int index, @Nullable final Object elseValue)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orNull(), elseValue );
     }
@@ -195,7 +200,7 @@ public class GameObject extends MetaObject implements IGameObject {
     public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate,
                                               @Nullable final Object elseValue)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, predicate ).orNull(), elseValue );
     }
@@ -203,7 +208,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final int index)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return onModuleElse( moduleType, index, null );
     }
@@ -211,7 +216,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate)
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return onModuleElse( moduleType, predicate, null );
     }
@@ -219,7 +224,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Override
     public ImmutableCollection<Module> listModules()
             throws NotAuthenticatedException, NotObservableException {
-        assertObservable( getLocation() );
+        assertObservable( this );
 
         return ImmutableList.copyOf( modules.values() );
     }

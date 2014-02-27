@@ -9,6 +9,7 @@ import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
 import java.util.*;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class MobilityModule extends Module implements IMobilityModule {
@@ -70,13 +71,16 @@ public class MobilityModule extends Module implements IMobilityModule {
     public double costForLevelingToLevel(final LevelType levelType)
             throws Security.NotAuthenticatedException, Security.NotObservableException {
         assertObservable();
+        Optional<Tile> location = getGameObject().getLocation();
+        if (!location.isPresent())
+            return Double.MAX_VALUE;
 
         // Level up until we reach the target level.
         double cost = 0;
-        LevelType currentLevel = getGameObject().getLocation().getLevel().getType();
+        LevelType currentLevel = location.get().getLevel().getType();
         if (levelType == currentLevel)
             return 0;
-        do {
+        while (true) {
             Optional<LevelType> newLevel = currentLevel.up();
             if (!newLevel.isPresent())
                 break;
@@ -93,12 +97,11 @@ public class MobilityModule extends Module implements IMobilityModule {
             if (currentLevel == levelType)
                 return cost;
         }
-        while (true);
 
         // Level down until we reach the target level.
         cost = 0;
-        currentLevel = getGameObject().getLocation().getLevel().getType();
-        do {
+        currentLevel = location.get().getLevel().getType();
+        while (true) {
             Optional<LevelType> newLevel = currentLevel.down();
             if (!newLevel.isPresent())
                 break;
@@ -115,7 +118,6 @@ public class MobilityModule extends Module implements IMobilityModule {
             if (currentLevel == levelType)
                 return cost;
         }
-        while (true);
 
         // Unreachable code.
         throw new IllegalArgumentException( "Unsupported level type: " + levelType );
@@ -132,17 +134,22 @@ public class MobilityModule extends Module implements IMobilityModule {
             throws Security.NotAuthenticatedException, Security.NotOwnedException, Security.NotObservableException {
         assertOwned();
 
-        Tile currentLocation = getGameObject().getLocation();
-        if (levelType == currentLocation.getLevel().getType())
+        Optional<Tile> currentLocation = getGameObject().getLocation();
+        if (!currentLocation.isPresent())
+            return Leveling.impossible( this, 0 );
+
+        if (levelType == currentLocation.get().getLevel().getType())
             // Already in the destination level.
-            return new Leveling( 0, currentLocation );
+            return Leveling.possible( this, currentLocation.get(), 0 );
 
         double cost = costForLevelingToLevel( levelType );
         if (cost > remainingSpeed)
             // Cannot move: insufficient speed remaining this turn.
-            return new Leveling( cost );
+            return Leveling.impossible( this, cost );
 
-        return new Leveling( cost, getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get() );
+        return Leveling.possible( this,
+                                  getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.get().getPosition() ).get(),
+                                  cost );
     }
 
     /**
@@ -159,7 +166,7 @@ public class MobilityModule extends Module implements IMobilityModule {
         Leveling leveling = leveling( target.getLevel().getType() );
         if (!leveling.isPossible())
             // Cannot move because we can't level to the target's level.
-            return new Movement( leveling.getCost() );
+            return Movement.impossible( this, leveling.getCost() );
 
         // Initialize cost calculation.
         Tile currentLocation = leveling.getTarget();
@@ -192,7 +199,7 @@ public class MobilityModule extends Module implements IMobilityModule {
 
         // Find the path!
         Optional<Path<Tile>> path = find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction );
-        return new Movement( leveling.getCost() + (path.isPresent()? path.get().getCost(): 0), leveling, path );
+        return Movement.possible( this, leveling.getCost() + (path.isPresent()? path.get().getCost(): 0), leveling, path );
     }
 
     @Override
@@ -209,19 +216,24 @@ public class MobilityModule extends Module implements IMobilityModule {
         return ModuleType.MOBILITY;
     }
 
-    public class Leveling extends MetaObject implements ILeveling {
+    public static class Leveling extends MetaObject implements ILeveling {
 
-        private final double         cost;
+        private final MobilityModule module;
+        private final double cost;
         private final Optional<Tile> target;
 
-        Leveling(final double cost) {
+        private Leveling(final MobilityModule module, final Optional<Tile> target, final double cost) {
+            this.module = module;
             this.cost = cost;
-            target = Optional.absent();
+            this.target = target;
         }
 
-        Leveling(final double cost, final Tile target) {
-            this.cost = cost;
-            this.target = Optional.of( target );
+        static Leveling impossible(final MobilityModule module, final double cost) {
+            return new Leveling( module, Optional.<Tile>absent(), cost );
+        }
+
+        static Leveling possible(final MobilityModule module, final Tile target, final double cost) {
+            return new Leveling( module, Optional.of( target ), cost );
         }
 
         @Override
@@ -254,42 +266,49 @@ public class MobilityModule extends Module implements IMobilityModule {
         @Authenticated
         public void execute()
                 throws Security.NotAuthenticatedException, Security.NotOwnedException, ImpossibleException, InvalidatedException {
-            assertOwned();
+            module.assertOwned();
             assertState( isPossible(), ImpossibleException.class );
-            assertState( cost <= remainingSpeed, InvalidatedException.class );
+            assertState( cost <= module.remainingSpeed, InvalidatedException.class );
 
             // TODO: No target.isAccessible check: Most units that level cannot see other levels before they go there.
             // TODO: Should we disallow leveling until you can see the level above you like we do with movement and the tile you move to?
-            Change.From<ITile> locationChange = Change.<ITile>from( getGameObject().getLocation() );
-            ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
+            Change.From<ITile> locationChange = Change.<ITile>from( module.getGameObject().getLocation().get() );
+            ChangeDbl.From remainingSpeedChange = ChangeDbl.from( module.remainingSpeed );
 
             // Execute the leveling.
-            getGameObject().getController().setLocation( target.get() );
-            remainingSpeed -= cost;
+            module.getGameObject().getController().setLocation( target.get() );
+            module.remainingSpeed -= cost;
 
-            getGameController().fireIfObservable( getGameObject().getLocation() )
-                               .onMobilityLeveled( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
-                                                   remainingSpeedChange.to( remainingSpeed ) );
+            module.getGameController()
+                  .fireIfObservable( module.getGameObject() )
+                  .onMobilityLeveled( module, locationChange.to( module.getGameObject().getLocation().get() ),
+                                      remainingSpeedChange.to( module.remainingSpeed ) );
         }
     }
 
 
-    public class Movement extends MetaObject implements IMovement {
+    public static class Movement extends MetaObject implements IMovement {
 
+        private final MobilityModule       module;
         private final double               cost;
         private final Leveling             leveling;
         private final Optional<Path<Tile>> path;
 
-        Movement(final double cost) {
-            this.cost = cost;
-            leveling = null;
-            path = Optional.absent();
-        }
-
-        Movement(final double cost, @Nonnull final Leveling leveling, final Optional<Path<Tile>> path) {
+        private Movement(final MobilityModule module, final double cost, @Nullable final Leveling leveling,
+                         final Optional<Path<Tile>> path) {
+            this.module = module;
             this.cost = cost;
             this.leveling = leveling;
             this.path = path;
+        }
+
+        static Movement impossible(final MobilityModule module, final double cost) {
+            return new Movement( module, cost, null, Optional.<Path<Tile>>absent() );
+        }
+
+        static Movement possible(final MobilityModule module, final double cost, @Nonnull final Leveling leveling,
+                                 final Optional<Path<Tile>> path) {
+            return new Movement( module, cost, leveling, path );
         }
 
         /**
@@ -322,19 +341,21 @@ public class MobilityModule extends Module implements IMobilityModule {
         @Authenticated
         public void execute()
                 throws Security.NotAuthenticatedException, Security.NotOwnedException, ImpossibleException, InvalidatedException {
-            assertOwned();
+            module.assertOwned();
             assertState( isPossible(), ImpossibleException.class );
-            assertState( cost <= remainingSpeed, InvalidatedException.class );
+            assertState( cost <= module.remainingSpeed, InvalidatedException.class );
+            assert leveling != null;
 
-            Change.From<ITile> locationChange = Change.<ITile>from( getGameObject().getLocation() );
-            ChangeDbl.From remainingSpeedChange = ChangeDbl.from( remainingSpeed );
+            Change.From<ITile> locationChange = Change.<ITile>from( module.getGameObject().getLocation().get() );
+            ChangeDbl.From remainingSpeedChange = ChangeDbl.from( module.remainingSpeed );
 
             // Check that the path can still be walked.
             Path<Tile> tracePath = path.get();
             do {
                 assertState( tracePath.getTarget().checkAccessible() || //
-                             isEqual( getGameObject().getLocation(), tracePath.getTarget() ), PathInvalidatedException.class,
-                             tracePath );
+                             isEqual( module.getGameObject().getLocation().get(), tracePath.getTarget() ), //
+                             PathInvalidatedException.class, tracePath
+                );
 
                 Optional<Path<Tile>> parent = tracePath.getParent();
                 if (!parent.isPresent())
@@ -348,12 +369,13 @@ public class MobilityModule extends Module implements IMobilityModule {
             leveling.execute();
 
             // Execute the path.
-            getGameObject().getController().setLocation( path.get().getTarget() );
-            remainingSpeed -= path.get().getCost();
+            module.getGameObject().getController().setLocation( path.get().getTarget() );
+            module.remainingSpeed -= path.get().getCost();
 
-            getGameController().fireIfObservable( getGameObject().getLocation() )
-                               .onMobilityMoved( MobilityModule.this, locationChange.to( getGameObject().getLocation() ),
-                                                 remainingSpeedChange.to( remainingSpeed ) );
+            module.getGameController()
+                  .fireIfObservable( module.getGameObject() )
+                  .onMobilityMoved( module, locationChange.to( module.getGameObject().getLocation().get() ),
+                                    remainingSpeedChange.to( module.remainingSpeed ) );
         }
     }
 

@@ -3,10 +3,7 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Splitter;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.*;
-import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 

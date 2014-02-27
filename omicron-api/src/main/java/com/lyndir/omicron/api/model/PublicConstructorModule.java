@@ -19,7 +19,9 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.omicron.api.Authenticated;
-import com.lyndir.omicron.api.model.error.OmicronException;
+import com.lyndir.omicron.api.model.IConstructorModule.InaccessibleException;
+import com.lyndir.omicron.api.model.IConstructorModule.IncompatibleLevelException;
+import com.lyndir.omicron.api.model.IConstructorModule.OutOfRangeException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.annotation.Nonnull;
 
@@ -106,8 +108,8 @@ public class PublicConstructorModule extends PublicModule implements IConstructo
     @Authenticated
     public IConstructionSite schedule(final IUnitType unitType, final ITile location)
             throws Security.NotOwnedException, Security.NotAuthenticatedException, Security.NotObservableException,
-                   IConstructorModule.OutOfRangeException, IConstructorModule.InaccessibleException,
-                   IConstructorModule.IncompatibleLevelException {
+                   OutOfRangeException, InaccessibleException,
+                   IncompatibleLevelException {
         assertOwned();
         Security.assertObservable( location );
 

@@ -2,7 +2,6 @@ package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.model.Security.*;
 
-import com.google.common.collect.*;
 import com.lyndir.omicron.api.util.Maybe;
 
 
@@ -13,13 +12,11 @@ public interface IPlayerController extends GameObserver {
     IGameController getGameController();
 
     /**
-     * List the objects of this player.
+     * List the objects of this player observable by the current player.
      *
-     * NOTE: The controller must be of the currently authenticated player.
-     *
-     * @return A list of game objects owned by this controller's player.
+     * @return A list of game objects owned by this controller's player filtered by visibility by the current player.
      */
-    ImmutableSet<? extends IGameObject> listObjects()
+    Iterable<? extends IGameObject> iterateObservableObjects()
             throws NotAuthenticatedException;
 
     /**

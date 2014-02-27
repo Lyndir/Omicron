@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
  */
 public class View {
 
+    @SuppressWarnings("NonConstantLogger")
     protected final Logger logger = Logger.get( getClass() );
 
     private final List<View> children = new LinkedList<>();

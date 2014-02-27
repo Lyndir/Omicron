@@ -2,12 +2,9 @@ package com.lyndir.omicron.api.model;
 
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.TypeUtils;
 import com.lyndir.omicron.api.GameListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;

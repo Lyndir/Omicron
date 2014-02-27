@@ -21,8 +21,8 @@ import javax.annotation.Nullable;
  */
 public class PublicGameObject extends MetaObject implements IGameObject {
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    final Logger logger = Logger.get( getClass() );
+    @SuppressWarnings("UnusedDeclaration")
+    private static final Logger logger = Logger.get( PublicGameObject.class );
 
     private final IGameObject core;
 
@@ -49,12 +49,6 @@ public class PublicGameObject extends MetaObject implements IGameObject {
         return core.getController();
     }
 
-    @Nonnull
-    @Override
-    public Optional<? extends IPlayer> checkOwner() {
-        return core.checkOwner();
-    }
-
     @Override
     @Authenticated
     public boolean isOwnedByCurrentPlayer()
@@ -62,18 +56,24 @@ public class PublicGameObject extends MetaObject implements IGameObject {
         return core.isOwnedByCurrentPlayer();
     }
 
-    @Authenticated
     @Override
-    @SuppressWarnings("ParameterHidesMemberVariable")
-    public Maybool canObserve(@Nonnull final ITile location) {
-        return core.canObserve( location );
+    @Authenticated
+    public Maybe<? extends IPlayer> checkOwner() {
+        return core.checkOwner();
+    }
+
+    @Override
+    @Authenticated
+    public Maybool canObserve(@Nonnull final GameObservable observable)
+            throws Security.NotAuthenticatedException {
+        return core.canObserve( observable );
     }
 
     @Authenticated
     @Nonnull
     @Override
-    public Iterable<? extends ITile> listObservableTiles() {
-        return core.listObservableTiles();
+    public Iterable<? extends ITile> iterateObservableTiles() {
+        return core.iterateObservableTiles();
     }
 
     @Override

@@ -94,4 +94,17 @@ public class PublicTile extends MetaObject implements ITile {
             throws Security.NotAuthenticatedException {
         return core.checkAccessible();
     }
+
+    @Override
+    @Authenticated
+    public Maybe<? extends IPlayer> checkOwner() {
+        return core.checkOwner();
+    }
+
+    @Override
+    @Authenticated
+    public Maybe<? extends ITile> checkLocation()
+            throws Security.NotAuthenticatedException {
+        return core.checkLocation();
+    }
 }

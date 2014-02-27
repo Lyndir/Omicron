@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.util.Maybool;
@@ -32,6 +31,6 @@ public interface GameObserver {
      */
     @Nonnull
     @Authenticated
-    Iterable<? extends ITile> listObservableTiles()
+    Iterable<? extends ITile> iterateObservableTiles()
             throws Security.NotAuthenticatedException, Security.NotObservableException;
 }

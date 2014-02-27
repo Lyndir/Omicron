@@ -22,7 +22,8 @@ import javax.annotation.Nullable;
 @SuppressWarnings("ParameterHidesMemberVariable") // IDEA doesn't understand setters that return this.
 public class Game extends MetaObject implements IGame {
 
-    static final Logger logger = Logger.get( IGame.class );
+    @SuppressWarnings("UnusedDeclaration")
+    private static final Logger logger = Logger.get( Game.class );
 
     private static final Random RANDOM = new Random();
 
@@ -42,8 +43,7 @@ public class Game extends MetaObject implements IGame {
     }
 
     private Game(final Size levelSize, final Iterable<Player> players, final Iterable<VictoryConditionType> victoryConditions,
-                 final Map<GameListener, IPlayer> gameListeners, final GameResourceConfig resourceConfig,
-                 final GameUnitConfig unitConfig)
+                 final Map<GameListener, IPlayer> gameListeners, final GameResourceConfig resourceConfig, final GameUnitConfig unitConfig)
             throws Security.NotAuthenticatedException {
         this.levelSize = levelSize;
         levels = ImmutableList.of( new Level( levelSize, LevelType.GROUND, this ), new Level( levelSize, LevelType.SKY, this ),

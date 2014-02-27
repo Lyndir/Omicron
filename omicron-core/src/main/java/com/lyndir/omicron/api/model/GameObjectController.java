@@ -15,8 +15,8 @@ import javax.annotation.Nullable;
 
 public class GameObjectController<O extends GameObject> extends MetaObject implements IGameObjectController<O> {
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    final Logger logger = Logger.get( getClass() );
+    @SuppressWarnings("UnusedDeclaration")
+    private static final Logger logger = Logger.get( GameObjectController.class );
 
     private final O gameObject;
 
@@ -39,14 +39,8 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
         return gameObject;
     }
 
-    @Nonnull
-    @Override
-    public Optional<Player> getOwner() {
-        return getGameObject().checkOwner();
-    }
-
     void setOwner(@Nullable final Player owner) {
-        Optional<Player> oldOwner = getOwner();
+        Optional<Player> oldOwner = getGameObject().getOwner();
         if (oldOwner.isPresent() && ObjectUtils.isEqual( oldOwner.get(), owner ))
             // Object already owned by owner.
             return;
@@ -56,43 +50,39 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
         getGameObject().setOwner( owner );
 
-        Optional<Player> newOwner = getOwner();
+        Optional<Player> newOwner = getGameObject().getOwner();
         if (newOwner.isPresent())
             newOwner.get().addObjects( getGameObject() );
     }
 
     void setLocation(@Nonnull final Tile location) {
-        Tile oldLocation = getGameObject().getLocation();
-        if (oldLocation != null && ObjectUtils.isEqual( oldLocation, location ))
+        Optional<Tile> oldLocation = getGameObject().getLocation();
+        if (oldLocation.isPresent() && ObjectUtils.isEqual( oldLocation.get(), location ))
             // Object already at location.
             return;
 
-        if (oldLocation != null)
-            oldLocation.setContents( null );
+        if (oldLocation.isPresent())
+            oldLocation.get().setContents( null );
 
         getGameObject().setLocation( location );
 
-        Tile newLocation = getGameObject().getLocation();
-        if (newLocation != null)
-            newLocation.setContents( getGameObject() );
+        Optional<Tile> newLocation = getGameObject().getLocation();
+        if (newLocation.isPresent())
+            newLocation.get().setContents( getGameObject() );
     }
 
     @Override
-    @Authenticated
-    public Maybool canObserve(@Nonnull final ITile location)
-            throws NotAuthenticatedException, NotObservableException {
-        if (isGod() || (getGameObject().isOwnedByCurrentPlayer() && ObjectUtils.equals( location, getGameObject().getLocation() )))
-            return Maybool.YES;
-
-        return getGameObject().onModuleElse( ModuleType.BASE, 0, Maybool.NO ).canObserve( location );
+    public Maybool canObserve(@Nonnull final GameObservable observable)
+            throws NotAuthenticatedException {
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, Maybool.NO ).canObserve( observable );
     }
 
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<Tile> listObservableTiles()
+    public Iterable<Tile> iterateObservableTiles()
             throws NotAuthenticatedException, NotObservableException {
-        return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).listObservableTiles();
+        return getGameObject().onModuleElse( ModuleType.BASE, 0, ImmutableList.of() ).iterateObservableTiles();
     }
 
     void onReset() {
@@ -107,23 +97,29 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     void die() {
         GameObject gameObject = getGameObject();
-        gameObject.getGame().getController().fireIfObservable( gameObject.getLocation() ) //
+        gameObject.getGame().getController().fireIfObservable( gameObject ) //
                 .onUnitDied( gameObject );
 
-        // Remove from the game (map & player).
-        Optional<Player> owner = gameObject.checkOwner();
+        // Remove from the game: player.
+        Optional<Player> owner = gameObject.getOwner();
         if (owner.isPresent())
             owner.get().getController().removeObject( gameObject );
-        gameObject.getLocation().setContents( null );
+
+        // Remove from the game: level.
+        Optional<Tile> location = getGameObject().getLocation();
+        if (location.isPresent())
+            location.get().setContents( null );
     }
 
     void replaceWith(final GameObject replacementObject) {
-        GameObject currentGameObject = getGameObject();
+        GameObject gameObject = getGameObject();
 
         // Remove from the game (map & player).
-        Optional<Player> owner = currentGameObject.checkOwner();
+        Optional<Player> owner = gameObject.getOwner();
         if (owner.isPresent())
-            owner.get().getController().removeObject( currentGameObject );
-        currentGameObject.getLocation().replaceContents( replacementObject );
+            owner.get().getController().removeObject( gameObject );
+        Optional<Tile> location = getGameObject().getLocation();
+        if (location.isPresent())
+            location.get().replaceContents( replacementObject );
     }
 }

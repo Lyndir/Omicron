@@ -59,7 +59,16 @@ public abstract class Maybe<T> {
 
     public abstract Presence presence();
 
+    @Nonnull
     public abstract T get();
+
+    @Nullable
+    public T orNull() {
+        if (presence() == Presence.PRESENT)
+            return get();
+
+        return null;
+    }
 
     public abstract String toString();
 
@@ -85,6 +94,7 @@ public abstract class Maybe<T> {
             return Presence.ABSENT;
         }
 
+        @Nonnull
         @Override
         public T get() {
             throw new IllegalStateException( "Cannot get() an absent reference." );
@@ -114,6 +124,7 @@ public abstract class Maybe<T> {
             return Presence.UNKNOWN;
         }
 
+        @Nonnull
         @Override
         public T get() {
             throw new IllegalStateException( "Cannot get() an unknown reference." );
@@ -149,6 +160,7 @@ public abstract class Maybe<T> {
             return Presence.PRESENT;
         }
 
+        @Nonnull
         @Override
         public T get() {
             return reference;

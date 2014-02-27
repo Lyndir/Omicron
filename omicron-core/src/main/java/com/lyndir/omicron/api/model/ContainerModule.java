@@ -68,7 +68,7 @@ public class ContainerModule extends Module implements IContainerModule {
         int stocked = newStock - stock;
         stock = newStock;
 
-        getGameObject().getGame().getController().fireIfObservable( getGameObject().getLocation() ) //
+        getGameObject().getGame().getController().fireIfObservable( getGameObject() ) //
                 .onContainerStockChanged( this, stockChange.to( stock ) );
 
         return stocked;
@@ -90,7 +90,7 @@ public class ContainerModule extends Module implements IContainerModule {
         int depleted = stock - newStock;
         stock = newStock;
 
-        getGameObject().getGame().getController().fireIfObservable( getGameObject().getLocation() ) //
+        getGameObject().getGame().getController().fireIfObservable( getGameObject() ) //
                 .onContainerStockChanged( this, stockChange.to( stock ) );
 
         return depleted;

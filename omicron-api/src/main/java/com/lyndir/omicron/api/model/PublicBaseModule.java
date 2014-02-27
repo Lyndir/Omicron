@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybool;
@@ -19,21 +18,16 @@ public class PublicBaseModule extends PublicModule implements IBaseModule {
 
     @Override
     @Authenticated
-    public Maybool canObserve(@Nonnull final ITile location) {
-        return core.canObserve( location );
+    public Maybool canObserve(@Nonnull final GameObservable observable)
+            throws Security.NotAuthenticatedException {
+        return core.canObserve( observable );
     }
 
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<? extends ITile> listObservableTiles() {
-        return core.listObservableTiles();
-    }
-
-    @Nonnull
-    @Override
-    public Optional<? extends IPlayer> getOwner() {
-        return core.getOwner();
+    public Iterable<? extends ITile> iterateObservableTiles() {
+        return core.iterateObservableTiles();
     }
 
     @Override

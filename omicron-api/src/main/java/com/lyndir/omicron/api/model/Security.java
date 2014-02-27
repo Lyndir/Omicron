@@ -19,7 +19,6 @@ package com.lyndir.omicron.api.model;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.lyndir.omicron.api.model.error.ExceptionUtils.*;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.util.Job;
 import com.lyndir.lhunath.opal.system.util.ObjectUtils;

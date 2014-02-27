@@ -4,10 +4,12 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.omicron.api.model.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.webapp.data.service.StateManager;
 import edu.umd.cs.findbugs.annotations.*;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -56,11 +58,11 @@ public class GameResource {
         public GetResponse(final IGame game) {
             turn = game.getCurrentTurn();
             levelSize = game.getLevelSize();
-            playersInfo = FluentIterable.from( game.getPlayers() ).transform( new Function<IPlayer, PlayerGameInfo>() {
-                @Nullable
+            playersInfo = FluentIterable.from( game.getPlayers() ).transform( new NNFunctionNN<IPlayer, PlayerGameInfo>() {
+                @Nonnull
                 @Override
-                public PlayerGameInfo apply(@Nullable final IPlayer input) {
-                    return game.getController().getPlayerGameInfo( input );
+                public PlayerGameInfo apply(@Nonnull final IPlayer player) {
+                    return game.getController().getPlayerGameInfo( player );
                 }
             } );
         }

@@ -1,7 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableCollection;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
@@ -34,12 +32,6 @@ public class PublicPlayerController implements IPlayerController {
         return core.getPlayer();
     }
 
-    @Nonnull
-    @Override
-    public Optional<? extends IPlayer> getOwner() {
-        return core.getOwner();
-    }
-
     @Override
     public IGameController getGameController() {
         return core.getGameController();
@@ -47,15 +39,16 @@ public class PublicPlayerController implements IPlayerController {
 
     @Override
     @Authenticated
-    public Maybool canObserve(@Nonnull final ITile location) {
-        return core.canObserve( location );
+    public Maybool canObserve(@Nonnull final GameObservable observable)
+            throws Security.NotAuthenticatedException {
+        return core.canObserve( observable );
     }
 
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<? extends ITile> listObservableTiles() {
-        return core.listObservableTiles();
+    public Iterable<? extends ITile> iterateObservableTiles() {
+        return core.iterateObservableTiles();
     }
 
     /**
@@ -67,9 +60,9 @@ public class PublicPlayerController implements IPlayerController {
      */
     @Override
     @Authenticated
-    public ImmutableCollection<? extends IGameObject> listObjects()
+    public Iterable<? extends IGameObject> iterateObservableObjects()
             throws Security.NotAuthenticatedException {
-        return core.listObjects();
+        return core.iterateObservableObjects();
     }
 
     /**

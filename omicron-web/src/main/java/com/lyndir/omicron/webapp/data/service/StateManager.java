@@ -7,6 +7,7 @@ import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.WebApplicationException;
@@ -20,8 +21,8 @@ public class StateManager {
 
     private static final Random RANDOM = new SecureRandom();
 
-    private static final Map<Long, IGame>               games        = Maps.newConcurrentMap();
-    private static final Map<Long, IGame.IBuilder>      gameBuilders = Maps.newConcurrentMap();
+    private static final ConcurrentMap<Long, IGame>               games        = Maps.newConcurrentMap();
+    private static final ConcurrentMap<Long, IGame.IBuilder>      gameBuilders = Maps.newConcurrentMap();
     private static final Table<Map<Long, ?>, Long, URI> redirections = HashBasedTable.create();
 
     @Nonnull
@@ -65,7 +66,7 @@ public class StateManager {
         return map.get( key );
     }
 
-    private static <T> long add(final Map<Long, T> map, final T value) {
+    private static <T> long add(final ConcurrentMap<Long, T> map, final T value) {
         long id;
         synchronized (map) {
             do {

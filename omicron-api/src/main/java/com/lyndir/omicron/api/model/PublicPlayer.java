@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybool;
@@ -41,22 +40,17 @@ public class PublicPlayer extends MetaObject implements IPlayer {
     }
 
     @Authenticated
+    @Nonnull
     @Override
-    public Maybool canObserve(@Nonnull final ITile location) {
-        return core.canObserve( location );
+    public Iterable<? extends ITile> iterateObservableTiles() {
+        return core.iterateObservableTiles();
     }
 
+    @Override
     @Authenticated
-    @Nonnull
-    @Override
-    public Iterable<? extends ITile> listObservableTiles() {
-        return core.listObservableTiles();
-    }
-
-    @Nonnull
-    @Override
-    public Optional<? extends IPlayer> getOwner() {
-        return core.getOwner();
+    public Maybool canObserve(@Nonnull final GameObservable observable)
+            throws Security.NotAuthenticatedException {
+        return core.canObserve( observable );
     }
 
     @Override

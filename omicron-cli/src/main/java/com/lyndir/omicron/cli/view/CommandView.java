@@ -16,6 +16,8 @@
 
 package com.lyndir.omicron.cli.view;
 
+import static com.lyndir.lhunath.opal.system.util.StringUtils.strf;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.lyndir.lanterna.view.*;
@@ -35,7 +37,7 @@ public class CommandView extends TitledView {
         TextView logView = new TextView() {
             @Override
             public String getText() {
-                return Joiner.on( '\n' ).join( OmicronCLI.get().getLog() );
+                return Joiner.on( strf("%n") ).join( OmicronCLI.get().getLog() );
             }
         };
         CommandInputView commandInputView = new CommandInputView();

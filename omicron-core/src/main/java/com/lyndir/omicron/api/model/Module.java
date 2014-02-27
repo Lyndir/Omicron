@@ -19,14 +19,13 @@ package com.lyndir.omicron.api.model;
 import com.google.common.base.Preconditions;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.MetaObject;
-import com.lyndir.lhunath.opal.system.util.ObjectMeta;
 import javax.annotation.Nullable;
 
 
 public abstract class Module extends MetaObject implements IModule {
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    protected final Logger logger = Logger.get( getClass() );
+    @SuppressWarnings("UnusedDeclaration")
+    private static final Logger logger = Logger.get( Module.class );
 
     private final ImmutableResourceCost resourceCost;
 
@@ -73,7 +72,7 @@ public abstract class Module extends MetaObject implements IModule {
 
     void assertObservable()
             throws Security.NotAuthenticatedException, Security.NotObservableException {
-        Security.assertObservable( getGameObject().getLocation() );
+        Security.assertObservable( getGameObject() );
     }
 
     protected abstract void onReset();

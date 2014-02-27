@@ -82,8 +82,8 @@ public class Player extends MetaObject implements IPlayer {
     @Authenticated
     @Nonnull
     @Override
-    public Iterable<Tile> listObservableTiles() {
-        return getController().listObservableTiles();
+    public Iterable<Tile> iterateObservableTiles() {
+        return getController().iterateObservableTiles();
     }
 
     @Override

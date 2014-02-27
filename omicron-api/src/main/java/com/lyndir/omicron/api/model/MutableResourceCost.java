@@ -42,11 +42,6 @@ public class MutableResourceCost extends ResourceCost {
         return ImmutableMap.copyOf( resourceQuantities );
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return This resource cost after applying the mutation.
-     */
     @Override
     public MutableResourceCost reduce(final ResourceType resourceType, final int term) {
         Preconditions.checkArgument( term >= 0, "Amount to reduce resource cost with must be positive." );
@@ -55,11 +50,6 @@ public class MutableResourceCost extends ResourceCost {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return This resource cost after applying the mutation.
-     */
     @Override
     public MutableResourceCost add(final ResourceType resourceType, final int term) {
         Preconditions.checkArgument( term >= 0, "Amount to increase resource cost with must be positive." );
@@ -68,11 +58,6 @@ public class MutableResourceCost extends ResourceCost {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return This resource cost after applying the mutation.
-     */
     @Override
     public MutableResourceCost add(final ResourceCost resourceCost) {
         for (final ResourceType resourceType : ResourceType.values())
@@ -81,11 +66,6 @@ public class MutableResourceCost extends ResourceCost {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return This resource cost after applying the mutation.
-     */
     @Override
     public MutableResourceCost multiply(final ResourceType resourceType, final int factor) {
         resourceQuantities.put( resourceType, get( resourceType ) * factor );
@@ -93,11 +73,6 @@ public class MutableResourceCost extends ResourceCost {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return This resource cost after applying the mutation.
-     */
     @Override
     public MutableResourceCost multiply(final int factor) {
         for (final ResourceType resourceType : ResourceType.values())

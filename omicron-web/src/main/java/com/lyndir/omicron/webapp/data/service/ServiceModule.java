@@ -34,9 +34,6 @@ public class ServiceModule extends AbstractModule {
 
     static final Logger logger = Logger.get( ServiceModule.class );
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void configure() {
         // Database

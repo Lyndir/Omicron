@@ -1,8 +1,5 @@
 package com.lyndir.omicron.cli.command;
 
-import com.lyndir.lanterna.view.Rectangle;
-import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.omicron.cli.OmicronCLI;
 import com.lyndir.omicron.cli.view.MapView;
 import java.util.*;

@@ -45,9 +45,6 @@ public class GuiceContext extends GuiceServletContextListener {
     private static final String PATH_APP      = "/app/*";
     private static final String PATH_APP_REST = "/app/rest/*";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Injector getInjector() {
         return Guice.createInjector( Stage.DEVELOPMENT, new ServiceModule(), new ServletModule() {

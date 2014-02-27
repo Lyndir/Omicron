@@ -52,8 +52,7 @@ public class SetGameCommand extends Command {
     @SubCommand( abbr = "p", desc = "The players that will compete in this game.")
     public void players(final Iterator<String> tokens) {
 
-        String gameSettingValue = Iterators.getOnlyElement( tokens, null );
-        if (gameSettingValue != null) {
+        if (tokens.hasNext()) {
             err( "players cannot be set this way.  Use 'add' and 'rm' instead." );
             return;
         }

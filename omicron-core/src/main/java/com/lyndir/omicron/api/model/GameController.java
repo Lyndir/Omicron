@@ -2,7 +2,6 @@ package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.model.CoreUtils.*;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.error.InternalInconsistencyException;
@@ -69,7 +68,7 @@ public class GameController implements IGameController {
     @Authenticated
     public PlayerGameInfo getPlayerGameInfo(final IPlayer player)
             throws Security.NotAuthenticatedException {
-        if (player.listObservableTiles().iterator().hasNext())
+        if (player.iterateObservableTiles().iterator().hasNext())
             return PlayerGameInfo.discovered( player, player.getScore() );
 
         return PlayerGameInfo.undiscovered( player );
@@ -186,6 +185,7 @@ public class GameController implements IGameController {
      */
     GameListener fire() {
         return TypeUtils.newProxyInstance( GameListener.class, new InvocationHandler() {
+            @Nullable
             @Override
             public Object invoke(final Object proxy, final Method method, final Object[] args) {
                 synchronized (gameListeners) {
@@ -218,7 +218,7 @@ public class GameController implements IGameController {
                     throws Throwable {
                 synchronized (gameListeners) {
                     for (final Map.Entry<GameListener, IPlayer> gameListenerEntry : gameListeners.entrySet()) {
-                        Player gameListenerOwner = coreP( gameListenerEntry.getValue() );
+                        Player gameListenerOwner = corePN( gameListenerEntry.getValue() );
                         if (gameListenerOwner == null)
                             Security.godRun( newGameListenerJob( gameListenerEntry.getKey(), method, args ) );
                         else if (playerCondition.apply( gameListenerOwner ))

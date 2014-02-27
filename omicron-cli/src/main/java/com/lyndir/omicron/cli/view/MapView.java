@@ -93,7 +93,7 @@ public class MapView extends View {
         Table<Integer, Integer, ITile> grid = HashBasedTable.create( levelSize.getHeight(), levelSize.getWidth() );
 
         // Iterate observable tiles and populate the grid.
-        for (final ITile tile : localPlayer.listObservableTiles()) {
+        for (final ITile tile : localPlayer.iterateObservableTiles()) {
             Vec2 coordinate = positionToMapCoordinate( tile.getPosition() );
             grid.put( coordinate.getY(), coordinate.getX(), tile );
         }
@@ -182,9 +182,9 @@ public class MapView extends View {
 
     private void setHomeOffset() {
         Optional<IPlayer> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
-        ImmutableCollection<? extends IGameObject> gameObjects = ImmutableSet.of();
+        Iterable<? extends IGameObject> gameObjects = ImmutableSet.of();
         if (localPlayerOptional.isPresent())
-            gameObjects = localPlayerOptional.get().getController().listObjects();
+            gameObjects = localPlayerOptional.get().getController().iterateObservableObjects();
 
         setOffset( FluentIterable.from( gameObjects ).filter( new PredicateNN<IGameObject>() {
             @Override

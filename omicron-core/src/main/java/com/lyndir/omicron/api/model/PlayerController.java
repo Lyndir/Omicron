@@ -9,6 +9,7 @@ import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.api.util.Maybool;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class PlayerController extends MetaObject implements IPlayerController {
@@ -40,19 +41,24 @@ public class PlayerController extends MetaObject implements IPlayerController {
     }
 
     /**
-     * @see GameObservable#checkOwner() IGameObject#canObserve(GameObservable)
+     * @see #iterateObservableObjects()
+     * @see IGameObject#canObserve(GameObservable)
      */
     @Override
     public Maybool canObserve(@Nonnull final GameObservable observable)
             throws NotAuthenticatedException {
-        ImmutableSet<GameObject> objects = getPlayer().getObjects();
-        if (getPlayer().isCurrentPlayer() && objects.contains( observable. )) {
-            // If we're the current player, checkOwner is a shortcut.
-            Maybe<? extends IPlayer> owner = observable.checkOwner();
-            if (owner.presence() == Maybe.Presence.PRESENT && ObjectUtils.isEqual( getPlayer(), owner.get() ))
-                // Observable is owned by us.
-                return Maybool.YES;
-        }
+
+        Iterable<GameObject> objects = iterateObservableObjects();
+        if (observable instanceof GameObject && Iterables.contains( objects, observable ))
+            return Maybool.YES;
+        if (observable instanceof Tile && FluentIterable.from( objects ).transform( new NFunctionNN<GameObject, Tile>() {
+            @Nullable
+            @Override
+            public Tile apply(@Nonnull final GameObject gameObject) {
+                return gameObject.checkLocation().orNull();
+            }
+        } ).contains( observable ))
+            return Maybool.YES;
 
         // Observable is not owned by us, check if any of our objects can see it.
         return FluentIterable.from( objects ).transform( new Function<IGameObject, Maybool>() {
@@ -68,39 +74,34 @@ public class PlayerController extends MetaObject implements IPlayerController {
         } ).or( Maybool.NO );
     }
 
+    /**
+     * @see #iterateObservableObjects()
+     * @see IGameObject#iterateObservableTiles()
+     */
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<Tile> listObservableTiles()
+    public Iterable<Tile> iterateObservableTiles()
             throws NotAuthenticatedException {
-        return FluentIterable.from( getPlayer().getObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
+        return FluentIterable.from( iterateObservableObjects() ).transformAndConcat( new Function<GameObject, Iterable<? extends Tile>>() {
             @Override
-            public Iterable<Tile> apply(final GameObject input) {
-                return input.listObservableTiles();
+            public Iterable<Tile> apply(final GameObject gameObject) {
+                return gameObject.iterateObservableTiles();
             }
         } );
     }
 
     /**
-     * List the objects of this player.
-     *
-     * NOTE: The controller must be of the currently authenticated player.
-     *
-     * @return A list of game objects owned by this controller's player.
+     * @see IPlayer#canObserve(GameObservable)
      */
     @Override
     @Authenticated
-    public ImmutableSet<GameObject> listObjects()
+    public Iterable<GameObject> iterateObservableObjects()
             throws NotAuthenticatedException {
         if (isGod() || getPlayer().isCurrentPlayer())
-            return ImmutableSet.copyOf( getPlayer().getObjects() );
+            return getPlayer().getObjects();
 
-        return FluentIterable.from( getPlayer().getObjects() ).filter( new PredicateNN<GameObject>() {
-            @Override
-            public boolean apply(@Nonnull final GameObject input) {
-                return currentPlayer().canObserve( input ).isTrue();
-            }
-        } ).toSet();
+        return iterateObservableObjects( currentPlayer() );
     }
 
     /**
@@ -115,8 +116,8 @@ public class PlayerController extends MetaObject implements IPlayerController {
     public Iterable<GameObject> iterateObservableObjects(final GameObserver observer) {
         return FluentIterable.from( getPlayer().getObjects() ).filter( new Predicate<GameObject>() {
             @Override
-            public boolean apply(final GameObject input) {
-                return observer.canObserve( input ).isTrue();
+            public boolean apply(final GameObject gameObject) {
+                return observer.canObserve( gameObject ).isTrue();
             }
         } );
     }

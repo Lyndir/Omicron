@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
  */
 public abstract class AbstractTest {
 
+    @SuppressWarnings("NonConstantLogger")
     protected final Logger logger = Logger.get( getClass() );
 
     private static final List<LevelType> levelIndexes = ImmutableList.of( LevelType.GROUND, LevelType.SKY, LevelType.SPACE );
@@ -27,8 +28,7 @@ public abstract class AbstractTest {
     protected void init() {
         Game.Builder builder = Game.builder();
         PlayerKey key = new PlayerKey();
-        staticPlayer = new Player( builder.nextPlayerID(), key, "testPlayer", Color.Template.randomColor(),
-                                    Color.Template.randomColor() ) {
+        staticPlayer = new Player( builder.nextPlayerID(), key, "testPlayer", Color.Template.randomColor(), Color.Template.randomColor() ) {
             private final PlayerController playerController = new PlayerController( this ) {
                 @Override
                 protected void onNewTurn() {

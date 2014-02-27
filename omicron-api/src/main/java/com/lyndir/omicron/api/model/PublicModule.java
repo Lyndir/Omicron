@@ -25,8 +25,9 @@ import javax.annotation.Nullable;
 
 public abstract class PublicModule extends MetaObject implements IModule {
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    protected final Logger logger = Logger.get( getClass() );
+    @SuppressWarnings("UnusedDeclaration")
+    private static final Logger logger = Logger.get( PublicModule.class );
+
     private final IModule coreModule;
 
     protected PublicModule(final IModule coreModule) {

@@ -1,6 +1,5 @@
 package com.lyndir.omicron.api.model;
 
-import com.google.common.base.Optional;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
@@ -10,9 +9,6 @@ import javax.annotation.Nullable;
 
 
 public class PublicGameObjectController<O extends IGameObject> extends MetaObject implements IGameObjectController<O> {
-
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    protected final Logger logger = Logger.get( getClass() );
 
     private final IGameObjectController<O> core;
 
@@ -38,22 +34,17 @@ public class PublicGameObjectController<O extends IGameObject> extends MetaObjec
         return core.getGameObject();
     }
 
-    @Nonnull
-    @Override
-    public Optional<? extends IPlayer> getOwner() {
-        return core.getOwner();
-    }
-
     @Override
     @Authenticated
-    public Maybool canObserve(@Nonnull final ITile location) {
-        return core.canObserve( location );
+    public Maybool canObserve(@Nonnull final GameObservable observable)
+            throws Security.NotAuthenticatedException {
+        return core.canObserve( observable );
     }
 
     @Nonnull
     @Override
     @Authenticated
-    public Iterable<? extends ITile> listObservableTiles() {
-        return core.listObservableTiles();
+    public Iterable<? extends ITile> iterateObservableTiles() {
+        return core.iterateObservableTiles();
     }
 }

@@ -41,11 +41,6 @@ public class ImmutableResourceCost extends ResourceCost {
         return resourceQuantities;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return A new immutable resource cost.
-     */
     @Override
     public ImmutableResourceCost reduce(final ResourceType resourceType, final int term) {
         Preconditions.checkArgument( term >= 0, "Amount to reduce resource cost with must be positive." );
@@ -55,11 +50,6 @@ public class ImmutableResourceCost extends ResourceCost {
                                                       .build() );
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return A new immutable resource cost.
-     */
     @Override
     public ImmutableResourceCost add(final ResourceType resourceType, final int term) {
         Preconditions.checkArgument( term >= 0, "Amount to increase resource cost with must be positive." );
@@ -69,11 +59,6 @@ public class ImmutableResourceCost extends ResourceCost {
                                                       .build() );
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return A new immutable resource cost.
-     */
     @Override
     public ImmutableResourceCost add(final ResourceCost resourceCost) {
         ImmutableMap.Builder<ResourceType, Integer> builder = ImmutableMap.builder();
@@ -83,11 +68,6 @@ public class ImmutableResourceCost extends ResourceCost {
         return new ImmutableResourceCost( builder.build() );
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return A new immutable resource cost.
-     */
     @Override
     public ImmutableResourceCost multiply(final ResourceType resourceType, final int factor) {
         return new ImmutableResourceCost( ImmutableMap.<ResourceType, Integer>builder()
@@ -96,11 +76,6 @@ public class ImmutableResourceCost extends ResourceCost {
                                                       .build() );
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return A new immutable resource cost.
-     */
     @Override
     public ImmutableResourceCost multiply(final int factor) {
         ImmutableMap.Builder<ResourceType, Integer> builder = ImmutableMap.builder();

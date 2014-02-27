@@ -16,6 +16,8 @@
 
 package com.lyndir.lanterna.view;
 
+import static com.lyndir.lhunath.opal.system.util.StringUtils.strf;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
@@ -69,7 +71,7 @@ public class TextView extends View {
     }
 
     private Iterable<String> getTextLines() {
-        return Splitter.on( '\n' ).split( getText() );
+        return Splitter.on( strf( "%n" ) ).split( getText() );
     }
 
     public Terminal.Color getTextColor() {

@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  *
  * @author lhunath
  */
-public interface ITile {
+public interface ITile extends GameObservable {
 
     @Nonnull
     Maybe<? extends IGameObject> checkContents()

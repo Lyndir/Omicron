@@ -10,7 +10,6 @@ import com.lyndir.lhunath.opal.math.Side;
 import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.*;
-import com.lyndir.omicron.api.model.Security.NotAuthenticatedException;
 import com.lyndir.omicron.api.util.Maybe;
 import java.util.*;
 import java.util.Objects;
@@ -59,6 +58,26 @@ public class Tile extends MetaObject implements ITile {
 
         Tile o = (Tile) obj;
         return isEqual( position, o.position ) && isEqual( level, o.level );
+    }
+
+    @Override
+    public Maybe<? extends IPlayer> checkOwner() {
+        if (!currentPlayer().canObserve( this ).isTrue())
+            return Maybe.unknown();
+
+        if (contents == null)
+            return Maybe.absent();
+
+        return contents.checkOwner();
+    }
+
+    @Override
+    public Maybe<? extends ITile> checkLocation()
+            throws NotAuthenticatedException {
+        if (!currentPlayer().canObserve( this ).isTrue())
+            return Maybe.unknown();
+
+        return Maybe.of( this );
     }
 
     @Nonnull

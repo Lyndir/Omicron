@@ -54,7 +54,7 @@ public class PrintCommand extends Command {
                 grid.put( y, x, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
-        for (final ITile tile : localPlayer.listObservableTiles()) {
+        for (final ITile tile : localPlayer.iterateObservableTiles()) {
             Maybe<? extends IGameObject> contents = tile.checkContents();
             char contentsChar;
             if (contents.presence() == Maybe.Presence.PRESENT)
