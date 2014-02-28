@@ -148,8 +148,8 @@ public abstract class ResourceCost extends MetaObject {
     public boolean isZero() {
         return FluentIterable.from( getResourceQuantities().values() ).filter( new PredicateNN<Integer>() {
             @Override
-            public boolean apply(@Nonnull final Integer input) {
-                return input > 0;
+            public boolean apply(@Nonnull final Integer resourceQuantity) {
+                return resourceQuantity > 0;
             }
         } ).isEmpty();
     }

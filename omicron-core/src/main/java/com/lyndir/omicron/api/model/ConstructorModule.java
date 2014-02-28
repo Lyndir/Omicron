@@ -89,8 +89,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
             // Initialize path finding functions.
             PredicateNN<GameObject> foundFunction = new PredicateNN<GameObject>() {
                 @Override
-                public boolean apply(@Nonnull final GameObject input) {
-                    for (final ContainerModule containerModule : input.getModules( ModuleType.CONTAINER ))
+                public boolean apply(@Nonnull final GameObject gameObject) {
+                    for (final ContainerModule containerModule : gameObject.getModules( ModuleType.CONTAINER ))
                         if (resourceCost.get( containerModule.getResourceType() ) > 0 && containerModule.getStock() > 0)
                             return true;
 
@@ -100,7 +100,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
             NNFunctionNN<PathUtils.Step<GameObject>, Double> costFunction = new NNFunctionNN<PathUtils.Step<GameObject>, Double>() {
                 @Nonnull
                 @Override
-                public Double apply(@Nonnull final PathUtils.Step<GameObject> input) {
+                public Double apply(@Nonnull final PathUtils.Step<GameObject> gameObjectStep) {
                     return 1d;
                 }
             };
@@ -309,8 +309,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     // Initialize path finding functions.
                     PredicateNN<GameObject> foundFunction = new PredicateNN<GameObject>() {
                         @Override
-                        public boolean apply(@Nonnull final GameObject input) {
-                            for (final ConstructorModule module : input.getModules( ModuleType.CONSTRUCTOR ))
+                        public boolean apply(@Nonnull final GameObject gameObject) {
+                            for (final ConstructorModule module : gameObject.getModules( ModuleType.CONSTRUCTOR ))
                                 if (module.getRemainingSpeed() > 0 && !module.isResourceConstrained()
                                     && getRemainingWork( module.getBuildsModule() ) > 0)
                                     return true;
@@ -321,7 +321,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     NNFunctionNN<PathUtils.Step<GameObject>, Double> costFunction = new NNFunctionNN<PathUtils.Step<GameObject>, Double>() {
                         @Nonnull
                         @Override
-                        public Double apply(@Nonnull final PathUtils.Step<GameObject> input) {
+                        public Double apply(@Nonnull final PathUtils.Step<GameObject> gameObjectStep) {
                             return 1d;
                         }
                     };
@@ -337,8 +337,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
                                                  .transform( new NFunctionNN<Tile, GameObject>() {
                                                      @Nullable
                                                      @Override
-                                                     public GameObject apply(@Nonnull final Tile input) {
-                                                         Optional<GameObject> contents = input.getContents();
+                                                     public GameObject apply(@Nonnull final Tile tile) {
+                                                         Optional<GameObject> contents = tile.getContents();
                                                          if (contents.isPresent()) {
                                                              for (final ConstructorModule module : contents.get()
                                                                                                            .getModules(
@@ -373,8 +373,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
                     synchronized (remainingWork) {
                         if (FluentIterable.from( remainingWork.values() ).filter( new PredicateNN<Integer>() {
                             @Override
-                            public boolean apply(@Nonnull final Integer input) {
-                                return input > 0;
+                            public boolean apply(@Nonnull final Integer remainingWork) {
+                                return remainingWork > 0;
                             }
                         } ).isEmpty())
                             // No more work remaining; create the constructed unit.

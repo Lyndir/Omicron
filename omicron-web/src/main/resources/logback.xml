@@ -6,9 +6,10 @@
         </layout>
     </appender>
 
-    <logger name="com.lyndir" level="DEBUG" />
+    <logger name="com.lyndir" level="INFO" />
+    <logger name="com.lyndir.omicron" level="DEBUG" />
 
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 

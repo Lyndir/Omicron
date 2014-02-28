@@ -91,9 +91,9 @@ public class FireCommand extends Command {
         final String levelArgument = ifNotNullElse( weaponIndexOrLevelArgument, location.getLevel().getType().getName() );
         Optional<? extends ILevel> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<ILevel>() {
             @Override
-            public boolean apply(final ILevel input) {
+            public boolean apply(final ILevel aLevel) {
 
-                return input.getType().getName().equalsIgnoreCase( levelArgument );
+                return aLevel.getType().getName().equalsIgnoreCase( levelArgument );
             }
         } );
         if (!level.isPresent()) {

@@ -156,8 +156,8 @@ public class Player extends MetaObject implements IPlayer {
         if (lostObject != null)
             getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
                 @Override
-                public boolean apply(@Nonnull final Player input) {
-                    return ObjectUtils.isEqual( Player.this, input );
+                public boolean apply(@Nonnull final Player player) {
+                    return ObjectUtils.isEqual( Player.this, player );
                 }
             } ).onPlayerLostObject( this, gameObject );
     }
@@ -170,8 +170,8 @@ public class Player extends MetaObject implements IPlayer {
         if (previousObject == null)
             getController().getGameController().fireIfPlayer( new PredicateNN<Player>() {
                 @Override
-                public boolean apply(@Nonnull final Player input) {
-                    return ObjectUtils.isEqual( Player.this, input );
+                public boolean apply(@Nonnull final Player player) {
+                    return ObjectUtils.isEqual( Player.this, player );
                 }
             } ).onPlayerGainedObject( this, gameObject );
     }

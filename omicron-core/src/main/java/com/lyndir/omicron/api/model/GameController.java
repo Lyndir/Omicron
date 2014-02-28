@@ -240,11 +240,11 @@ public class GameController implements IGameController {
     GameListener fireIfObservable(@Nonnull final ITile location) {
         return fireIfPlayer( new PredicateNN<Player>() {
             @Override
-            public boolean apply(@Nonnull final Player input) {
+            public boolean apply(@Nonnull final Player player) {
                 return Security.godRun( new Job<Boolean>() {
                     @Override
                     public Boolean execute() {
-                        return input.canObserve( location ).isTrue();
+                        return player.canObserve( location ).isTrue();
                     }
                 } );
             }
@@ -260,11 +260,11 @@ public class GameController implements IGameController {
     GameListener fireIfObservable(@Nonnull final IGameObject gameObject) {
         return fireIfPlayer( new PredicateNN<Player>() {
             @Override
-            public boolean apply(@Nonnull final Player input) {
+            public boolean apply(@Nonnull final Player player) {
                 return Security.godRun( new Job<Boolean>() {
                     @Override
                     public Boolean execute() {
-                        return input.canObserve( gameObject ).isTrue();
+                        return player.canObserve( gameObject ).isTrue();
                     }
                 } );
             }

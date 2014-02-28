@@ -1,6 +1,7 @@
 <configuration scan="true">
 
-    <logger name="com.lyndir.omicron" level="TRACE" />
+    <logger name="com.lyndir" level="INFO" />
+    <logger name="com.lyndir.omicron" level="DEBUG" />
 
     <root level="INFO" />
 

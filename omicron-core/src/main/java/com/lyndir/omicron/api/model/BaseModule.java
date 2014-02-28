@@ -84,7 +84,7 @@ public class BaseModule extends Module implements IBaseModule {
                     }
                 }
 
-                return Maybool.from(ourLocation.get().getPosition().distanceTo( observableLocation.getPosition() ) > viewRange);
+                return Maybool.from(ourLocation.get().getPosition().distanceTo( observableLocation.getPosition() ) <= viewRange);
         }
 
         throw new AlreadyCheckedException( "Switch statement should handle all cases." );

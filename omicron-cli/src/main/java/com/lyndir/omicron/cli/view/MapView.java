@@ -188,18 +188,18 @@ public class MapView extends View {
 
         setOffset( FluentIterable.from( gameObjects ).filter( new PredicateNN<IGameObject>() {
             @Override
-            public boolean apply(@Nonnull final IGameObject input) {
+            public boolean apply(@Nonnull final IGameObject gameObject) {
                 // Only game objects in this map's displayed level.
-                return input.checkLocation().get().getLevel().getType() == getLevelType();
+                return gameObject.checkLocation().get().getLevel().getType() == getLevelType();
             }
         } ).transform( new NNFunctionNN<IGameObject, Vec2>() {
             @Nonnull
             @Override
-            public Vec2 apply(@Nonnull final IGameObject input) {
+            public Vec2 apply(@Nonnull final IGameObject gameObject) {
                 // Transform game objects into their offset from the center of the map.
                 hasUnits = true;
                 Box contentBox = getContentBoxOnScreen();
-                return positionToMapCoordinate( input.checkLocation().get().getPosition() ) //
+                return positionToMapCoordinate( gameObject.checkLocation().get().getPosition() ) //
                         .translate( -contentBox.getSize().getWidth() / 2, -contentBox.getSize().getHeight() / 2 );
             }
         } ).first().or( new Supplier<Vec2>() {

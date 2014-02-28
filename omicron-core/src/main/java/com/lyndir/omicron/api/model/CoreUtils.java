@@ -92,8 +92,8 @@ public abstract class CoreUtils {
         return Lists.transform( checkNotNull( object ), new NNFunctionNN<PublicVictoryConditionType, VictoryConditionType>() {
             @Nonnull
             @Override
-            public VictoryConditionType apply(@Nonnull final PublicVictoryConditionType input) {
-                return coreVCT( input );
+            public VictoryConditionType apply(@Nonnull final PublicVictoryConditionType victoryConditionType) {
+                return coreVCT( victoryConditionType );
             }
         } );
     }

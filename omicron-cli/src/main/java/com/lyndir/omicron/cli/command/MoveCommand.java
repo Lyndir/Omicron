@@ -56,16 +56,16 @@ public class MoveCommand extends Command {
             err( "No such side/level: %s.  Valid sides are: %s, valid levels are: %s", side, //
                  FluentIterable.from( ImmutableList.copyOf( Side.values() ) ).transform( new Function<Side, String>() {
                      @Override
-                     public String apply(final Side input) {
+                     public String apply(final Side aSide) {
 
-                         return input.name();
+                         return aSide.name();
                      }
                  } ), //
                  FluentIterable.from( ImmutableList.copyOf( LevelType.values() ) ).transform( new Function<LevelType, String>() {
                      @Override
-                     public String apply(final LevelType input) {
+                     public String apply(final LevelType levelType) {
 
-                         return input.name();
+                         return levelType.name();
                      }
                  } )
             );

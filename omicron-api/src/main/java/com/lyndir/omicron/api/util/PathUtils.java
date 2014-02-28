@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 public abstract class PathUtils {
 
+    @SuppressWarnings("UnusedDeclaration")
     private static final Logger logger = Logger.get( PathUtils.class );
 
     /**
@@ -30,8 +31,10 @@ public abstract class PathUtils {
                                              final NNFunctionNN<E, Iterable<E>> neighboursFunction) {
 
         // Test the root.
-        if (foundFunction.apply( root ))
+        if (foundFunction.apply( root )) {
+            logger.trc( "found root: %s", root );
             return Optional.of( new Path<>( root, 0 ) );
+        }
 
         // Initialize breath-first.
         Set<E> testedNodes = new HashSet<>();
@@ -50,14 +53,19 @@ public abstract class PathUtils {
                     continue;
 
                 double neighbourCost = testPath.getCost() + costFunction.apply( new Step<>( testPath.getTarget(), neighbour ) );
-                if (neighbourCost > maxCost)
+                if (neighbourCost > maxCost) {
                     // Stepping to neighbour from here would exceed maximum cost.
+                    logger.trc( "neighbour exceeds maximum cost (%.2f > %.2f): %s", neighbourCost, maxCost, neighbour );
                     continue;
+                }
 
                 // Did we find the target?
                 Path<E> neighbourPath = new Path<>( testPath, neighbour, neighbourCost );
-                if (foundFunction.apply( neighbour ))
+                if (foundFunction.apply( neighbour )) {
+                    logger.trc( "found neighbour at cost %.2f: %s", neighbourCost, neighbour );
                     return Optional.of( neighbourPath );
+                }
+                logger.trc( "intermediate neighbour at cost %.2f: %s", neighbourCost, neighbour );
 
                 // Neighbour is not the target, add it for testing its neighbours later.
                 testPaths.add( neighbourPath );
@@ -100,13 +108,16 @@ public abstract class PathUtils {
                     // Neighbour was already tested.
                     continue;
 
-                double neighbourCost = testPath.getCost() + 1;
-                if (neighbourCost > radius)
+                double neighbourDistance = testPath.getCost() + 1;
+                if (neighbourDistance > radius) {
                     // Stepping to neighbour from here would exceed maximum cost.
+                    logger.trc( "neighbour exceeds radius (%.2f > %.2f): %s", neighbourDistance, radius, neighbour );
                     continue;
+                }
 
                 // Add it for testing its neighbours later.
-                testPaths.add( new Path<>( testPath, neighbour, neighbourCost ) );
+                logger.trc( "neighbour at distance %.2f: %s", neighbourDistance, neighbour );
+                testPaths.add( new Path<>( testPath, neighbour, neighbourDistance ) );
             }
         }
 

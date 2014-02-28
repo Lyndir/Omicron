@@ -73,8 +73,8 @@ public class ExtractorModule extends Module implements IExtractorModule {
         // Initialize path finding functions.
         PredicateNN<GameObject> foundFunction = new PredicateNN<GameObject>() {
             @Override
-            public boolean apply(@Nonnull final GameObject input) {
-                for (final ContainerModule containerModule : input.getModules( ModuleType.CONTAINER ))
+            public boolean apply(@Nonnull final GameObject gameObject) {
+                for (final ContainerModule containerModule : gameObject.getModules( ModuleType.CONTAINER ))
                     if (containerModule.getAvailable() > 0)
                         return true;
 
@@ -84,7 +84,7 @@ public class ExtractorModule extends Module implements IExtractorModule {
         NNFunctionNN<PathUtils.Step<GameObject>, Double> costFunction = new NNFunctionNN<PathUtils.Step<GameObject>, Double>() {
             @Nonnull
             @Override
-            public Double apply(@Nonnull final PathUtils.Step<GameObject> input) {
+            public Double apply(@Nonnull final PathUtils.Step<GameObject> gameObjectStep) {
                 return 1d;
             }
         };
@@ -95,8 +95,8 @@ public class ExtractorModule extends Module implements IExtractorModule {
                 return FluentIterable.from( neighbour.getLocation().get().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
                     @Nullable
                     @Override
-                    public GameObject apply(@Nonnull final Tile input) {
-                        return input.getContents().orNull();
+                    public GameObject apply(@Nonnull final Tile tile) {
+                        return tile.getContents().orNull();
                     }
                 } ).filter( Predicates.notNull() );
             }

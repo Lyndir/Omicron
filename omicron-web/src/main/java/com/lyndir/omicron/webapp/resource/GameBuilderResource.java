@@ -82,8 +82,8 @@ public class GameBuilderResource {
             players = Collections2.transform( gameBuilder.getPlayers(), new NNFunctionNN<IPlayer, HumanPlayer>() {
                 @Nonnull
                 @Override
-                public HumanPlayer apply(@Nonnull final IPlayer input) {
-                    return new HumanPlayer( input );
+                public HumanPlayer apply(@Nonnull final IPlayer player) {
+                    return new HumanPlayer( player );
                 }
             } );
             victoryConditions = gameBuilder.getVictoryConditions();
@@ -126,10 +126,10 @@ public class GameBuilderResource {
         public HumanPlayer() {
         }
 
-        public HumanPlayer(final IPlayer input) {
-            name = input.getName();
-            primaryColor = input.getPrimaryColor();
-            secondaryColor = input.getSecondaryColor();
+        public HumanPlayer(final IPlayer player) {
+            name = player.getName();
+            primaryColor = player.getPrimaryColor();
+            secondaryColor = player.getSecondaryColor();
         }
 
         String name;

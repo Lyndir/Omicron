@@ -61,13 +61,13 @@ public class Game extends MetaObject implements IGame {
         Map<ResourceType, Integer> remainingResources = new EnumMap<>( ResourceType.class );
         remainingResources.putAll( FluentIterable.from( levels ).transformAndConcat( new Function<Level, Iterable<ResourceType>>() {
             @Override
-            public Iterable<ResourceType> apply(final Level input) {
-                return input.getType().getSupportedResources();
+            public Iterable<ResourceType> apply(final Level level) {
+                return level.getType().getSupportedResources();
             }
         } ).toMap( new Function<ResourceType, Integer>() {
             @Override
-            public Integer apply(final ResourceType input) {
-                return resourceConfig.quantity( input );
+            public Integer apply(final ResourceType resourceType) {
+                return resourceConfig.quantity( resourceType );
             }
         } ) );
         while (true) {
@@ -91,8 +91,8 @@ public class Game extends MetaObject implements IGame {
                                                                     new NNFunctionNN<Tile, Iterable<Tile>>() {
                                                                         @Nonnull
                                                                         @Override
-                                                                        public Iterable<Tile> apply(@Nonnull final Tile input) {
-                                                                            return input.neighbours();
+                                                                        public Iterable<Tile> apply(@Nonnull final Tile tile) {
+                                                                            return tile.neighbours();
                                                                         }
                                                                     } );
 
@@ -135,8 +135,8 @@ public class Game extends MetaObject implements IGame {
     public Level getLevel(final LevelType levelType) {
         return FluentIterable.from( levels ).firstMatch( new Predicate<Level>() {
             @Override
-            public boolean apply(final Level input) {
-                return input.getType() == levelType;
+            public boolean apply(final Level level) {
+                return level.getType() == levelType;
             }
         } ).get();
     }
@@ -229,8 +229,8 @@ public class Game extends MetaObject implements IGame {
         public Builder setPlayer(final PlayerKey playerKey, final String name, final Color primaryColor, final Color secondaryColor) {
             IPlayer existingPlayer = Iterables.find( players, new PredicateNN<IPlayer>() {
                 @Override
-                public boolean apply(@Nonnull final IPlayer input) {
-                    return input.hasKey( playerKey );
+                public boolean apply(@Nonnull final IPlayer player) {
+                    return player.hasKey( playerKey );
                 }
             }, null );
             if (existingPlayer != null)
@@ -244,8 +244,8 @@ public class Game extends MetaObject implements IGame {
         public Builder addPlayer(final IPlayer player) {
             IPlayer existingPlayer = Iterables.find( players, new PredicateNN<IPlayer>() {
                 @Override
-                public boolean apply(@Nonnull final IPlayer input) {
-                    return input.getPlayerID() == player.getPlayerID();
+                public boolean apply(@Nonnull final IPlayer aPlayer) {
+                    return aPlayer.getPlayerID() == player.getPlayerID();
                 }
             }, null );
             Preconditions.checkState( existingPlayer == null, "A player with this player's ID has already been added: %s", existingPlayer );
@@ -361,8 +361,8 @@ public class Game extends MetaObject implements IGame {
                 GameObject engineer = new GameObject( UnitTypes.ENGINEER, coreGame, corePlayer );
                 engineer.onModule( ModuleType.CONTAINER, new PredicateNN<ContainerModule>() {
                     @Override
-                    public boolean apply(@Nonnull final ContainerModule input) {
-                        return input.getResourceType() == ResourceType.METALS;
+                    public boolean apply(@Nonnull final ContainerModule module) {
+                        return module.getResourceType() == ResourceType.METALS;
                     }
                 } ).addStock( Integer.MAX_VALUE );
                 engineerTile.get().setContents( engineer );

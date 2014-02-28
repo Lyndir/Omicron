@@ -175,15 +175,15 @@ public class MobilityModule extends Module implements IMobilityModule {
         // Initialize path finding data functions.
         PredicateNN<Tile> foundFunction = new PredicateNN<Tile>() {
             @Override
-            public boolean apply(@Nonnull final Tile input) {
-                return isEqual( input, target );
+            public boolean apply(@Nonnull final Tile tile) {
+                return isEqual( tile, target );
             }
         };
         NNFunctionNN<Step<Tile>, Double> costFunction = new NNFunctionNN<Step<Tile>, Double>() {
             @Nonnull
             @Override
-            public Double apply(@Nonnull final Step<Tile> input) {
-                if (!input.getTo().checkAccessible())
+            public Double apply(@Nonnull final Step<Tile> tileStep) {
+                if (!tileStep.getTo().checkAccessible())
                     return Double.MAX_VALUE;
 
                 return stepCost;
@@ -192,8 +192,8 @@ public class MobilityModule extends Module implements IMobilityModule {
         NNFunctionNN<Tile, Iterable<Tile>> neighboursFunction = new NNFunctionNN<Tile, Iterable<Tile>>() {
             @Nonnull
             @Override
-            public Iterable<Tile> apply(@Nonnull final Tile input) {
-                return input.neighbours();
+            public Iterable<Tile> apply(@Nonnull final Tile tile) {
+                return tile.neighbours();
             }
         };
 
