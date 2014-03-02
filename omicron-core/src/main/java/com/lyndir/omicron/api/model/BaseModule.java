@@ -1,7 +1,7 @@
 package com.lyndir.omicron.api.model;
 
 import static com.lyndir.omicron.api.model.CoreUtils.*;
-import static com.lyndir.omicron.api.model.Security.currentPlayer;
+import static com.lyndir.omicron.api.model.Security.*;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
@@ -46,7 +46,6 @@ public class BaseModule extends Module implements IBaseModule {
     }
 
     /**
-     * @see Player#canObserve(GameObservable)
      * @see GameObservable#checkLocation()
      */
     @Override
@@ -63,7 +62,7 @@ public class BaseModule extends Module implements IBaseModule {
                 return Maybool.UNKNOWN;
             case PRESENT:
                 ITile observableLocation = null;
-                if (getGameObject().isOwnedByCurrentPlayer()) {
+                if (isGod() || getGameObject().isOwnedByCurrentPlayer()) {
                     // FIXME: HACKS!  Get rid of the instanceof.
                     if (observable instanceof ITile)
                         observableLocation = (ITile) observable;

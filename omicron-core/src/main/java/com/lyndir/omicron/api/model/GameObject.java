@@ -83,7 +83,7 @@ public class GameObject extends MetaObject implements IGameObject {
     @Nonnull
     @Override
     public Maybe<Player> checkOwner() {
-        return currentPlayer() == owner || currentPlayer().canObserve( this ).isTrue()? Maybe.fromNullable( owner ): Maybe.<Player>unknown();
+        return isGod() || ObjectUtils.isEqual( owner, currentPlayer() ) || currentPlayer().canObserve( this ).isTrue()? Maybe.fromNullable( owner ): Maybe.<Player>unknown();
     }
 
     @Override
@@ -102,6 +102,9 @@ public class GameObject extends MetaObject implements IGameObject {
                 .onUnitCaptured( this, ownerChange.to( this.owner ) );
     }
 
+    /**
+     * @see GameObjectController#canObserve(GameObservable)
+     */
     @Authenticated
     @Override
     public Maybool canObserve(@Nonnull final GameObservable observable)

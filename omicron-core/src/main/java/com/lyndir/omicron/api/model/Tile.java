@@ -62,7 +62,7 @@ public class Tile extends MetaObject implements ITile {
 
     @Override
     public Maybe<? extends IPlayer> checkOwner() {
-        if (!currentPlayer().canObserve( this ).isTrue())
+        if (!isGod() || !currentPlayer().canObserve( this ).isTrue())
             return Maybe.unknown();
 
         if (contents == null)
@@ -74,7 +74,7 @@ public class Tile extends MetaObject implements ITile {
     @Override
     public Maybe<? extends ITile> checkLocation()
             throws NotAuthenticatedException {
-        if (!currentPlayer().canObserve( this ).isTrue())
+        if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
             return Maybe.unknown();
 
         return Maybe.of( this );

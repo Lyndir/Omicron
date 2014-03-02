@@ -71,6 +71,9 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
             newLocation.get().setContents( getGameObject() );
     }
 
+    /**
+     * @see BaseModule#canObserve(GameObservable)
+     */
     @Override
     public Maybool canObserve(@Nonnull final GameObservable observable)
             throws NotAuthenticatedException {

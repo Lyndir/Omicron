@@ -42,6 +42,7 @@ public class PlayerController extends MetaObject implements IPlayerController {
 
     /**
      * @see #iterateObservableObjects()
+     * @see IGameObject#checkLocation()
      * @see IGameObject#canObserve(GameObservable)
      */
     @Override
@@ -92,7 +93,7 @@ public class PlayerController extends MetaObject implements IPlayerController {
     }
 
     /**
-     * @see IPlayer#canObserve(GameObservable)
+     * @see #iterateObservableObjects(GameObserver)
      */
     @Override
     @Authenticated
@@ -105,11 +106,7 @@ public class PlayerController extends MetaObject implements IPlayerController {
     }
 
     /**
-     * Iterate the objects of this player that the given observer (and the current player) can observe.
-     *
-     * @param observer The observer that we want to observe the player's objects with.
-     *
-     * @return An iterable of game objects owned by this controller's player.
+     * @see GameObserver#canObserve(GameObservable)
      */
     @Override
     @Authenticated

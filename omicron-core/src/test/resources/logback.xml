@@ -7,7 +7,7 @@
     </appender>
 
     <logger name="com.lyndir" level="DEBUG" />
-    <logger name="com.lyndir.omicron" level="TRACE" />
+    <logger name="com.lyndir.omicron" level="DEBUG" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

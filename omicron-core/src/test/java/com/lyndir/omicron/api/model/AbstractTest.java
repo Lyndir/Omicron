@@ -26,6 +26,10 @@ public abstract class AbstractTest {
     protected Player staticPlayer;
 
     protected void init() {
+        staticGame = newGameBuilder().build();
+    }
+
+    protected Game.Builder newGameBuilder() {
         Game.Builder builder = Game.builder();
         PlayerKey key = new PlayerKey();
         staticPlayer = new Player( builder.nextPlayerID(), key, "testPlayer", Color.Template.randomColor(), Color.Template.randomColor() ) {
@@ -44,13 +48,12 @@ public abstract class AbstractTest {
                 return playerController;
             }
         };
+        Security.authenticate( staticPlayer, key );
         builder.setLevelSize( new Size( 10, 10 ) );
         builder.setResourceConfig( IGame.GameResourceConfigs.NONE );
         builder.setUnitConfig( Game.GameUnitConfigs.NONE );
         builder.addPlayer( staticPlayer );
-        staticGame = builder.build();
-
-        Security.authenticate( staticPlayer, key );
+        return builder;
     }
 
     protected void printWorldMap() {
@@ -120,13 +123,19 @@ public abstract class AbstractTest {
         return createUnit( unitType, 0, 0 );
     }
 
-    protected GameObject createUnit(final UnitType unitType, final int u, final int v) {
-        return createUnit( unitType, staticGame, staticPlayer, u, v );
+    protected GameObject createUnit(final UnitType unitType, final int x, final int y) {
+        return createUnit( unitType, staticGame, staticPlayer, x, y );
     }
 
-    protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final int u, final int v) {
+    protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final int x, final int y) {
+        Tile tile = game.getLevel( LevelType.GROUND ).getTile( x, y ).get();
+
+        return createUnit(unitType, game, player, tile);
+    }
+
+    protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final Tile tile) {
         GameObject gameObject = new GameObject( unitType, game, player );
-        game.getLevel( LevelType.GROUND ).getTile( u, v ).get().setContents( gameObject );
+        tile.setContents( gameObject );
 
         return gameObject;
     }
