@@ -1,7 +1,19 @@
 Webapp.ApplicationRoute = Ember.Route.extend({
-    // admittedly, this should be in IndexRoute and not in the
-    // top level ApplicationRoute; we're in transition... :-)
-    model: function () {
-        return ['red', 'yellow', 'blue'];
+    model: function() {
+        return [];
+    }
+});
+Webapp.PlayerRoute = Ember.Route.extend({
+    model: function() {
+        return {
+            name:"Maarten Billemont",
+            seniority:new Date(),
+            numberOfGames:7,
+            victoryPercentage:27,
+            badge: Webapp.BadgeView.create({
+                primaryColor: "#2F2E2E",
+                secondaryColor: "#2BAA9C"
+            })
+        };
     }
 });

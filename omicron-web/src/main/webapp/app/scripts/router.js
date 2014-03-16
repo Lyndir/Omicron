@@ -1,3 +1,6 @@
 Webapp.Router.map(function () {
-  // Add your routes here
+    this.route("player");
+    this.route("game");
+    this.route("map");
+    this.route("unit");
 });
