@@ -55,11 +55,8 @@ public class ExtractorModule extends Module implements IExtractorModule {
     @Override
     protected void onNewTurn() {
         // Mine some resources.
-        Optional<Tile> location = getGameObject().getLocation();
-        if (!location.isPresent())
-            return;
-
-        Optional<Integer> availableResources = location.get().getResourceQuantity( resourceType );
+        Tile location = getGameObject().getLocation();
+        Optional<Integer> availableResources = location.getResourceQuantity( resourceType );
         if (!availableResources.isPresent())
             // No resources left to mine.
             return;
@@ -92,7 +89,7 @@ public class ExtractorModule extends Module implements IExtractorModule {
             @Nonnull
             @Override
             public Iterable<GameObject> apply(@Nonnull final GameObject neighbour) {
-                return FluentIterable.from( neighbour.getLocation().get().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
+                return FluentIterable.from( neighbour.getLocation().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
                     @Nullable
                     @Override
                     public GameObject apply(@Nonnull final Tile tile) {
@@ -118,7 +115,7 @@ public class ExtractorModule extends Module implements IExtractorModule {
         newAvailableResources += minedResources;
 
         // Update the amount of resources left in the tile after this turn's extraction.
-        location.get().setResourceQuantity( resourceType, newAvailableResources );
+        location.setResourceQuantity( resourceType, newAvailableResources );
         logger.trc( "unstocked resources: %d %s, left in tile: %d", minedResources, resourceType, newAvailableResources );
     }
 

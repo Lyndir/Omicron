@@ -67,7 +67,7 @@ public class BaseModule extends Module implements IBaseModule {
                     if (observable instanceof ITile)
                         observableLocation = (ITile) observable;
                     else if (observable instanceof IGameObject)
-                        observableLocation = coreGO( (IGameObject) observable ).getLocation().get();
+                        observableLocation = coreGO( (IGameObject) observable ).getLocation();
                     else
                         throw new InternalInconsistencyException( "This hack failed.  We seem to have an unexpected kind of observable." );
                 }

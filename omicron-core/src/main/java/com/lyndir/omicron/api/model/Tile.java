@@ -98,7 +98,8 @@ public class Tile extends MetaObject implements ITile {
 
     void setContents(@Nullable final GameObject contents) {
         if (contents != null)
-            Preconditions.checkState( this.contents == null, "Cannot put object on tile that is not empty: %s", this );
+            Preconditions.checkState( this.contents == null || this.contents.equals( contents ),
+                                      "Cannot put object on tile that is not empty: %s", this );
 
         replaceContents( contents );
     }

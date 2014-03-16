@@ -56,19 +56,14 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
     }
 
     void setLocation(@Nonnull final Tile location) {
-        Optional<Tile> oldLocation = getGameObject().getLocation();
-        if (oldLocation.isPresent() && ObjectUtils.isEqual( oldLocation.get(), location ))
+        Tile oldLocation = getGameObject().getLocation();
+        if (ObjectUtils.isEqual( oldLocation, location ))
             // Object already at location.
             return;
 
-        if (oldLocation.isPresent())
-            oldLocation.get().setContents( null );
-
+        oldLocation.setContents( null );
         getGameObject().setLocation( location );
-
-        Optional<Tile> newLocation = getGameObject().getLocation();
-        if (newLocation.isPresent())
-            newLocation.get().setContents( getGameObject() );
+        location.setContents( getGameObject() );
     }
 
     /**
@@ -109,20 +104,28 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
             owner.get().getController().removeObject( gameObject );
 
         // Remove from the game: level.
-        Optional<Tile> location = getGameObject().getLocation();
-        if (location.isPresent())
-            location.get().setContents( null );
+        gameObject.getLocation().setContents( null );
     }
 
+    /**
+     * Replace this controller's object with a new object in the game.  The existing object essentially "transforms" and will not die.  This
+     * call registers the replacement object into the game if it hasn't been already.
+     *
+     * @param replacementObject The object to replace this object with.
+     *
+     * @return The replacement object.
+     */
     void replaceWith(final GameObject replacementObject) {
         GameObject gameObject = getGameObject();
 
-        // Remove from the game (map & player).
+        // Remove from the game: player.
         Optional<Player> owner = gameObject.getOwner();
         if (owner.isPresent())
             owner.get().getController().removeObject( gameObject );
-        Optional<Tile> location = getGameObject().getLocation();
-        if (location.isPresent())
-            location.get().replaceContents( replacementObject );
+
+        // Replace in the game: level.
+        gameObject.getLocation().replaceContents( replacementObject );
+
+        replacementObject.register();
     }
 }

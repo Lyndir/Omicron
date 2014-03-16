@@ -99,7 +99,7 @@ public class WeaponModule extends Module implements IWeaponModule {
                    OutOfAmmunitionException {
         assertOwned();
         Security.assertObservable( target );
-        assertState( !getGameObject().getLocation().isPresent() || getGameObject().getLocation().get().getPosition().distanceTo( target.getPosition() ) <= range, OutOfRangeException.class );
+        assertState( getGameObject().getLocation().getPosition().distanceTo( target.getPosition() ) <= range, OutOfRangeException.class );
         assertState( repeated < repeat, OutOfRepeatsException.class );
         assertState( ammunition > 0, OutOfAmmunitionException.class );
 

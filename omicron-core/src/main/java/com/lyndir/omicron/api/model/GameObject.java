@@ -33,17 +33,17 @@ public class GameObject extends MetaObject implements IGameObject {
     private final ImmutableListMultimap<ModuleType<?>, Module> modules;
     @Nullable
     private       Player                                       owner;
-    @Nullable
     private       Tile                                         location;
 
-    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner) {
-        this( unitType, game, owner, owner.nextObjectID() );
+    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nonnull final Player owner, final Tile location) {
+        this( unitType, game, owner, location, owner.nextObjectID() );
     }
 
-    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final int objectID) {
+    GameObject(@Nonnull final UnitType unitType, @Nonnull final Game game, @Nullable final Player owner, final Tile location, final int objectID) {
         this.unitType = unitType;
         this.game = game;
         this.owner = owner;
+        this.location = location;
         this.objectID = objectID;
 
         ImmutableListMultimap.Builder<ModuleType<?>, Module> modulesBuilder = ImmutableListMultimap.builder();
@@ -53,8 +53,13 @@ public class GameObject extends MetaObject implements IGameObject {
         }
         modules = modulesBuilder.build();
         controller = new GameObjectController<>( this );
+    }
 
-        // Register ourselves into the game.
+    /**
+     * Register ourselves into the game.
+     */
+    void register() {
+        location.setContents( this );
         if (owner != null)
             owner.addObjects( this );
     }
@@ -130,26 +135,21 @@ public class GameObject extends MetaObject implements IGameObject {
         return game;
     }
 
-    Optional<Tile> getLocation() {
-        return Optional.fromNullable( location );
+    Tile getLocation() {
+        return location;
     }
 
     @Override
     public Maybe<Tile> checkLocation()
             throws NotAuthenticatedException {
-        Optional<Tile> location = getLocation();
-        if (!isGod() && !isOwnedByCurrentPlayer()) {
-            if (location.isPresent()) {
-                if (!currentPlayer().canObserve( location.get() ).isTrue())
-                    // Has a location but current player cannot observe it.
-                    return Maybe.unknown();
-            } else if (!isOwnedByCurrentPlayer())
-                // Has no location and not owned by current player.
+        Tile location = getLocation();
+        if (!isGod() && !isOwnedByCurrentPlayer())
+            if (!currentPlayer().canObserve( location ).isTrue())
+                // Has a location but current player cannot observe it.
                 return Maybe.unknown();
-        }
 
         // We're either god, can be observed by or are owned by the current player.
-        return Maybe.fromOptional( location );
+        return Maybe.of( location );
     }
 
     void setLocation(@Nonnull final Tile location) {

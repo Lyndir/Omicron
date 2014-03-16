@@ -34,16 +34,12 @@ public class BigGameTest extends AbstractTest {
                 270, 280, 290 };
 
         ImmutableList.Builder<GameObject> gameObjectsBuilder = ImmutableList.builder();
-        for (int x = 0; x < coordinates.length; ++x) {
-            for (int y = 0; y < coordinates.length; ++y) {
-                gameObjectsBuilder.add( createUnit( UnitTypes.SCOUT, staticGame, staticPlayer, coordinates[x], coordinates[y] ) );
-            }
-        }
-        for (int x = 0; x < coordinates.length; ++x) {
-            for (int y = 0; y < coordinates.length; ++y) {
-                createUnit( UnitTypes.SCOUT, staticGame, otherPlayer, coordinates[x] + 5, coordinates[y] + 5 );
-            }
-        }
+        for (final int x : coordinates)
+            for (final int y : coordinates)
+                gameObjectsBuilder.add( createUnit( UnitTypes.SCOUT, staticGame, staticPlayer, x, y ) );
+        for (final int x : coordinates)
+            for (final int y : coordinates)
+                createUnit( UnitTypes.SCOUT, staticGame, otherPlayer, x + 5, y + 5 );
 
         long startNanos = System.nanoTime();
         staticGame.getController().setReady();
@@ -52,7 +48,7 @@ public class BigGameTest extends AbstractTest {
             GameObject gameObject = gameObjects.get( i );
             logger.dbg( "Moving gameObject %d / %d (%d%%)", i,   gameObjects.size(), i * 100 / gameObjects.size() );
             gameObject.onModule( PublicModuleType.MOBILITY, 0 )
-                      .movement( gameObject.getLocation().get().neighbour( Side.E ).get() )
+                      .movement( gameObject.getLocation().neighbour( Side.E ).get() )
                       .execute();
         }
         logger.inf( "Movement took %dns", System.nanoTime() - startNanos );

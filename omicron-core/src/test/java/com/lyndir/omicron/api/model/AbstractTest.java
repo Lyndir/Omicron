@@ -134,8 +134,8 @@ public abstract class AbstractTest {
     }
 
     protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final Tile tile) {
-        GameObject gameObject = new GameObject( unitType, game, player );
-        tile.setContents( gameObject );
+        GameObject gameObject = new GameObject( unitType, game, player, tile );
+        gameObject.register();
 
         return gameObject;
     }

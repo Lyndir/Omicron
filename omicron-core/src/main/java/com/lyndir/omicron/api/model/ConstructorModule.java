@@ -108,11 +108,8 @@ public class ConstructorModule extends Module implements IConstructorModule {
                 @Nonnull
                 @Override
                 public Iterable<GameObject> apply(@Nonnull final GameObject gameObject) {
-                    Optional<Tile> location = gameObject.getLocation();
-                    if (!location.isPresent())
-                        return ImmutableList.of();
-
-                    return FluentIterable.from( location.get().neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
+                    Tile location = gameObject.getLocation();
+                    return FluentIterable.from( location.neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
                         @Nullable
                         @Override
                         public GameObject apply(@Nonnull final Tile gameObject_) {
@@ -216,14 +213,14 @@ public class ConstructorModule extends Module implements IConstructorModule {
     @Authenticated
     public ConstructionSite schedule(final IUnitType unitType, final ITile location)
             throws Security.NotAuthenticatedException, InaccessibleException, IncompatibleLevelException, OutOfRangeException {
-        Optional<Tile> ownLocation = getGameObject().getLocation();
+        Tile ownLocation = getGameObject().getLocation();
         assertState( location.checkAccessible(), InaccessibleException.class );
-        assertState( ownLocation.isPresent(), OutOfRangeException.class );
-        assertState( location.getLevel().equals( ownLocation.get().getLevel() ), IncompatibleLevelException.class );
-        assertState( location.getPosition().distanceTo( ownLocation.get().getPosition() ) == 1, OutOfRangeException.class );
+        assertState( location.getLevel().equals( ownLocation.getLevel() ), IncompatibleLevelException.class );
+        assertState( location.getPosition().distanceTo( ownLocation.getPosition() ) == 1, OutOfRangeException.class );
 
-        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().checkOwner().get() );
-        coreT( location ).setContents( site );
+        ConstructionSite site = new ConstructionSite( coreUT( unitType ), getGameObject().getGame(), getGameObject().checkOwner().get(),
+                                                      coreT( location ) );
+        site.register();
         setTarget( site );
 
         return site;
@@ -241,8 +238,9 @@ public class ConstructorModule extends Module implements IConstructorModule {
                 Maps.<PublicModuleType<?>, Integer>newHashMap() );
         private final List<? extends Module> constructionModules;
 
-        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner) {
-            super( UnitTypes.CONSTRUCTION, game, owner );
+        private ConstructionSite(@Nonnull final UnitType constructionUnitType, @Nonnull final Game game, @Nonnull final Player owner,
+                                 final Tile location) {
+            super( UnitTypes.CONSTRUCTION, game, owner, location );
 
             this.constructionUnitType = constructionUnitType;
             constructionModules = constructionUnitType.createModules();
@@ -329,30 +327,23 @@ public class ConstructorModule extends Module implements IConstructorModule {
                         @Nonnull
                         @Override
                         public Iterable<GameObject> apply(@Nonnull final GameObject neighbourInput) {
-                            Optional<Tile> location = neighbourInput.getLocation();
-                            if (!location.isPresent())
-                                return ImmutableList.of();
+                            Tile location = neighbourInput.getLocation();
+                            return FluentIterable.from( location.neighbours() ).transform( new NFunctionNN<Tile, GameObject>() {
+                                @Nullable
+                                @Override
+                                public GameObject apply(@Nonnull final Tile tile) {
+                                    Optional<GameObject> contents = tile.getContents();
+                                    if (contents.isPresent()) {
+                                        for (final ConstructorModule module : contents.get().getModules( ModuleType.CONSTRUCTOR )) {
+                                            if (ObjectUtils.isEqual( neighbourInput, module.getTarget() )) {
+                                                return contents.get();
+                                            }
+                                        }
+                                    }
 
-                            return FluentIterable.from( location.get().neighbours() )
-                                                 .transform( new NFunctionNN<Tile, GameObject>() {
-                                                     @Nullable
-                                                     @Override
-                                                     public GameObject apply(@Nonnull final Tile tile) {
-                                                         Optional<GameObject> contents = tile.getContents();
-                                                         if (contents.isPresent()) {
-                                                             for (final ConstructorModule module : contents.get()
-                                                                                                           .getModules(
-                                                                                                                   ModuleType.CONSTRUCTOR )) {
-                                                                 if (ObjectUtils.isEqual( neighbourInput, module.getTarget() )) {
-                                                                     return contents.get();
-                                                                 }
-                                                             }
-                                                         }
-
-                                                         return null;
-                                                     }
-                                                 } )
-                                                 .filter( Predicates.notNull() );
+                                    return null;
+                                }
+                            } ).filter( Predicates.notNull() );
                         }
                     };
 
@@ -378,7 +369,7 @@ public class ConstructorModule extends Module implements IConstructorModule {
                             }
                         } ).isEmpty())
                             // No more work remaining; create the constructed unit.
-                            replaceWith( new GameObject( constructionUnitType, getGame(), getOwner().get() ) );
+                            replaceWith( new GameObject( constructionUnitType, getGame(), getOwner().get(), getLocation() ) );
                     }
                 }
             };
