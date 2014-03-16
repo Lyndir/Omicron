@@ -5,6 +5,7 @@ import static com.lyndir.omicron.api.model.Security.currentPlayer;
 
 import com.google.common.base.*;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.hash.*;
 import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.Authenticated;
 import com.lyndir.omicron.api.ChangeInt;
@@ -42,7 +43,7 @@ public class Player extends MetaObject implements IPlayer {
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
     private int score;
     @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private int nextObjectID;
+    private int nextObjectSeed;
 
     public Player(final int playerID, @Nullable final PlayerKey key, final String name, final Color primaryColor,
                   final Color secondaryColor) {
@@ -141,7 +142,7 @@ public class Player extends MetaObject implements IPlayer {
     }
 
     int nextObjectID() {
-        return nextObjectID++;
+        return Hashing.murmur3_32().newHasher().putInt( playerID ).putInt( nextObjectSeed++ ).hash().asInt();
     }
 
     @Nonnull
