@@ -46,7 +46,7 @@ public class GameBuilderResource {
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED })
     public Response post(final GameBuilderRequest input) {
-        long gameBuilderID = stateManager.addGameBuilder( Director.DIRECTOR.gameBuilder() );
+        long gameBuilderID = stateManager.addGameBuilder( Director.CORE_DIRECTOR.gameBuilder() );
 
         // Handle.
         input.handle( Preconditions.checkNotNull( stateManager.getGameBuilder( gameBuilderID ) ), sessionManager.getUser() );

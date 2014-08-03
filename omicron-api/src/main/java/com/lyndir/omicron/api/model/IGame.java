@@ -123,8 +123,8 @@ public interface IGame {
         BASIC;
 
         public GameUnitConfig get() {
-            return (GameUnitConfig) EnumUtils.unsafeEnumNamed( TypeUtils.loadClass( "com.lyndir.omicron.api.model.Game.GameUnitConfigs" ),
-                                                               name() );
+            return (GameUnitConfig) EnumUtils.unsafeEnumNamed(
+                    TypeUtils.loadClass( "com.lyndir.omicron.api.model.Game.GameUnitConfigs" ).get(), name() );
         }
     }
 }

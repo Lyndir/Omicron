@@ -104,7 +104,7 @@ public class Tile extends MetaObject implements ITile {
         replaceContents( contents );
     }
 
-    void replaceContents(@Nullable final GameObject contents) {
+    void replaceContents(@SuppressWarnings("ParameterHidesMemberVariable") @Nullable final GameObject contents) {
         Change.From<IGameObject> contentsChange = Change.<IGameObject>from( this.contents );
 
         this.contents = contents;

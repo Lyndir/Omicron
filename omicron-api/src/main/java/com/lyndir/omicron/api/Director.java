@@ -9,7 +9,8 @@ import com.lyndir.omicron.api.model.IGame;
  */
 public interface Director {
 
-    Director DIRECTOR = TypeUtils.newInstance( "com.lyndir.omicron.api.DirectorImpl" );
+    Director CORE_DIRECTOR = TypeUtils.<Director>newInstance( "com.lyndir.omicron.api.CoreDirector" ).get();
+    Director REST_DIRECTOR = TypeUtils.<Director>newInstance( "com.lyndir.omicron.api.RESTDirector" ).get();
 
     IGame.IBuilder gameBuilder();
 }

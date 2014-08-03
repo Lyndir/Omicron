@@ -41,7 +41,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     @Nullable
     public User findUser(final String emailAddress) {
-        return Iterables.getFirst( db.createQuery( "SELECT u FROM LLEmailAddress e JOIN e.user u " + //
+        return Iterables.getFirst( db.createQuery( "SELECT u FROM OEmailAddress e JOIN e.user u " + //
                                                    "WHERE u.mode = :mode AND e.address = :emailAddress", User.class )
                                      .setParameter( "emailAddress", emailAddress )
                                      .getResultList(), null );
@@ -50,6 +50,6 @@ public class UserDAOImpl implements UserDAO {
     @Nonnull
     @Override
     public List<User> listUsers() {
-        return db.createQuery( "SELECT u FROM LLUser u", User.class ).getResultList();
+        return db.createQuery( "SELECT u FROM OUser u", User.class ).getResultList();
     }
 }

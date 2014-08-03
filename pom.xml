@@ -46,6 +46,7 @@
         <module>omicron-api</module>
         <module>omicron-core</module>
         <module>omicron-cli</module>
+        <module>omicron-protobuf</module>
         <module>omicron-web</module>
     </modules>
 

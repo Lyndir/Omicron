@@ -1,6 +1,7 @@
 package com.lyndir.omicron.webapp.data.service;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.*;
 import com.lyndir.omicron.api.model.IGame;
 import java.net.URI;
@@ -27,7 +28,7 @@ public class StateManager {
 
     @Nonnull
     public IGame getGame(final long gameID) {
-        return Preconditions.checkNotNull( findGame( gameID ), "Game not found: %s", gameID );
+        return Verify.verifyNotNull( findGame( gameID ), "Game not found: %s", gameID );
     }
 
     @Nullable
@@ -41,7 +42,7 @@ public class StateManager {
 
     @Nonnull
     public IGame.IBuilder getGameBuilder(final long gameBuilderID) {
-        return Preconditions.checkNotNull( findGameBuilder( gameBuilderID ), "Game builder not found: %s", gameBuilderID );
+        return Verify.verifyNotNull( findGameBuilder( gameBuilderID ), "Game builder not found: %s", gameBuilderID );
     }
 
     @Nullable
