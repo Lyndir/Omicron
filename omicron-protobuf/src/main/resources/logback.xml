@@ -1,0 +1,16 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%-4relative | %15c{0}@%-5thread | %-5level | %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <logger name="com.lyndir" level="INFO" />
+    <logger name="com.lyndir.omicron" level="DEBUG" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>
