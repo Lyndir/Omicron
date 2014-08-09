@@ -4,7 +4,7 @@ import static com.lyndir.lhunath.opal.system.util.StringUtils.*;
 
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.system.util.URLUtils;
-import com.lyndir.omicron.api.model.Color;
+import com.lyndir.omicron.api.core.Color;
 import com.lyndir.omicron.webapp.data.User;
 import com.lyndir.omicron.webapp.data.service.EmailAddressUnavailableException;
 import com.lyndir.omicron.webapp.data.service.UserDAO;

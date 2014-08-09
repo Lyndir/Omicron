@@ -30,7 +30,7 @@ import com.lyndir.lhunath.opal.math.*;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import com.lyndir.omicron.api.GameListener;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Map;

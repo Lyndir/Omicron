@@ -17,7 +17,7 @@
 package com.lyndir.omicron.api;
 
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import java.util.Collection;
 import java.util.List;
 

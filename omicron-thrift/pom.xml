@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PROJECT METADATA -->
+    <parent>
+        <groupId>com.lyndir.lhunath.omicron</groupId>
+        <artifactId>omicron</artifactId>
+        <version>GIT-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>omicron-thrift</artifactId>
+    <version>GIT-SNAPSHOT</version>
+
+    <name>Omicron Thrift API</name>
+    <description>
+        A thrift interface to the Omicron core.
+    </description>
+
+
+    <!-- BUILD CONFIGURATION -->
+    <build>
+        <plugins>
+            <!--plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+
+                <configuration>
+                    <compilerId>javac</compilerId>
+                </configuration>
+            </plugin-->
+            <plugin>
+                <groupId>org.apache.thrift.tools</groupId>
+                <artifactId>maven-thrift-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- DEPENDENCY MANAGEMENT -->
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lyndir.lhunath.omicron</groupId>
+            <artifactId>omicron-api</artifactId>
+            <version>GIT-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+</project>
+

@@ -16,7 +16,7 @@
 
 package com.lyndir.omicron.api;
 
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import javax.annotation.Nullable;
 
 

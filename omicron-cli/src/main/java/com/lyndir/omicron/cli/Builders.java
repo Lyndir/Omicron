@@ -1,6 +1,6 @@
 package com.lyndir.omicron.cli;
 
-import com.lyndir.omicron.api.model.IGame;
+import com.lyndir.omicron.api.core.IGame;
 import javax.annotation.Nullable;
 
 

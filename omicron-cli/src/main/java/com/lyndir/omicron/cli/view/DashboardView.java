@@ -17,7 +17,7 @@
 package com.lyndir.omicron.cli.view;
 
 import com.lyndir.lanterna.view.TitledView;
-import com.lyndir.omicron.api.model.LevelType;
+import com.lyndir.omicron.api.core.LevelType;
 
 
 /**

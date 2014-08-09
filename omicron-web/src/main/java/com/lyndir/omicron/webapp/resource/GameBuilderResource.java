@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.omicron.api.Director;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import com.lyndir.omicron.webapp.data.User;
 import com.lyndir.omicron.webapp.data.service.*;
 import edu.umd.cs.findbugs.annotations.*;

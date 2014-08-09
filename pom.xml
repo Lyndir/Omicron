@@ -46,7 +46,7 @@
         <module>omicron-api</module>
         <module>omicron-core</module>
         <module>omicron-cli</module>
-        <module>omicron-protobuf</module>
+        <module>omicron-thrift</module>
         <module>omicron-web</module>
     </modules>
 
@@ -58,8 +58,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
 
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

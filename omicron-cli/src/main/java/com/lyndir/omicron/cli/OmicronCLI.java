@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lanterna.view.OmicronWindow;
 import com.lyndir.omicron.api.GameListener;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import java.util.*;
 import javax.annotation.Nonnull;
 

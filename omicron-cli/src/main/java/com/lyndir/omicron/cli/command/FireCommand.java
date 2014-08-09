@@ -7,7 +7,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;

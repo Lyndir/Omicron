@@ -1,9 +1,8 @@
 package com.lyndir.omicron.webapp.data.service;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.collect.*;
-import com.lyndir.omicron.api.model.IGame;
+import com.lyndir.omicron.api.core.IGame;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Map;

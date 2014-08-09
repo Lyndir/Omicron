@@ -3,7 +3,7 @@ package com.lyndir.omicron.cli.command;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.omicron.api.model.*;
+import com.lyndir.omicron.api.core.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 

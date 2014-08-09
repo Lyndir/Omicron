@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="style.css" rel="stylesheet" type="text/css"/>
+<title>Thrift module: omicron-client</title></head><body>
+<div class="container-fluid">
+<h1>Thrift module: omicron-client</h1>
+<table class="table-bordered table-striped table-condensed"><thead><th>Module</th><th>Services</th><th>Data types</th><th>Constants</th></thead>
+<tr>
+<td>omicron-client</td><td></td>
+<td><a href="#Struct_BaseModule">BaseModule</a><br/>
+<a href="#Struct_Color">Color</a><br/>
+<a href="#Struct_ConstructorModule">ConstructorModule</a><br/>
+<a href="#Struct_ContainerModule">ContainerModule</a><br/>
+<a href="#Struct_ExtractorModule">ExtractorModule</a><br/>
+<a href="#Struct_Game">Game</a><br/>
+<a href="#Struct_GameObject">GameObject</a><br/>
+<a href="#Struct_Level">Level</a><br/>
+<a href="#Enum_LevelType">LevelType</a><br/>
+<a href="#Struct_MobilityModule">MobilityModule</a><br/>
+<a href="#Struct_Module">Module</a><br/>
+<a href="#Enum_ModuleType">ModuleType</a><br/>
+<a href="#Struct_Player">Player</a><br/>
+<a href="#Struct_ResourceCost">ResourceCost</a><br/>
+<a href="#Enum_ResourceType">ResourceType</a><br/>
+<a href="#Struct_Size">Size</a><br/>
+<a href="#Struct_Tile">Tile</a><br/>
+<a href="#Struct_Turn">Turn</a><br/>
+<a href="#Enum_UnitType">UnitType</a><br/>
+<a href="#Struct_Vec2">Vec2</a><br/>
+<a href="#Enum_VictoryConditionType">VictoryConditionType</a><br/>
+<a href="#Struct_WeaponModule">WeaponModule</a><br/>
+</td>
+<td></code></td>
+</tr></table>
+<hr/><h2 id="Enumerations">Enumerations</h2>
+<div class="definition"><h3 id="Enum_UnitType">Enumeration: UnitType</h3>
+<br/><table class="table-bordered table-striped table-condensed">
+<tr><td><code>U_ENGINEER</code></td><td><code>1</code></td><td>
+</td></tr>
+<tr><td><code>U_SCOUT</code></td><td><code>2</code></td><td>
+</td></tr>
+<tr><td><code>U_AIRSHIP</code></td><td><code>3</code></td><td>
+</td></tr>
+<tr><td><code>U_CONTAINER</code></td><td><code>4</code></td><td>
+</td></tr>
+<tr><td><code>U_QUARRY</code></td><td><code>5</code></td><td>
+</td></tr>
+<tr><td><code>U_DRILL</code></td><td><code>6</code></td><td>
+</td></tr>
+<tr><td><code>U_CONSTRUCTION</code></td><td><code>7</code></td><td>
+</td></tr>
+</table></div>
+<div class="definition"><h3 id="Enum_VictoryConditionType">Enumeration: VictoryConditionType</h3>
+<br/><table class="table-bordered table-striped table-condensed">
+<tr><td><code>VC_SUPREMACY</code></td><td><code>1</code></td><td>
+</td></tr>
+<tr><td><code>VC_MIGRATION</code></td><td><code>2</code></td><td>
+</td></tr>
+<tr><td><code>VC_MIGHT</code></td><td><code>3</code></td><td>
+</td></tr>
+<tr><td><code>VC_CAPTURE</code></td><td><code>4</code></td><td>
+</td></tr>
+</table></div>
+<div class="definition"><h3 id="Enum_ModuleType">Enumeration: ModuleType</h3>
+<br/><table class="table-bordered table-striped table-condensed">
+<tr><td><code>M_BASE</code></td><td><code>1</code></td><td>
+</td></tr>
+<tr><td><code>M_MOBILITY</code></td><td><code>2</code></td><td>
+</td></tr>
+<tr><td><code>M_CONTAINER</code></td><td><code>3</code></td><td>
+</td></tr>
+<tr><td><code>M_EXTRACTOR</code></td><td><code>4</code></td><td>
+</td></tr>
+<tr><td><code>M_CONSTRUCTOR</code></td><td><code>5</code></td><td>
+</td></tr>
+<tr><td><code>M_WEAPON</code></td><td><code>6</code></td><td>
+</td></tr>
+</table></div>
+<div class="definition"><h3 id="Enum_ResourceType">Enumeration: ResourceType</h3>
+<br/><table class="table-bordered table-striped table-condensed">
+<tr><td><code>R_FUEL</code></td><td><code>0</code></td><td>
+</td></tr>
+<tr><td><code>R_METALS</code></td><td><code>1</code></td><td>
+</td></tr>
+<tr><td><code>R_SILICON</code></td><td><code>2</code></td><td>
+</td></tr>
+<tr><td><code>R_RARE_ELEMENTS</code></td><td><code>3</code></td><td>
+</td></tr>
+</table></div>
+<div class="definition"><h3 id="Enum_LevelType">Enumeration: LevelType</h3>
+<br/><table class="table-bordered table-striped table-condensed">
+<tr><td><code>L_GROUND</code></td><td><code>1</code></td><td>
+</td></tr>
+<tr><td><code>L_SKY</code></td><td><code>2</code></td><td>
+</td></tr>
+<tr><td><code>L_SPACE</code></td><td><code>3</code></td><td>
+</td></tr>
+</table></div>
+<hr/><h2 id="Structs">Data structures</h2>
+<div class="definition"><h3 id="Struct_Color">Struct: Color</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>red</td><td><code>byte</code></td><td>The 1-byte red component of this RGB color.<br/></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>green</td><td><code>byte</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>blue</td><td><code>byte</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Vec2">Struct: Vec2</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>x</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>y</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Size">Struct: Size</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>width</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>height</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Turn">Struct: Turn</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>number</td><td><code>i32</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Tile">Struct: Tile</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>2</td><td>position</td><td><code><a href="omicron-client.html#Struct_Vec2">Vec2</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>resourceQuantities</td><td><code>map&lt;<code><a href="omicron-client.html#Enum_ResourceType">ResourceType</a></code>, <code>i16</code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Level">Struct: Level</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>size</td><td><code><a href="omicron-client.html#Struct_Size">Size</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>type</td><td><code><a href="omicron-client.html#Enum_LevelType">LevelType</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>tileMap</td><td><code>map&lt;<code><a href="omicron-client.html#Struct_Vec2">Vec2</a></code>, <code><a href="omicron-client.html#Struct_Tile">Tile</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_ResourceCost">Struct: ResourceCost</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>resourceQuantities</td><td><code>map&lt;<code><a href="omicron-client.html#Enum_ResourceType">ResourceType</a></code>, <code>i16</code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Module">Struct: Module</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>resourceCost</td><td><code><a href="omicron-client.html#Struct_ResourceCost">ResourceCost</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>type</td><td><code><a href="omicron-client.html#Enum_ModuleType">ModuleType</a></code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_GameObject">Struct: GameObject</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>unitType</td><td><code><a href="omicron-client.html#Enum_UnitType">UnitType</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>objectID</td><td><code>i64</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>modules</td><td><code>map&lt;<code><a href="omicron-client.html#Enum_ModuleType">ModuleType</a></code>, <code><a href="omicron-client.html#Struct_Module">Module</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>6</td><td>location</td><td><code><a href="omicron-client.html#Struct_Tile">Tile</a></code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Player">Struct: Player</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>playerID</td><td><code>i32</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>name</td><td><code>string</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>primaryColor</td><td><code><a href="omicron-client.html#Struct_Color">Color</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>secondaryColor</td><td><code><a href="omicron-client.html#Struct_Color">Color</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>5</td><td>objects</td><td><code>map&lt;<code>i64</code>, <code><a href="omicron-client.html#Struct_GameObject">GameObject</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>6</td><td>score</td><td><code>i32</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_Game">Struct: Game</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>1</td><td>turns</td><td><code>list&lt;<code><a href="omicron-client.html#Struct_Turn">Turn</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>2</td><td>levelSize</td><td><code><a href="omicron-client.html#Struct_Size">Size</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>levels</td><td><code>list&lt;<code><a href="omicron-client.html#Struct_Level">Level</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>4</td><td>players</td><td><code>list&lt;<code><a href="omicron-client.html#Struct_Player">Player</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>5</td><td>readyPlayers</td><td><code>set&lt;<code><a href="omicron-client.html#Struct_Player">Player</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>6</td><td>running</td><td><code>bool</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_BaseModule">Struct: BaseModule</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>255</td><td>zuper</td><td><code><a href="omicron-client.html#Struct_Module">Module</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>1</td><td>maxHealth</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>armor</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>viewRange</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>supportedLayers</td><td><code>set&lt;<code><a href="omicron-client.html#Enum_LevelType">LevelType</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>5</td><td>damage</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_MobilityModule">Struct: MobilityModule</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>255</td><td>zuper</td><td><code><a href="omicron-client.html#Struct_Module">Module</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>1</td><td>movementSpeed</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>movementCost</td><td><code>map&lt;<code><a href="omicron-client.html#Enum_LevelType">LevelType</a></code>, <code>double</code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>3</td><td>levelingCost</td><td><code>map&lt;<code><a href="omicron-client.html#Enum_LevelType">LevelType</a></code>, <code>double</code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>4</td><td>remainingSpeed</td><td><code>double</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_ContainerModule">Struct: ContainerModule</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>255</td><td>zuper</td><td><code><a href="omicron-client.html#Struct_Module">Module</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>1</td><td>resourceType</td><td><code><a href="omicron-client.html#Enum_ResourceType">ResourceType</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>capacity</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>stock</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_ExtractorModule">Struct: ExtractorModule</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>255</td><td>zuper</td><td><code><a href="omicron-client.html#Struct_Module">Module</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>1</td><td>resourceType</td><td><code><a href="omicron-client.html#Enum_ResourceType">ResourceType</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>speed</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_ConstructorModule">Struct: ConstructorModule</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>255</td><td>zuper</td><td><code><a href="omicron-client.html#Struct_Module">Module</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>1</td><td>buildSpeed</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>buildsModule</td><td><code><a href="omicron-client.html#Enum_ModuleType">ModuleType</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>resourceConstrained</td><td><code>bool</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>remainingSpeed</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>5</td><td>target</td><td><code><a href="omicron-client.html#Struct_GameObject">GameObject</a></code></td><td></td><td>optional</td><td></td></tr>
+</table><br/></div><div class="definition"><h3 id="Struct_WeaponModule">Struct: WeaponModule</h3>
+<table class="table-bordered table-striped table-condensed"><thead><th>Key</th><th>Field</th><th>Type</th><th>Description</th><th>Requiredness</th><th>Default value</th></thead>
+<tr><td>255</td><td>zuper</td><td><code><a href="omicron-client.html#Struct_Module">Module</a></code></td><td></td><td>required</td><td></td></tr>
+<tr><td>1</td><td>firePower</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>2</td><td>variance</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>3</td><td>range</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>4</td><td>repeat</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>5</td><td>ammunitionLoad</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>6</td><td>supportedLayers</td><td><code>set&lt;<code><a href="omicron-client.html#Enum_LevelType">LevelType</a></code>&gt;</code></td><td></td><td>default</td><td></td></tr>
+<tr><td>7</td><td>repeated</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+<tr><td>8</td><td>ammunition</td><td><code>i16</code></td><td></td><td>required</td><td></td></tr>
+</table><br/></div></div></body></html>
