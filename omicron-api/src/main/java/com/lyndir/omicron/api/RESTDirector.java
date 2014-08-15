@@ -17,7 +17,6 @@
 package com.lyndir.omicron.api;
 
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.omicron.api.core.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,104 +28,6 @@ public class RESTDirector implements Director {
 
     @Override
     public IGame.IBuilder gameBuilder() {
-        return new IGame.IBuilder() {
-            @Override
-            public IGame build()
-                    throws Security.NotAuthenticatedException {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public Size getLevelSize() {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder setLevelSize(final Size levelSize) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public Collection<IPlayer> getPlayers() {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder setPlayer(final PlayerKey playerKey, final String name, final Color primaryColor,
-                                            final Color secondaryColor) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder addPlayer(final IPlayer player) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public List<PublicVictoryConditionType> getVictoryConditions() {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder addVictoryCondition(final PublicVictoryConditionType victoryCondition) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public Integer getTotalPlayers() {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder setTotalPlayers(final Integer totalPlayers) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder addGameListener(final GameListener gameListener) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.GameResourceConfig getResourceConfig() {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder setResourceConfig(final IGame.GameResourceConfig resourceConfig) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.GameUnitConfig getUnitConfig() {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public IGame.IBuilder setUnitConfig(final IGame.GameUnitConfig unitConfig) {
-                // TODO
-                return null;
-            }
-
-            @Override
-            public int nextPlayerID() {
-                // TODO
-                return 0;
-            }
-        };
+        return null;
     }
 }

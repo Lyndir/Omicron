@@ -14,16 +14,14 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api;
 
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.*;
-import com.lyndir.omicron.api.core.ILevel;
-import com.lyndir.omicron.api.core.LevelType;
-import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
@@ -33,82 +31,32 @@ import javax.annotation.Nullable;
  *
  * @author lhunath
  */
-public class Level extends MetaObject implements ILevel {
+public class Level extends ThriftObject<com.lyndir.omicron.api.thrift.Level> implements ILevel {
 
-    @ObjectMeta(ignoreFor = ObjectMeta.For.toString)
-    private final Size                                  size;
-    private final com.lyndir.omicron.api.core.LevelType type;
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final Game                                  game;
-
-    @ObjectMeta(ignoreFor = ObjectMeta.For.all)
-    private final ImmutableMap<Vec2, Tile> tileMap;
-
-    Level(final Size size, final com.lyndir.omicron.api.core.LevelType type, final Game game) {
-        this.size = size;
-        this.type = type;
-        this.game = game;
-
-        ImmutableMap.Builder<Vec2, Tile> tileMapBuilder = ImmutableMap.builder();
-        for (int x = 0; x < size.getWidth(); ++x)
-            for (int y = 0; y < size.getHeight(); ++y) {
-                Vec2 coordinate = Vec2.create( x, y );
-                tileMapBuilder.put( coordinate, new Tile( coordinate, this ) );
-            }
-        tileMap = tileMapBuilder.build();
+    public Level(final com.lyndir.omicron.api.thrift.Level thrift) {
+        super( thrift );
     }
 
     @Override
     public Size getSize() {
-        return size;
+        return cast( thrift().getSize() );
     }
 
     @Override
     public LevelType getType() {
-        return type;
+        return cast( thrift().getType() );
     }
 
     @Override
-    public Game getGame() {
-        return game;
-    }
-
-    @Override
-    public Map<Vec2, Tile> getTiles() {
-        return tileMap;
-    }
-
-    /**
-     * Get the tile at the given position in this level.
-     *
-     * @param position The position of the tile to get.
-     *
-     * @return {@code null} if the position is outside of the bounds of this level.
-     */
-    @Override
-    public Optional<Tile> getTile(final Vec2 position) {
-        if (!size.isInBounds( position ))
-            return Optional.absent();
-
-        return Optional.of( tileMap.get( position ) );
-    }
-
-    /**
-     * Get the tile at the given position in this level.
-     *
-     * @param x The x coordinate of the position of the tile to get.
-     * @param y The y coordinate of the position of the tile to get.
-     *
-     * @return {@code null} if the position is outside of the bounds of this level.
-     */
-    @Override
-    public Optional<Tile> getTile(final int x, final int y) {
-        return getTile( Vec2.create( x, y ) );
+    public ImmutableMap<Vec2, ? extends ITile> getTilesByPosition() {
+        ImmutableMap.Builder<Vec2, ITile> builder = ImmutableBiMap.builder();
+        thrift().getTilesByPosition().forEach( (position, tile) -> builder.put( cast( position ), new Tile( tile ) ) );
+        return builder.build();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash( size, type );
+        return Objects.hash( getSize(), getType() );
     }
 
     @Override
@@ -119,6 +67,6 @@ public class Level extends MetaObject implements ILevel {
             return false;
 
         Level o = (Level) obj;
-        return ObjectUtils.isEqual( size, o.size ) && ObjectUtils.isEqual( type, o.type );
+        return ObjectUtils.isEqual( getSize(), o.getSize() ) && ObjectUtils.isEqual( getType(), o.getType() );
     }
 }

@@ -1,11 +1,12 @@
 package com.lyndir.omicron.cli.command;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.IGameController;
+import com.lyndir.omicron.api.IPlayer;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
+import java.util.Optional;
 
 
 /**
@@ -40,6 +41,7 @@ public class EndCommand extends Command {
             inf( "%s ready.  New turn started.", localPlayer.getName() );
         else
             inf( "%s ready.  Not yet ready: %s", localPlayer.getName(),
-                 Sets.difference( ImmutableSet.copyOf( gameController.get().listPlayers() ), gameController.get().listReadyPlayers() ) );
+                 Sets.difference( ImmutableSet.copyOf( gameController.get().getGame().getPlayers() ),
+                                  gameController.get().getGame().getReadyPlayers() ) );
     }
 }

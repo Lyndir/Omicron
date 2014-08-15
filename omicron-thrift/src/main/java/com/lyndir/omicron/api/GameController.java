@@ -18,7 +18,7 @@ package com.lyndir.omicron.api;
 
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.system.error.TodoException;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.error.NotAuthenticatedException;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 
 
@@ -36,41 +36,25 @@ public class GameController implements IGameController {
     }
 
     @Override
-    public void addGameListener(final GameListener gameListener)
-            throws Security.NotAuthenticatedException {
+    public void addGameListener(final GameListener gameListener) {
         throw new TodoException();
     }
 
     @Override
     public PlayerGameInfo getPlayerGameInfo(final IPlayer player)
-            throws Security.NotAuthenticatedException {
+            throws NotAuthenticatedException {
         throw new TodoException();
     }
 
     @Override
     public ImmutableCollection<PlayerGameInfo> listPlayerGameInfo()
-            throws Security.NotAuthenticatedException {
-        throw new TodoException();
-    }
-
-    @Override
-    public Iterable<? extends IPlayer> listPlayers() {
+            throws NotAuthenticatedException {
         throw new TodoException();
     }
 
     @Override
     public boolean setReady()
-            throws Security.NotAuthenticatedException {
-        throw new TodoException();
-    }
-
-    @Override
-    public ImmutableList<? extends ILevel> listLevels() {
-        throw new TodoException();
-    }
-
-    @Override
-    public ImmutableSet<? extends IPlayer> listReadyPlayers() {
+            throws NotAuthenticatedException {
         throw new TodoException();
     }
 }

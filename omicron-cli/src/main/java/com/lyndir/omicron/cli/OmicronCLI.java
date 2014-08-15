@@ -1,10 +1,8 @@
 package com.lyndir.omicron.cli;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.lyndir.lanterna.view.OmicronWindow;
-import com.lyndir.omicron.api.GameListener;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import java.util.*;
 import javax.annotation.Nonnull;
 
@@ -53,7 +51,7 @@ public class OmicronCLI {
 
     public Optional<IGameController> getGameController() {
 
-        return Optional.fromNullable( gameController );
+        return Optional.ofNullable( gameController );
     }
 
     public void setGameController(@Nonnull final IGameController gameController) {
@@ -67,7 +65,7 @@ public class OmicronCLI {
 
     public Optional<IPlayer> getLocalPlayer() {
 
-        return Optional.fromNullable( localPlayer );
+        return Optional.ofNullable( localPlayer );
     }
 
     public void setLocalPlayer(final IPlayer localPlayer) {

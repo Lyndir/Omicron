@@ -40,7 +40,7 @@ public class OmicronWindow extends Window {
         super.onReady();
 
         new BuildCommand( OmicronCLI.get() ).game( ImmutableList.<String>of().iterator() );
-        new AddGameCommand( OmicronCLI.get() ).player( ImmutableList.of( "Simon,red,red" ).iterator() );
+        new AddGameCommand( OmicronCLI.get() ).player( ImmutableList.of( "lhunath,green,gold" ).iterator() );
         new CreateCommand( OmicronCLI.get() ).game( ImmutableList.<String>of().iterator() );
     }
 

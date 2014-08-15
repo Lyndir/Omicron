@@ -4,7 +4,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.webapp.data.service.StateManager;
 import edu.umd.cs.findbugs.annotations.*;

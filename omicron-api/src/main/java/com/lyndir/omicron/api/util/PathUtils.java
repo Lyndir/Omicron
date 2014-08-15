@@ -1,11 +1,11 @@
 package com.lyndir.omicron.api.util;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
 import com.lyndir.lhunath.opal.system.util.PredicateNN;
 import java.util.*;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 
 
@@ -24,11 +24,11 @@ public abstract class PathUtils {
      * @param neighboursFunction The function that determines what an object's direct neighbours are.
      * @param <E>                The type of objects we're searching.
      *
-     * @return An optional path to the found object, or absent if no path was found (no neighbours left or all paths too expensive).
+     * @return An optional path to the found object, or empty if no path was found (no neighbours left or all paths too expensive).
      */
-    public static <E> Optional<Path<E>> find(final E root, final PredicateNN<E> foundFunction,
+    public static <E, R extends E> Optional<Path<E>> find(final R root, final PredicateNN<E> foundFunction,
                                              final NNFunctionNN<Step<E>, Double> costFunction, final double maxCost,
-                                             final NNFunctionNN<E, Iterable<E>> neighboursFunction) {
+                                             final NNFunctionNN<E, Stream<? extends E>> neighboursFunction) {
 
         // Test the root.
         if (foundFunction.apply( root )) {
@@ -47,7 +47,9 @@ public abstract class PathUtils {
             Path<E> testPath = testPaths.removeFirst();
 
             // Check each neighbour.
-            for (final E neighbour : neighboursFunction.apply( testPath.getTarget() )) {
+            Iterator<? extends E> neighboursIt = neighboursFunction.apply( testPath.getTarget() ).iterator();
+            while (neighboursIt.hasNext()) {
+                E neighbour = neighboursIt.next();
                 if (!testedNodes.add( neighbour ))
                     // Neighbour was already tested.
                     continue;
@@ -72,7 +74,7 @@ public abstract class PathUtils {
             }
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -87,7 +89,7 @@ public abstract class PathUtils {
      *
      * @return A collection of the object's neighbours.
      */
-    public static <E> Collection<E> neighbours(final E root, final int radius, final NNFunctionNN<E, Iterable<E>> neighboursFunction) {
+    public static <E> Collection<E> neighbours(final E root, final int radius, final NNFunctionNN<E, Iterable<? extends E>> neighboursFunction) {
 
         if (radius == 0)
             return ImmutableSet.of( root );
@@ -131,7 +133,7 @@ public abstract class PathUtils {
         private final double            cost;
 
         Path(final E target, final double cost) {
-            parent = Optional.absent();
+            parent = Optional.empty();
             this.target = target;
             this.cost = cost;
         }

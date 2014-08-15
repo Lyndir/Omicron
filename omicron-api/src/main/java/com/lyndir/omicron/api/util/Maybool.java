@@ -6,55 +6,69 @@ import javax.annotation.Nullable;
 /**
  * @author lhunath, 2013-08-17
  */
-public enum Maybool {
+public interface Maybool {
 
-    YES {
-        @Override
-        public boolean isTrue() {
-            return true;
-        }
+    boolean isTrue();
 
-        @Override
-        public boolean isKnown() {
-            return true;
-        }
-    }, NO {
-        @Override
-        public boolean isTrue() {
-            return false;
-        }
+    boolean isKnown();
 
-        @Override
-        public boolean isKnown() {
-            return true;
-        }
-    }, UNKNOWN {
-        @Override
-        public boolean isTrue() {
-            return false;
-        }
+    static Maybool yes() {
+        return Value.YES;
+    }
 
-        @Override
-        public boolean isKnown() {
-            return false;
-        }
-    };
+    static Maybool no() {
+        return Value.NO;
+    }
 
-    public abstract boolean isTrue();
-
-    public abstract boolean isKnown();
+    static Maybool unknown() {
+        return Value.UNKNOWN;
+    }
 
     /**
      * @return YES if value is true, NO if value is false.
      */
-    public static Maybool from(final boolean value) {
-        return value? YES: NO;
+    static Maybool from(final boolean value) {
+        return value? yes(): no();
     }
 
     /**
      * @return UNKNOWN if value is null, YES if value is true, NO if value is false.
      */
-    public static Maybool fromNullable(@Nullable final Boolean value) {
-        return value == null? UNKNOWN : value? YES: NO;
+    static Maybool fromNullable(@Nullable final Boolean value) {
+        return value == null? unknown(): value? yes(): no();
+    }
+
+    enum Value implements Maybool {
+        YES {
+            @Override
+            public boolean isTrue() {
+                return true;
+            }
+
+            @Override
+            public boolean isKnown() {
+                return true;
+            }
+        }, NO {
+            @Override
+            public boolean isTrue() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnown() {
+                return true;
+            }
+        }, UNKNOWN {
+            @Override
+            public boolean isTrue() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnown() {
+                return false;
+            }
+        }
     }
 }

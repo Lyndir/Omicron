@@ -2,12 +2,11 @@ package com.lyndir.omicron.cli.command;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 
-import com.google.common.base.*;
-import com.google.common.collect.FluentIterable;
+import java.util.Optional;
 import com.google.common.collect.Iterators;
 import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
@@ -78,7 +77,7 @@ public class FireCommand extends Command {
             return;
         }
         IGameObject gameObject = maybeObject.get();
-        ITile location = gameObject.checkLocation().get();
+        ITile location = gameObject.getLocation().get();
 
         String weaponIndexOrLevelArgument = Iterators.getNext( tokens, null );
         Optional<Integer> optionalWeaponIndex = ConversionUtils.toInteger( weaponIndexOrLevelArgument );
@@ -89,13 +88,8 @@ public class FireCommand extends Command {
         }
 
         final String levelArgument = ifNotNullElse( weaponIndexOrLevelArgument, location.getLevel().getType().getName() );
-        Optional<? extends ILevel> level = FluentIterable.from( gameController.get().listLevels() ).firstMatch( new Predicate<ILevel>() {
-            @Override
-            public boolean apply(final ILevel aLevel) {
-
-                return aLevel.getType().getName().equalsIgnoreCase( levelArgument );
-            }
-        } );
+        Optional<? extends ILevel> level = gameController.get().getGame().getLevels().stream().filter(
+                aLevel -> aLevel.getType().getName().equalsIgnoreCase( levelArgument ) ).findFirst();
         if (!level.isPresent()) {
             err( "No such level in this game: %s", levelArgument );
             return;
@@ -122,20 +116,20 @@ public class FireCommand extends Command {
 
         // Fire at the target.
         try {
-            if (!weaponModule.fireAt( target.get() )) {
+            if (!weaponModule.getController().fireAt( target.get() )) {
                 err( "Firing not possible." );
                 return;
             }
 
-            inf( "Fired at: %s", target.get().checkContents() );
+            inf( "Fired at: %s", target.get().getContents() );
         }
-        catch (final IWeaponModule.OutOfRangeException ignored) {
+        catch (final IWeaponModuleController.OutOfRangeException ignored) {
             err( "Couldn't fire, target out of range: %s", target.get() );
         }
-        catch (final IWeaponModule.OutOfRepeatsException ignored) {
+        catch (final IWeaponModuleController.OutOfRepeatsException ignored) {
             err( "Couldn't fire, weapon out of repeats." );
         }
-        catch (final IWeaponModule.OutOfAmmunitionException ignored) {
+        catch (final IWeaponModuleController.OutOfAmmunitionException ignored) {
             err( "Couldn't fire, weapon out of ammunition." );
         }
     }

@@ -14,11 +14,11 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api;
 
+import com.lyndir.lhunath.opal.system.error.TodoException;
 import com.lyndir.lhunath.opal.system.logging.Logger;
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.thrift.ThriftObject;
 import javax.annotation.Nullable;
 
 
@@ -45,16 +45,11 @@ public abstract class Module<T> extends ThriftObject<T> implements IModule {
 
     @Override
     public ImmutableResourceCost getResourceCost() {
-        return new ImmutableResourceCost(thriftModule().getResourceCost());
+        return cast( thriftModule().getResourceCost() );
     }
 
     @Override
     public GameObject getGameObject() {
-        return new GameObject( thriftModule().getGameObject() );
-    }
-
-    @Override
-    public GameController getGameController() {
-        return getGameObject().getGame().getController();
+        throw new TodoException();
     }
 }

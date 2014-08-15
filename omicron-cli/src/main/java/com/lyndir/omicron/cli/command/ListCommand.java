@@ -2,9 +2,8 @@ package com.lyndir.omicron.cli.command;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.ifNotNullElse;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.view.PlayerGameInfo;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
@@ -32,13 +31,7 @@ public class ListCommand extends Command {
         }
 
         List<PlayerGameInfo> playerGameInfos = new LinkedList<>( gameController.get().listPlayerGameInfo() );
-        Collections.sort( playerGameInfos, new Comparator<PlayerGameInfo>() {
-            @Override
-            public int compare(final PlayerGameInfo o1, final PlayerGameInfo o2) {
-
-                return o1.getScore() > o2.getScore()? 1: o1.getScore() < o2.getScore()? -1: 0;
-            }
-        } );
+        Collections.sort( playerGameInfos, (o1, o2) -> o1.getScore() > o2.getScore()? 1: o1.getScore() < o2.getScore()? -1: 0 );
 
         inf( "%20s | %s", "score", "name" );
         for (final PlayerGameInfo playerGameInfo : playerGameInfos)
@@ -63,14 +56,14 @@ public class ListCommand extends Command {
         IPlayer localPlayer = localPlayerOptional.get();
 
         ImmutableList.Builder<IGameObject> gameObjectBuilder = ImmutableList.builder();
-        for (final IPlayer player : gameController.get().listPlayers())
-            gameObjectBuilder.addAll( player.getController().iterateObservableObjects( localPlayer ) );
+        for (final IPlayer player : gameController.get().getGame().getPlayers())
+            gameObjectBuilder.addAll( player.getController().playerObjectsObservableBy( localPlayer ).iterator() );
 
         inf( "%5s | %20s | (%7s: %3s, %3s) | %s", "ID", "player", "type", "x", "y", "type" );
         for (final IGameObject gameObject : gameObjectBuilder.build()) {
-            ITile location = gameObject.checkLocation().get();
+            ITile location = gameObject.getLocation().get();
             inf( "%5s | %20s | (%7s: %3d, %3d) | %s", //
-                 gameObject.getObjectID(), ifNotNullElse( IPlayer.class, gameObject.checkOwner().orNull(), "-" ).getName(),
+                 gameObject.getObjectID(), ifNotNullElse( IPlayer.class, gameObject.getOwner().orElse( null ), "-" ).getName(),
                  location.getLevel().getType().getName(), location.getPosition().getX(), location.getPosition().getY(),
                  gameObject.getType().getTypeName() );
         }

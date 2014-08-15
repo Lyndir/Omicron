@@ -1,6 +1,6 @@
 package com.lyndir.omicron.api.view;
 
-import com.lyndir.omicron.api.core.IPlayer;
+import com.lyndir.omicron.api.IPlayer;
 import java.util.Objects;
 
 

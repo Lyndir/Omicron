@@ -1,7 +1,6 @@
 package com.lyndir.omicron.api;
 
 import com.lyndir.lhunath.opal.system.util.TypeUtils;
-import com.lyndir.omicron.api.core.IGame;
 
 
 /**

@@ -14,9 +14,14 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api;
 
-import com.lyndir.omicron.api.core.*;
+import com.google.common.collect.ImmutableSet;
+import com.lyndir.lhunath.opal.system.error.AlreadyCheckedException;
+import com.lyndir.lhunath.opal.system.error.TodoException;
+import com.lyndir.omicron.api.error.NotAuthenticatedException;
+import com.lyndir.omicron.api.error.NotObservableException;
 
 
 public class ConstructorModule extends Module<com.lyndir.omicron.api.thrift.ConstructorModule> implements IConstructorModule {
@@ -31,8 +36,7 @@ public class ConstructorModule extends Module<com.lyndir.omicron.api.thrift.Cons
     }
 
     @Override
-    public PublicModuleType<?> getBuildsModule()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+    public PublicModuleType<?> getBuildsModule() {
         switch (thrift().getBuildsModule()) {
             case M_BASE:
                 return PublicModuleType.BASE;
@@ -47,29 +51,41 @@ public class ConstructorModule extends Module<com.lyndir.omicron.api.thrift.Cons
             case M_WEAPON:
                 return PublicModuleType.WEAPON;
         }
+
+        throw new AlreadyCheckedException();
     }
 
     @Override
     public int getBuildSpeed()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         return thrift().getBuildSpeed();
     }
 
     @Override
     public boolean isResourceConstrained()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         return thrift().isResourceConstrained();
     }
 
     @Override
     public int getRemainingSpeed()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         return thrift().getRemainingSpeed();
     }
 
     @Override
     public IGameObject getTarget()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
-        return new GameObject(thrift().getTarget());
+            throws NotAuthenticatedException, NotObservableException {
+        return new GameObject( thrift().getTarget() );
+    }
+
+    @Override
+    public ImmutableSet<? extends IUnitType> blueprints() {
+        return ImmutableSet.copyOf( thrift().getBlueprints().stream().map( this::cast ).iterator() );
+    }
+
+    @Override
+    public IConstructorModuleController getController() {
+        throw new TodoException();
     }
 }

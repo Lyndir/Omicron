@@ -16,14 +16,8 @@
 
 package com.lyndir.omicron.api;
 
-import com.google.common.base.Function;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.error.*;
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.core.LevelType;
-import com.lyndir.omicron.api.core.Security.*;
-import com.lyndir.omicron.api.util.Maybool;
-import javax.annotation.Nonnull;
+import com.lyndir.lhunath.opal.system.error.TodoException;
 
 
 public class BaseModule extends Module<com.lyndir.omicron.api.thrift.BaseModule> implements IBaseModule {
@@ -38,52 +32,32 @@ public class BaseModule extends Module<com.lyndir.omicron.api.thrift.BaseModule>
     }
 
     @Override
-    public int getMaxHealth()
-            throws NotAuthenticatedException, NotObservableException {
+    public int getMaxHealth() {
         return thrift().getMaxHealth();
     }
 
     @Override
-    public int getRemainingHealth()
-            throws NotAuthenticatedException, NotObservableException {
-        return Math.max( 0, thrift().getMaxHealth() - thrift().getDamage() );
+    public int getDamage() {
+        return thrift().getDamage();
     }
 
     @Override
-    public int getArmor()
-            throws NotAuthenticatedException, NotObservableException {
+    public int getArmor() {
         return thrift().getArmor();
     }
 
     @Override
-    public int getViewRange()
-            throws NotAuthenticatedException, NotObservableException {
+    public int getViewRange() {
         return thrift().getViewRange();
     }
 
     @Override
-    public ImmutableSet<LevelType> getSupportedLayers()
-            throws NotAuthenticatedException, NotObservableException {
-        return FluentIterable.from(thrift().getSupportedLayers()).transform( new Function<com.lyndir.omicron.api.thrift.LevelType, LevelType>() {
-            @Override
-            public LevelType apply(final com.lyndir.omicron.api.thrift.LevelType input) {
-                return LevelType.values()[input.ordinal()];
-            }
-        } ).toSet();
+    public ImmutableSet<LevelType> getSupportedLayers() {
+        return FluentIterable.from(thrift().getSupportedLayers()).transform( this::cast ).toSet();
     }
 
     @Override
-    public Maybool canObserve(@Nonnull final GameObservable observable)
-            throws NotAuthenticatedException {
-        // TODO
-        throw new TodoException();
-    }
-
-    @Nonnull
-    @Override
-    public Iterable<? extends ITile> iterateObservableTiles()
-            throws NotAuthenticatedException, NotObservableException {
-        // TODO
+    public IBaseModuleController getController() {
         throw new TodoException();
     }
 }

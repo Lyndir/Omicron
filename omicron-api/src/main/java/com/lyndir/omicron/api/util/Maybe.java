@@ -14,11 +14,12 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api.util;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -28,8 +29,8 @@ import javax.annotation.Nullable;
  */
 public abstract class Maybe<T> {
 
-    public static <T> Maybe<T> absent() {
-        return new Absent<>();
+    public static <T> Maybe<T> empty() {
+        return new Empty<>();
     }
 
     public static <T> Maybe<T> unknown() {
@@ -37,17 +38,17 @@ public abstract class Maybe<T> {
     }
 
     /**
-     * @return {@link Presence#ABSENT} if reference is null, otherwise {@link Presence#PRESENT}.
+     * @return {@link Presence#EMPTY} if reference is null, otherwise {@link Presence#PRESENT}.
      */
-    public static <T> Maybe<T> fromNullable(@Nullable final T reference) {
-        return reference == null? Maybe.<T>absent(): new Present<>( reference );
+    public static <T> Maybe<T> ofNullable(@Nullable final T reference) {
+        return reference == null? Maybe.<T>empty(): new Present<>( reference );
     }
 
     /**
-     * @return {@link Presence#ABSENT} if reference is {@link Optional#absent()}, otherwise {@link Presence#PRESENT}.
+     * @return {@link Presence#EMPTY} if reference is {@link Optional#empty()}, otherwise {@link Presence#PRESENT}.
      */
-    public static <T> Maybe<T> fromOptional(final Optional<T> reference) {
-        return reference.isPresent()? new Present<>( reference.get() ): Maybe.<T>absent();
+    public static <T> Maybe<T> ofOptional(final Optional<T> reference) {
+        return reference.isPresent()? new Present<>( reference.get() ): Maybe.<T>empty();
     }
 
     /**
@@ -57,7 +58,38 @@ public abstract class Maybe<T> {
         return new Present<>( reference );
     }
 
+    /**
+     * @return The availability of the reference.
+     */
     public abstract Presence presence();
+
+    /**
+     * @return {@code true} if the reference is present.
+     */
+    public boolean isPresent() {
+        return presence() == Presence.PRESENT;
+    }
+
+    /**
+     * @return {@code true} if the reference is unknown.
+     */
+    public boolean isUnknown() {
+        return presence() == Presence.UNKNOWN;
+    }
+
+    /**
+     * @return {@code true} if the reference is empty.
+     */
+    public boolean isEmpty() {
+        return presence() == Presence.EMPTY;
+    }
+
+    /**
+     * @return {@code true} if the reference is either present or empty (ie. not unknown).
+     */
+    public boolean isKnown() {
+        return isPresent() || isEmpty();
+    }
 
     @Nonnull
     public abstract T get();
@@ -73,11 +105,11 @@ public abstract class Maybe<T> {
     public abstract String toString();
 
     public enum Presence {
-        ABSENT, UNKNOWN, PRESENT
+        EMPTY, UNKNOWN, PRESENT
     }
 
 
-    private static class Absent<T> extends Maybe<T> {
+    private static class Empty<T> extends Maybe<T> {
 
         @Override
         public int hashCode() {
@@ -86,23 +118,23 @@ public abstract class Maybe<T> {
 
         @Override
         public boolean equals(final Object obj) {
-            return obj instanceof Absent;
+            return obj instanceof Empty;
         }
 
         @Override
         public Presence presence() {
-            return Presence.ABSENT;
+            return Presence.EMPTY;
         }
 
         @Nonnull
         @Override
         public T get() {
-            throw new IllegalStateException( "Cannot get() an absent reference." );
+            throw new IllegalStateException( "Cannot get() an empty reference." );
         }
 
         @Override
         public String toString() {
-            return "<absent>";
+            return "<empty>";
         }
     }
 

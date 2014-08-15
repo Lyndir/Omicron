@@ -14,26 +14,17 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-import static com.lyndir.omicron.api.core.Security.*;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import com.lyndir.lhunath.opal.math.Side;
+import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.Vec2;
-import com.lyndir.lhunath.opal.system.util.MetaObject;
+import com.lyndir.lhunath.opal.system.error.TodoException;
 import com.lyndir.lhunath.opal.system.util.ObjectMeta;
-import com.lyndir.omicron.api.*;
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.core.ResourceType;
 import com.lyndir.omicron.api.util.Maybe;
 import java.util.*;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 /**
@@ -42,30 +33,15 @@ import javax.annotation.Nullable;
  * @author lhunath
  */
 @ObjectMeta(useFor = { })
-public class Tile extends MetaObject implements ITile {
+public class Tile extends ThriftObject<com.lyndir.omicron.api.thrift.Tile> implements ITile {
 
-    @Nullable
-    private       GameObject contents;
-    @ObjectMeta(useFor = ObjectMeta.For.all)
-    private final Vec2       position;
-    @ObjectMeta(useFor = ObjectMeta.For.all)
-    private final Level      level;
-    @ObjectMeta(useFor = ObjectMeta.For.all)
-    private final Map<ResourceType, Integer> resourceQuantities = Collections.synchronizedMap(
-            new EnumMap<ResourceType, Integer>( ResourceType.class ) );
-
-    Tile(final Vec2 position, final Level level) {
-        this.position = position;
-        this.level = level;
-    }
-
-    Tile(final int x, final int y, final Level level) {
-        this( Vec2.create( x, y ), level );
+    public Tile(final com.lyndir.omicron.api.thrift.Tile thrift) {
+        super( thrift );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash( position, level );
+        return Objects.hash( getPosition(), getLevel() );
     }
 
     @Override
@@ -76,160 +52,38 @@ public class Tile extends MetaObject implements ITile {
             return false;
 
         Tile o = (Tile) obj;
-        return isEqual( position, o.position ) && isEqual( level, o.level );
+        return isEqual( getPosition(), o.getPosition() ) && isEqual( getLevel(), o.getLevel() );
     }
 
     @Override
-    public Maybe<? extends IPlayer> checkOwner() {
-        if (!isGod() || !currentPlayer().canObserve( this ).isTrue())
-            return Maybe.unknown();
-
-        if (contents == null)
-            return Maybe.absent();
-
-        return contents.checkOwner();
-    }
-
-    @Override
-    public Maybe<? extends ITile> checkLocation()
-            throws NotAuthenticatedException {
-        if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
-            return Maybe.unknown();
-
-        return Maybe.of( this );
-    }
-
-    @Nonnull
-    Optional<GameObject> getContents() {
-        return Optional.fromNullable( contents );
-    }
-
-    @Override
-    @Nonnull
-    public Maybe<GameObject> checkContents()
-    throws NotAuthenticatedException {
-        if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
-            // Cannot observe tile.
-            return Maybe.unknown();
-
-        return Maybe.fromNullable( contents );
-    }
-
-    void setContents(@Nullable final GameObject contents) {
-        if (contents != null)
-            Preconditions.checkState( this.contents == null || this.contents.equals( contents ),
-                                      "Cannot put object on tile that is not empty: %s", this );
-
-        replaceContents( contents );
-    }
-
-    void replaceContents(@SuppressWarnings("ParameterHidesMemberVariable") @Nullable final GameObject contents) {
-        Change.From<IGameObject> contentsChange = Change.<IGameObject>from( this.contents );
-
-        this.contents = contents;
-        if (contents != null)
-            contents.setLocation( this );
-
-        getLevel().getGame().getController().fireIfObservable( this ) //
-                .onTileContents( this, contentsChange.to( this.contents ) );
+    public Maybe<? extends IGameObject> getContents() {
+        throw new TodoException();
     }
 
     @Override
     public Vec2 getPosition() {
-        return position;
+        return cast( thrift().getPosition() );
     }
 
     @Override
-    public Level getLevel() {
-        return level;
-    }
-
-    void setResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
-        Preconditions.checkArgument( resourceQuantity >= 0, "Resource quantity cannot be less than zero: %s", resourceQuantity );
-        ChangeInt.From quantityChange;
-        if (resourceQuantity > 0)
-            quantityChange = ChangeInt.from( resourceQuantities.put( resourceType, resourceQuantity ) );
-        else
-            quantityChange = ChangeInt.from( resourceQuantities.remove( resourceType ) );
-
-        getLevel().getGame().getController().fireIfObservable( this ) //
-                .onTileResources( this, resourceType, quantityChange.to( resourceQuantity ) );
-    }
-
-    void addResourceQuantity(final ResourceType resourceType, final int resourceQuantity) {
-        setResourceQuantity( resourceType, ifNotNullElse( resourceQuantities.get( resourceType ), 0 ) + resourceQuantity );
-    }
-
-    Optional<Integer> getResourceQuantity(final ResourceType resourceType) {
-        return Optional.fromNullable( resourceQuantities.get( resourceType ) );
+    public ILevel getLevel() {
+        throw new TodoException();
     }
 
     @Override
-    @Authenticated
-    public Maybe<Integer> checkResourceQuantity(final ResourceType resourceType)
-            throws NotAuthenticatedException {
-        if (!isGod() && !currentPlayer().canObserve( this ).isTrue())
-            // Cannot observe location.
-            return Maybe.unknown();
-
-        return Maybe.fromNullable( resourceQuantities.get( resourceType ) );
+    public ImmutableMap<ResourceType, Maybe<Integer>> getQuantitiesByResourceType() {
+        ImmutableMap.Builder<ResourceType, Maybe<Integer>> builder = ImmutableMap.builder();
+        thrift().getQuantitiesByResourceType().forEach( (resourceType, maybeI16) -> builder.put( cast( resourceType ), cast( maybeI16 ) ) );
+        return builder.build();
     }
 
     @Override
-    @Nonnull
-    public Optional<Tile> neighbour(final Side side) {
-        return level.getTile( getPosition().translate( side.getDelta() ) );
+    public Optional<? extends IPlayer> getOwner() {
+        throw new TodoException();
     }
 
     @Override
-    public ImmutableCollection<Tile> neighbours() {
-        ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
-        for (final Side side : Side.values()) {
-            Optional<Tile> neighbour = neighbour( side );
-            if (neighbour.isPresent())
-                neighbours.add( neighbour.get() );
-        }
-
-        return neighbours.build();
-    }
-
-    @Override
-    public ImmutableCollection<Tile> neighbours(final int distance) {
-        ImmutableList.Builder<Tile> neighbours = ImmutableList.builder();
-        // FIXME: Not correct.
-        for (int dx = -distance; dx <= distance; ++dx)
-            for (int dy = Math.max( -distance, -dx - distance ); dy <= Math.min( distance, -dx + distance ); ++dy)
-                neighbours.add( level.getTile( getPosition().translate( dx, dy ) ).get() );
-
-        return neighbours.build();
-    }
-
-    @Override
-    public Maybe<Boolean> checkContains(@Nonnull final IGameObject target)
-            throws NotAuthenticatedException {
-        Maybe<GameObject> contents = checkContents();
-        if (contents.presence() == Maybe.Presence.ABSENT)
-            return Maybe.of( false );
-        if (contents.presence() == Maybe.Presence.UNKNOWN)
-            return Maybe.unknown();
-
-        return Maybe.of( isEqual( contents.get(), target ) );
-    }
-
-    /**
-     * @return true if this tile has no contents.
-     */
-    boolean isAccessible() {
-        return !getContents().isPresent();
-    }
-
-    /**
-     * @return true if this tile is visible to the current player and has no contents.
-     */
-    @Override
-    @Authenticated
-    public boolean checkAccessible()
-            throws NotAuthenticatedException {
-        return checkContents().presence() == Maybe.Presence.ABSENT;
+    public Maybe<? extends ITile> getLocation() {
+        throw new TodoException();
     }
 }

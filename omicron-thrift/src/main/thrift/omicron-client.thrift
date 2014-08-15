@@ -92,6 +92,13 @@ enum LevelType {
 
 /* === GAME === */
 
+struct MaybeI16 {
+    /** Determines whether the value for this container is known by the current player. */
+    1: required bool known,
+    /** Provides the value if it's known and present. */
+    2: optional i16 value,
+}
+
 struct Turn {
     /** Each turn has a linearly incrementing identifying integer counter value. */
     1: required i32 number,
@@ -103,7 +110,14 @@ struct Tile {
     2: required Vec2 position,
     //3: required Level level,
     /** The quantities of the remaining resources available on this tile mapped by their resource type. */
-    4: map<ResourceType,i16> quantitiesByResourceType,
+    4: map<ResourceType,MaybeI16> quantitiesByResourceType,
+}
+
+struct MaybeTile {
+    /** Determines whether the value for this container is known by the current player. */
+    1: required bool known,
+    /** Provides the value if it's known and present. */
+    2: optional Tile value,
 }
 
 struct Level {
@@ -133,13 +147,13 @@ struct GameObject {
     /** The unique identifier of this unit in the game. */
     1: required i64 objectID,
     /** The type that defines the behavior of this unit. */
-    2: required UnitType unitType,
+    2: required UnitType type,
     //3: required Game game,
     /** The modules that implement the behavior of this unit. */
     4: map<ModuleType, list<Module>> modulesByType,
     //5: optional Player owner,
     /** The tile that this unit currently occupies in the game. */
-    6: required Tile location,
+    6: required MaybeTile location,
 }
 
 struct Player {

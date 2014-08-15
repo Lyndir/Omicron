@@ -16,8 +16,9 @@
 
 package com.lyndir.omicron.api;
 
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.core.ResourceType;
+import com.lyndir.lhunath.opal.system.error.TodoException;
+import com.lyndir.omicron.api.error.NotAuthenticatedException;
+import com.lyndir.omicron.api.error.NotObservableException;
 
 
 public class ExtractorModule extends Module<com.lyndir.omicron.api.thrift.ExtractorModule> implements IExtractorModule {
@@ -32,14 +33,18 @@ public class ExtractorModule extends Module<com.lyndir.omicron.api.thrift.Extrac
     }
 
     @Override
-    public ResourceType getResourceType()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+    public ResourceType getResourceType() {
         return ResourceType.values()[ thrift().getResourceType().ordinal() ];
     }
 
     @Override
     public int getSpeed()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         return thrift().getSpeed();
+    }
+
+    @Override
+    public IExtractorModuleController getController() {
+        throw new TodoException();
     }
 }

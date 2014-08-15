@@ -14,12 +14,11 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.cli.view;
 
 import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
 import com.google.common.collect.*;
 import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.screen.Screen;
@@ -27,13 +26,12 @@ import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.lyndir.lanterna.view.*;
 import com.lyndir.lhunath.opal.math.*;
-import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.GameListener;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -93,10 +91,10 @@ public class MapView extends View {
         Table<Integer, Integer, ITile> grid = HashBasedTable.create( levelSize.getHeight(), levelSize.getWidth() );
 
         // Iterate observable tiles and populate the grid.
-        for (final ITile tile : localPlayer.iterateObservableTiles()) {
+        localPlayer.observableTiles().forEach( tile -> {
             Vec2 coordinate = positionToMapCoordinate( tile.getPosition() );
             grid.put( coordinate.getY(), coordinate.getX(), tile );
-        }
+        } );
 
         // Draw grid in view.
         Box contentBox = getContentBoxOnScreen();
@@ -111,13 +109,13 @@ public class MapView extends View {
                 Maybe<? extends IGameObject> contents;
                 Terminal.Color bgColor = getBackgroundColor();
                 if (tile == null)
-                    contents = Maybe.absent();
+                    contents = Maybe.empty();
                 else {
-                    contents = tile.checkContents();
+                    contents = tile.getContents();
                     bgColor = levelTypeColors.get( tile.getLevel().getType() );
 
                     for (final ResourceType resourceType : ResourceType.values()) {
-                        Maybe<Integer> resourceQuantity = tile.checkResourceQuantity( resourceType );
+                        Maybe<Integer> resourceQuantity = tile.getResourceQuantity( resourceType );
                         if (resourceQuantity.presence() == Maybe.Presence.PRESENT)
                             bgColor = resourceTypeColors.get( resourceType );
                     }
@@ -182,35 +180,25 @@ public class MapView extends View {
 
     private void setHomeOffset() {
         Optional<IPlayer> localPlayerOptional = OmicronCLI.get().getLocalPlayer();
-        Iterable<? extends IGameObject> gameObjects = ImmutableSet.of();
+        Stream<? extends IGameObject> gameObjects = Stream.empty();
         if (localPlayerOptional.isPresent())
-            gameObjects = localPlayerOptional.get().getController().iterateObservableObjects();
+            gameObjects = localPlayerOptional.get().getController().playerObjectsObservable();
 
-        setOffset( FluentIterable.from( gameObjects ).filter( new PredicateNN<IGameObject>() {
-            @Override
-            public boolean apply(@Nonnull final IGameObject gameObject) {
-                // Only game objects in this map's displayed level.
-                return gameObject.checkLocation().get().getLevel().getType() == getLevelType();
-            }
-        } ).transform( new NNFunctionNN<IGameObject, Vec2>() {
-            @Nonnull
-            @Override
-            public Vec2 apply(@Nonnull final IGameObject gameObject) {
-                // Transform game objects into their offset from the center of the map.
-                hasUnits = true;
-                Box contentBox = getContentBoxOnScreen();
-                return positionToMapCoordinate( gameObject.checkLocation().get().getPosition() ) //
-                        .translate( -contentBox.getSize().getWidth() / 2, -contentBox.getSize().getHeight() / 2 );
-            }
-        } ).first().or( new Supplier<Vec2>() {
-            @Override
-            public Vec2 get() {
-                // If there is no game object in this level, go to the map's center.
-                hasUnits = false;
-                Box contentBox = getContentBoxOnScreen();
-                return Vec2.create( contentBox.getSize().getWidth() / 2, contentBox.getSize().getHeight() / 2 );
-            }
-        } ) );
+        setOffset( gameObjects.filter( gameObject -> gameObject.getLocation().get().getLevel().getType() == getLevelType() )
+                              .map( gameObject -> {
+                                  // Transform game objects into their offset from the center of the map.
+                                  hasUnits = true;
+                                  Box contentBox = getContentBoxOnScreen();
+                                  return positionToMapCoordinate( gameObject.getLocation().get().getPosition() ) //
+                                          .translate( -contentBox.getSize().getWidth() / 2, -contentBox.getSize().getHeight() / 2 );
+                              } )
+                              .findFirst()
+                              .orElseGet( () -> {
+                                  // If there is no game object in this level, go to the map's center.
+                                  hasUnits = false;
+                                  Box contentBox = getContentBoxOnScreen();
+                                  return Vec2.create( contentBox.getSize().getWidth() / 2, contentBox.getSize().getHeight() / 2 );
+                              } ) );
     }
 
     private static Vec2 positionToMapCoordinate(final Vec2 position) {

@@ -16,8 +16,9 @@
 
 package com.lyndir.omicron.api;
 
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.core.ResourceType;
+import com.lyndir.lhunath.opal.system.error.TodoException;
+import com.lyndir.omicron.api.error.NotAuthenticatedException;
+import com.lyndir.omicron.api.error.NotObservableException;
 
 
 public class ContainerModule extends Module<com.lyndir.omicron.api.thrift.ContainerModule> implements IContainerModule {
@@ -37,20 +38,18 @@ public class ContainerModule extends Module<com.lyndir.omicron.api.thrift.Contai
     }
 
     @Override
-    public int getCapacity()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+    public int getCapacity() {
         return thrift().getCapacity();
     }
 
     @Override
     public int getStock()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
+            throws NotAuthenticatedException, NotObservableException {
         return thrift().getStock();
     }
 
     @Override
-    public int getAvailable()
-            throws Security.NotAuthenticatedException, Security.NotObservableException {
-        return Math.max( 0, getCapacity() - getStock() );
+    public IContainerModuleController getController() {
+        throw new TodoException();
     }
 }

@@ -1,7 +1,8 @@
 package com.lyndir.omicron.cli.command;
 
 import com.google.common.collect.Iterators;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.IGame;
+import com.lyndir.omicron.api.IPlayer;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
 
@@ -41,7 +42,7 @@ public class RemoveGameCommand extends Command {
             return;
         }
 
-        Iterator<IPlayer> playerIt = gameBuilder.getPlayers().iterator();
+        Iterator<? extends IPlayer> playerIt = gameBuilder.getPlayers().iterator();
         while (playerIt.hasNext()) {
             if (playerIt.next().getName().equals( value )) {
                 playerIt.remove();

@@ -1,10 +1,9 @@
 package com.lyndir.omicron.cli.command;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.Size;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.*;
@@ -44,18 +43,19 @@ public class PrintCommand extends Command {
         IPlayer localPlayer = localPlayerOptional.get();
 
         // Create an empty grid.
-        Size maxSize = null;
-        for (final ILevel level : gameController.get().listLevels())
-            maxSize = Size.max( maxSize, level.getSize() );
-        assert maxSize != null;
+        Size findMaxSize = null;
+        for (final ILevel level : gameController.get().getGame().getLevels())
+            findMaxSize = Size.max( findMaxSize, level.getSize() );
+        assert findMaxSize != null;
+        final Size maxSize = findMaxSize;
         Table<Integer, Integer, StringBuilder> grid = HashBasedTable.create( maxSize.getHeight(), maxSize.getWidth() );
         for (int x = 0; x < maxSize.getWidth(); ++x)
             for (int y = 0; y < maxSize.getHeight(); ++y)
                 grid.put( y, x, new StringBuilder( "   " ) );
 
         // Iterate observable tiles and populate the grid.
-        for (final ITile tile : localPlayer.iterateObservableTiles()) {
-            Maybe<? extends IGameObject> contents = tile.checkContents();
+        localPlayer.observableTiles().forEach( tile -> {
+            Maybe<? extends IGameObject> contents = tile.getContents();
             char contentsChar;
             if (contents.presence() == Maybe.Presence.PRESENT)
                 contentsChar = contents.get().getType().getTypeName().charAt( 0 );
@@ -66,10 +66,10 @@ public class PrintCommand extends Command {
             int y = tile.getPosition().getY();
             int x = (tile.getPosition().getX() + y / 2) % maxSize.getWidth();
             grid.get( y, x ).setCharAt( levelIndex, contentsChar );
-        }
+        } );
 
         for (int y = 0; y < maxSize.getHeight(); ++y) {
-            Map<Integer, StringBuilder> row = new TreeMap<>( Ordering.natural() );
+            Map<Integer, StringBuilder> row = new TreeMap<Integer, StringBuilder>( Ordering.natural() );
             row.putAll( grid.row( y ) );
             inf( "%s|%s|", y % 2 == 0? "": "  ", Joiner.on( ' ' ).join( row.values() ) );
         }

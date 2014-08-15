@@ -1,11 +1,11 @@
 package com.lyndir.omicron.cli.command;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
+import java.util.Optional;
 
 
 /**
@@ -46,12 +46,11 @@ public class AddGameCommand extends Command {
         String playerPrimaryColor = playerValueIt.next();
         String playerSecondaryColor = Iterators.getOnlyElement( playerValueIt );
 
-        IPlayer newPlayer = new Player( gameBuilder.nextPlayerID(), getOmicron().getLocalKey(), playerName, //
-                                        Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
-        gameBuilder.addPlayer( newPlayer );
+        IPlayer newPlayer = gameBuilder.addPlayer( getOmicron().getLocalKey(), playerName, //
+                                                   Color.of( playerPrimaryColor ), Color.of( playerSecondaryColor ) );
         getOmicron().setLocalPlayer( newPlayer );
 
-        Security.authenticate( newPlayer, getOmicron().getLocalKey() );
+        Security.activatePlayer( (Player) newPlayer );
         inf( "Added player to game: %s", newPlayer );
     }
 }

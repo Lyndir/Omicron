@@ -14,19 +14,14 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api;
 
-import static com.lyndir.omicron.api.core.Security.*;
-
-import com.google.common.base.Optional;
 import com.google.common.collect.*;
-import com.lyndir.lhunath.opal.system.util.*;
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.thrift.ThriftObject;
+import com.lyndir.lhunath.opal.system.error.TodoException;
 import com.lyndir.omicron.api.util.Maybe;
-import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 /**
@@ -36,9 +31,13 @@ import javax.annotation.Nullable;
  */
 public class GameObject extends ThriftObject<com.lyndir.omicron.api.thrift.GameObject> implements IGameObject {
 
+    public GameObject(final com.lyndir.omicron.api.thrift.GameObject thrift) {
+        super( thrift );
+    }
+
     @Override
     public int hashCode() {
-        return getObjectID();
+        return Objects.hashCode( getObjectID() );
     }
 
     @Override
@@ -47,106 +46,39 @@ public class GameObject extends ThriftObject<com.lyndir.omicron.api.thrift.GameO
     }
 
     @Override
-    @Nonnull
-    public GameObjectController<? extends GameObject> getController() {
-        return controller;
-    }
-
-    @Override
-    public int getObjectID() {
+    public long getObjectID() {
         return thrift().getObjectID();
     }
 
     @Override
-    public Maybe<Tile> checkLocation()
-            throws NotAuthenticatedException {
-        Tile location = getLocation();
-        if (!isGod() && !isOwnedByCurrentPlayer())
-            if (!currentPlayer().canObserve( location ).isTrue())
-                // Has a location but current player cannot observe it.
-                return Maybe.unknown();
-
-        // We're either god, can be observed by or are owned by the current player.
-        return Maybe.of( location );
-    }
-
-    void setLocation(@Nonnull final Tile location) {
-        Change.From<ITile> locationChange = Change.<ITile>from( this.location );
-        this.location = location;
-
-        getGame().getController().fireIfObservable( location ) //
-                .onUnitMoved( this, locationChange.to( this.location ) );
+    public IGame getGame() {
+        throw new TodoException();
     }
 
     @Override
-    public UnitType getType() {
-        return unitType;
+    public IUnitType getType() {
+        return cast( thrift().getType() );
     }
 
     @Override
-    public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final int index)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
+    public ImmutableMultimap<PublicModuleType<?>, ? extends IModule> getModulesByType() {
+        // TODO
+        return null;
+    }
 
-        return Optional.fromNullable( Iterables.get( getModules( moduleType ), index, null ) );
+    @Nonnull
+    @Override
+    public IGameObjectController<? extends IGameObject> getController() {
+        throw new TodoException();
     }
 
     @Override
-    public <M extends IModule> Optional<M> getModule(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        return FluentIterable.from( getModules( moduleType ) ).firstMatch( predicate );
+    public java.util.Optional<? extends IPlayer> getOwner() {
+        throw new TodoException();
     }
 
     @Override
-    public <M extends IModule> List<M> getModules(final PublicModuleType<M> moduleType)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        // Checked by Module's constructor.
-        //noinspection unchecked
-        return (List<M>) modules.get( coreMT( moduleType ) );
-    }
-
-    @Override
-    public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final int index, @Nullable final Object elseValue)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orNull(), elseValue );
-    }
-
-    @Override
-    public <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate,
-                                              @Nullable final Object elseValue)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, predicate ).orNull(), elseValue );
-    }
-
-    @Override
-    public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final int index)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        return onModuleElse( moduleType, index, null );
-    }
-
-    @Override
-    public <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final PredicateNN<M> predicate)
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        return onModuleElse( moduleType, predicate, null );
-    }
-
-    @Override
-    public ImmutableCollection<Module> listModules()
-            throws NotAuthenticatedException, NotObservableException {
-        assertObservable( this );
-
-        return ImmutableList.copyOf( modules.values() );
+    public Maybe<? extends ITile> getLocation() {
+        return cast( thrift().getLocation() );
     }
 }

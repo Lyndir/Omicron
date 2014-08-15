@@ -47,7 +47,7 @@
         <module>omicron-core</module>
         <module>omicron-cli</module>
         <module>omicron-thrift</module>
-        <module>omicron-web</module>
+        <!--module>omicron-web</module-->
     </modules>
 
     <!-- BUILD CONFIGURATION -->

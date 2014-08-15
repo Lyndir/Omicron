@@ -16,7 +16,6 @@
 
 package com.lyndir.omicron.api;
 
-import com.lyndir.omicron.api.core.*;
 import javax.annotation.Nullable;
 
 
@@ -186,7 +185,7 @@ public abstract class GameListener {
      * @param remainingWork    The total amount of remaining work to complete the construction of the given module type at the site before
      *                         and after the change.
      */
-    public void onConstructionSiteWorked(final IConstructorModule.IConstructionSite constructionSite, final PublicModuleType<?> moduleType,
+    public void onConstructionSiteWorked(final IConstructorModuleController.IConstructionSite constructionSite, final PublicModuleType<?> moduleType,
                                          final ChangeInt remainingWork) {
     }
 

@@ -2,7 +2,7 @@ package com.lyndir.omicron.webapp.data.service;
 
 import com.google.common.base.Verify;
 import com.google.common.collect.*;
-import com.lyndir.omicron.api.core.IGame;
+import com.lyndir.omicron.api.IGame;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Map;

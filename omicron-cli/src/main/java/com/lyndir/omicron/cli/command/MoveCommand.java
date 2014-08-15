@@ -1,13 +1,15 @@
 package com.lyndir.omicron.cli.command;
 
-import com.google.common.base.*;
+import com.google.common.base.Throwables;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.*;
 import com.lyndir.lhunath.opal.system.util.ConversionUtils;
-import com.lyndir.omicron.api.core.*;
+import com.lyndir.omicron.api.*;
 import com.lyndir.omicron.api.util.Maybe;
 import com.lyndir.omicron.cli.OmicronCLI;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /**
@@ -54,20 +56,8 @@ public class MoveCommand extends Command {
         Optional<Side> side = Side.forName( sideArgument );
         if (!side.isPresent()) {
             err( "No such side/level: %s.  Valid sides are: %s, valid levels are: %s", side, //
-                 FluentIterable.from( ImmutableList.copyOf( Side.values() ) ).transform( new Function<Side, String>() {
-                     @Override
-                     public String apply(final Side aSide) {
-
-                         return aSide.name();
-                     }
-                 } ), //
-                 FluentIterable.from( ImmutableList.copyOf( LevelType.values() ) ).transform( new Function<LevelType, String>() {
-                     @Override
-                     public String apply(final LevelType levelType) {
-
-                         return levelType.name();
-                     }
-                 } )
+                 Stream.of( Side.values() ).map( Side::name ), //
+                 Stream.of( LevelType.values() ).map( LevelType::name )
             );
             return;
         }
@@ -88,7 +78,7 @@ public class MoveCommand extends Command {
         }
         IMobilityModule mobilityModule = optionalMobility.get();
 
-        Maybe<? extends ITile> maybeLocation = mobilityModule.getGameObject().checkLocation();
+        Maybe<? extends ITile> maybeLocation = mobilityModule.getGameObject().getLocation();
         if (maybeLocation.presence() != Maybe.Presence.PRESENT) {
             err( "Object's location is not known: %s", gameObject );
             return;
@@ -103,7 +93,7 @@ public class MoveCommand extends Command {
         }
 
         // Move the object.
-        IMobilityModule.IMovement movement = mobilityModule.movement( targetLocation.get() );
+        IMobilityModuleController.IMovement movement = mobilityModule.getController().movement( targetLocation.get() );
         if (!movement.isPossible()) {
             err( "This movement is not possible: %s.", movement );
             return;
@@ -111,7 +101,7 @@ public class MoveCommand extends Command {
 
         try {
             movement.execute();
-            inf( "Object is now at: %s", gameObject.checkLocation() );
+            inf( "Object is now at: %s", gameObject.getLocation() );
         }
         catch (IModule.ImpossibleException | IModule.InvalidatedException e) {
             throw Throwables.propagate( e );

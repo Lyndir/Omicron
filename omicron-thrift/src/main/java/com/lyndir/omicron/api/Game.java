@@ -14,18 +14,15 @@
  *   limitations under the License.
  */
 
+
 package com.lyndir.omicron.api;
 
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.Size;
 import com.lyndir.lhunath.opal.system.error.TodoException;
-import com.lyndir.lhunath.opal.system.util.NNFunctionNN;
-import com.lyndir.lhunath.opal.system.util.PredicateNN;
-import com.lyndir.omicron.api.core.*;
-import com.lyndir.omicron.api.thrift.ThriftObject;
 import java.util.Deque;
 import java.util.LinkedList;
-import javax.annotation.Nonnull;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 
@@ -57,46 +54,28 @@ public class Game extends ThriftObject<com.lyndir.omicron.api.thrift.Game> imple
 
     @Override
     public ILevel getLevel(final LevelType levelType) {
-        return new Level( Iterables.filter( thrift().getLevels(), new PredicateNN<com.lyndir.omicron.api.thrift.Level>() {
-            @Override
-            public boolean apply(@Nonnull final Level input) {
-                return input.getType().ordinal() == levelType.ordinal();
-            }
-        } ).iterator().next() );
+        return new Level(
+                thrift().getLevels().stream().filter( level -> level.getType().ordinal() == levelType.ordinal() ).findFirst().get() );
     }
 
     @Override
     public Deque<Turn> getTurns() {
-        return new LinkedList<>(
-                FluentIterable.from( thrift().getTurns() ).transform( new NNFunctionNN<com.lyndir.omicron.api.thrift.Turn, Turn>() {
-                    @Nonnull
-                    @Override
-                    public Turn apply(@Nonnull final com.lyndir.omicron.api.thrift.Turn input) {
-                        return new Turn( input );
-                    }
-                } ) );
+        return thrift().getTurns().stream().map( this::cast ).collect( Collectors.toCollection( LinkedList::new ) );
     }
 
     @Override
-    public ImmutableList<? extends ILevel> listLevels() {
-        return FluentIterable.from( thrift().getLevels() ).transform( new NNFunctionNN<com.lyndir.omicron.api.thrift.Level, Level>() {
-            @Nonnull
-            @Override
-            public Level apply(@Nonnull final com.lyndir.omicron.api.thrift.Level input) {
-                return new Level( input );
-            }
-        } ).toList();
+    public ImmutableList<? extends ILevel> getLevels() {
+        return FluentIterable.from( thrift().getLevels() ).transform( Level::new ).toList();
     }
 
     @Override
     public ImmutableList<Player> getPlayers() {
-        return FluentIterable.from( thrift().getPlayers() ).transform( new NNFunctionNN<com.lyndir.omicron.api.thrift.Player, Player>() {
-            @Nonnull
-            @Override
-            public Player apply(@Nonnull final com.lyndir.omicron.api.thrift.Player input) {
-                return new Player( input );
-            }
-        } ).toList();
+        return FluentIterable.from( thrift().getPlayers() ).transform( Player::new ).toList();
+    }
+
+    @Override
+    public ImmutableSet<? extends IPlayer> getReadyPlayers() {
+        return ImmutableSet.copyOf( thrift().getReadyPlayers().stream().map( Player::new ).iterator() );
     }
 
     @Override
@@ -106,6 +85,6 @@ public class Game extends ThriftObject<com.lyndir.omicron.api.thrift.Game> imple
 
     @Override
     public Size getLevelSize() {
-        return new Size( thrift().getLevelSize() );
+        return cast( thrift().getLevelSize() );
     }
 }
