@@ -52,7 +52,8 @@ public class PlayerController extends MetaObject implements IPlayerController {
 
         if (observable instanceof GameObject && playerObjectsObservable().anyMatch( object -> object == observable ))
             return Maybool.yes();
-        if (observable instanceof Tile && playerObjectsObservable().map( GameObject::getLocation ).anyMatch( tile -> tile == observable ))
+        if (observable instanceof Tile && playerObjectsObservable().map( GameObject::getLocation )
+                                                                   .anyMatch( tile -> tile.isPresent() && tile.get() == observable ))
             return Maybool.yes();
 
         // Observable is not owned by us, check if any of our objects can see it.

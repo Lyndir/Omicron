@@ -76,7 +76,7 @@ public enum VictoryConditionType {
                 public void onPlayerScore(final IPlayer player, final ChangeInt score) {
                     if (mightyPlayer != null) {
                         // There is a mighty player, check if this player's new score dethrones him.
-                        if (ObjectUtils.isEqual( mightyPlayer, player ))
+                        if (mightyPlayer.equals( player ))
                             return;
 
                         if (mightyPlayer.getScore() - score.getTo() < MIGHT_SCORE_THRESHOLD) {

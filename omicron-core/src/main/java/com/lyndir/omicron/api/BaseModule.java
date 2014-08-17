@@ -49,7 +49,7 @@ public class BaseModule extends Module implements IBaseModule, IBaseModuleContro
     @Override
     public Maybool canObserve(@Nonnull final GameObservable observable)
             throws NotAuthenticatedException {
-        if (ObjectUtils.isEqual( getGameObject(), observable ))
+        if (observable.equals( getGameObject() ))
             return Maybool.yes();
 
         Maybe<Tile> ourLocation = getGameObject().getLocation();

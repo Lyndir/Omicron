@@ -1,14 +1,13 @@
 package com.lyndir.omicron.api;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.Size;
+import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.logging.Logger;
 import com.lyndir.lhunath.opal.system.util.StringUtils;
-import com.lyndir.omicron.api.*;
+import com.lyndir.omicron.api.util.Maybe;
 import java.util.*;
-import javax.annotation.Nonnull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -32,28 +31,21 @@ public abstract class AbstractTest {
 
     protected Game.Builder newGameBuilder() {
         Game.Builder builder = Game.builder();
-        PlayerKey key = new PlayerKey();
-        staticPlayer = new Player( builder.nextPlayerID(), key, "testPlayer", Color.Template.randomColor(), Color.Template.randomColor() ) {
-            private final PlayerController playerController = new PlayerController( this ) {
-                @Override
-                protected void onNewTurn() {
-                    super.onNewTurn();
-
-                    printWorldMap();
-                }
-            };
-
-            @Nonnull
-            @Override
-            public PlayerController getController() {
-                return playerController;
-            }
-        };
-        Security.activatePlayer( staticPlayer, key );
         builder.setLevelSize( new Size( 10, 10 ) );
         builder.setResourceConfig( IGame.GameResourceConfigs.NONE );
-        builder.setUnitConfig( Game.GameUnitConfigs.NONE );
-        builder.addPlayer( staticPlayer );
+        builder.setUnitConfig( IGame.PublicGameUnitConfig.NONE );
+
+        Security.activatePlayer( staticPlayer = builder.addPlayer( new PlayerKey(), "testPlayer", Color.Template.randomColor(),
+                                                                   Color.Template.randomColor() ) );
+
+        builder.addGameListener( new GameListener() {
+            @Override
+            public void onNewTurn(final Turn currentTurn) {
+                super.onNewTurn( currentTurn );
+                printWorldMap();
+            }
+        } );
+
         return builder;
     }
 
@@ -66,9 +58,9 @@ public abstract class AbstractTest {
 
         // Iterate observable tiles and populate the grid.
         for (final LevelType levelType : LevelType.values()) {
-            Level level = staticGame.getLevel( levelType );
-            for (final Tile tile : level.getTiles().values()) {
-                Optional<GameObject> contents = tile.getContents();
+            ILevel level = staticGame.getLevel( levelType );
+            for (final ITile tile : level.getTilesByPosition().values()) {
+                Maybe<? extends IGameObject> contents = tile.getContents();
                 if (!contents.isPresent())
                     continue;
 
@@ -85,7 +77,7 @@ public abstract class AbstractTest {
 
         logger.inf( "▄▄▄" + StringUtils.repeat( "▄", size.getWidth() * 4 ) );
         for (int v = 0; v < size.getHeight(); ++v) {
-            Map<Integer, String> row = new TreeMap<>( Ordering.natural() );
+            Map<Integer, String> row = new TreeMap<Integer, String>( Ordering.natural() );
             row.putAll( grid.row( v ) );
             logger.inf( "%s▌%s▐%s", v % 2 == 0? "": "██", Joiner.on( ' ' ).join( row.values() ), v % 2 == 0? "██": "" );
         }
@@ -129,9 +121,9 @@ public abstract class AbstractTest {
     }
 
     protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final int x, final int y) {
-        Tile tile = game.getLevel( LevelType.GROUND ).getTile( x, y ).get();
+        Tile tile = Tile.cast( game.getLevel( LevelType.GROUND ).getTile( Vec2.create( x, y ) ).get() );
 
-        return createUnit(unitType, game, player, tile);
+        return createUnit( unitType, game, player, tile );
     }
 
     protected GameObject createUnit(final UnitType unitType, final Game game, final Player player, final Tile tile) {

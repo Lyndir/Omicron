@@ -106,7 +106,7 @@ public class GameController implements IGameController {
     boolean setReady(final Player player)
             throws NotAuthenticatedException {
         if (!player.isKeyLess())
-            Preconditions.checkState( ObjectUtils.isEqual( player, Security.currentPlayer() ),
+            Preconditions.checkState( player.equals( Security.currentPlayer() ),
                                       "Cannot set protected player ready: not authenticated.  First authenticate using Security.authenticate()." );
 
         boolean allReady = game.setReady( player );

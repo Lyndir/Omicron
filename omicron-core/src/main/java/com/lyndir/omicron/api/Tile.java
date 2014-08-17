@@ -53,7 +53,7 @@ public class Tile extends MetaObject implements ITile {
             return false;
 
         Tile o = (Tile) obj;
-        return isEqual( position, o.position ) && isEqual( level, o.level );
+        return position.equals( o.position ) && level.equals( o.level );
     }
 
     @Override
@@ -118,7 +118,7 @@ public class Tile extends MetaObject implements ITile {
         ImmutableMap.Builder<ResourceType, Maybe<Integer>> builder = ImmutableMap.builder();
         for (final ResourceType resourceType : ResourceType.values())
             if (observable)
-                builder.put( resourceType, Maybe.of( ifNotNullElse( resourceQuantities.get( resourceType ), 0 ) ) );
+                builder.put( resourceType, Maybe.ofNullable( resourceQuantities.get( resourceType ) ) );
             else
                 builder.put( resourceType, Maybe.unknown() );
 

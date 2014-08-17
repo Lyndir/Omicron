@@ -132,7 +132,11 @@ public class GameObject extends MetaObject implements IGameObject {
     }
 
     @Nullable
-    static GameObject cast(@Nullable final IGameObject gameObject) {
+    static GameObject castN(@Nullable final IGameObject gameObject) {
+        return (GameObject) gameObject;
+    }
+
+    static GameObject cast(final IGameObject gameObject) {
         return (GameObject) gameObject;
     }
 }

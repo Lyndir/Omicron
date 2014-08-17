@@ -17,8 +17,6 @@
 
 package com.lyndir.omicron.api;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.*;
-
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.Vec2;
 import com.lyndir.lhunath.opal.system.error.TodoException;
@@ -52,7 +50,7 @@ public class Tile extends ThriftObject<com.lyndir.omicron.api.thrift.Tile> imple
             return false;
 
         Tile o = (Tile) obj;
-        return isEqual( getPosition(), o.getPosition() ) && isEqual( getLevel(), o.getLevel() );
+        return getPosition().equals( o.getPosition() ) && getLevel().equals( o.getLevel() );
     }
 
     @Override

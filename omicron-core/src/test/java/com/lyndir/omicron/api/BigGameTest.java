@@ -1,5 +1,6 @@
 package com.lyndir.omicron.api;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.lyndir.lhunath.opal.math.Side;
 import com.lyndir.lhunath.opal.math.Size;
@@ -16,7 +17,7 @@ public class BigGameTest extends AbstractTest {
     @Override
     protected Game.Builder newGameBuilder() {
         Game.Builder builder = super.newGameBuilder();
-        builder.addPlayer( otherPlayer = new Player( builder.nextPlayerID(), null, Player.randomName(), Color.random(), Color.random() ) );
+        otherPlayer = builder.addPlayer( null, Player.randomName(), Color.random(), Color.random() );
         builder.setLevelSize( new Size( 1000, 1000 ) );
         return builder;
     }
@@ -46,10 +47,16 @@ public class BigGameTest extends AbstractTest {
         ImmutableList<GameObject> gameObjects = gameObjectsBuilder.build();
         for (int i = 0; i < gameObjects.size(); i++) {
             GameObject gameObject = gameObjects.get( i );
-            logger.dbg( "Moving gameObject %d / %d (%d%%)", i,   gameObjects.size(), i * 100 / gameObjects.size() );
-            gameObject.onModule( PublicModuleType.MOBILITY, 0 )
-                      .movement( gameObject.getLocation().neighbour( Side.E ).get() )
-                      .execute();
+            logger.dbg( "Moving gameObject %d / %d (%d%%)", i, gameObjects.size(), i * 100 / gameObjects.size() );
+            gameObject.onModule( PublicModuleType.MOBILITY, 0, module -> {
+                try {
+                    module.getController().movement( gameObject.getLocation().get().neighbour( Side.E ).get() ).execute();
+                    return Void.TYPE;
+                }
+                catch (IModule.ImpossibleException | IModule.InvalidatedException e) {
+                    throw Throwables.propagate( e );
+                }
+            } );
         }
         logger.inf( "Movement took %dns", System.nanoTime() - startNanos );
     }

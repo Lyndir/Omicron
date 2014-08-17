@@ -176,7 +176,7 @@ public class ConstructorModule extends Module implements IConstructorModule, ICo
     public void setTarget(@Nullable final IGameObject target) {
         Change.From<IGameObject> targetChange = Change.<IGameObject>from( this.target );
 
-        this.target = GameObject.cast( target );
+        this.target = GameObject.castN( target );
 
         Security.currentGame().getController().fireIfObservable( getGameObject() ) //
                 .onConstructorTargeted( this, targetChange.to( this.target ) );
@@ -317,7 +317,7 @@ public class ConstructorModule extends Module implements IConstructorModule, ICo
                                 Maybe<? extends IGameObject> contents = tile.getContents();
                                 if (contents.isPresent())
                                     for (final ConstructorModule module : contents.get().getModules( ModuleType.CONSTRUCTOR ))
-                                        if (ObjectUtils.isEqual( neighbourInput, module.getTarget() ))
+                                        if (neighbourInput.equals( module.getTarget() ))
                                             return contents.get();
 
                                 return null;

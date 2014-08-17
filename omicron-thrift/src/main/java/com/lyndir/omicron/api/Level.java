@@ -67,6 +67,6 @@ public class Level extends ThriftObject<com.lyndir.omicron.api.thrift.Level> imp
             return false;
 
         Level o = (Level) obj;
-        return ObjectUtils.isEqual( getSize(), o.getSize() ) && ObjectUtils.isEqual( getType(), o.getType() );
+        return getSize().equals( o.getSize() ) && getType() == o.getType();
     }
 }

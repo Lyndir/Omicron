@@ -37,7 +37,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     void setOwner(@Nullable final Player owner) {
         Optional<Player> oldOwner = getGameObject().getOwner();
-        if (oldOwner.isPresent() && ObjectUtils.isEqual( oldOwner.get(), owner ))
+        if (oldOwner.isPresent() && oldOwner.get().equals( owner ))
             // Object already owned by owner.
             return;
 
@@ -53,7 +53,7 @@ public class GameObjectController<O extends GameObject> extends MetaObject imple
 
     void setLocation(@Nonnull final Tile location) {
         Maybe<Tile> oldLocation = getGameObject().getLocation();
-        if (ObjectUtils.isEqual( oldLocation, location )) // FIXME: Type fail
+        if (oldLocation.isPresent() && oldLocation.get().equals( location ))
             // Object already at location.
             return;
 

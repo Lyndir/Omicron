@@ -333,8 +333,8 @@ public class Game extends MetaObject implements IGame {
 
                 // Add the units.
                 GameObject engineer = new GameObject( UnitTypes.ENGINEER, game, player, Tile.cast( engineerTile.get() ) );
-                engineer.onModule( ModuleType.CONTAINER, module -> module.getResourceType() == ResourceType.METALS )
-                        .addStock( Integer.MAX_VALUE );
+                engineer.onModule( ModuleType.CONTAINER, module -> module.getResourceType() == ResourceType.METALS,
+                                   module -> module.addStock( Integer.MAX_VALUE ) );
                 engineer.register();
 
                 new GameObject( UnitTypes.AIRSHIP, game, player, Tile.cast( airshipTile.get() ) ).register();

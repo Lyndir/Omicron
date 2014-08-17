@@ -74,8 +74,8 @@ public class Player extends MetaObject implements IPlayer {
         return playerID;
     }
 
-    boolean hasKey(final PlayerKey playerKey) {
-        return ObjectUtils.isEqual( key, playerKey );
+    boolean hasKey(@Nonnull final PlayerKey playerKey) {
+        return playerKey.equals( key );
     }
 
     boolean isKeyLess() {
@@ -84,7 +84,7 @@ public class Player extends MetaObject implements IPlayer {
 
     @Override
     public boolean isCurrentPlayer() {
-        return ObjectUtils.isEqual( this, currentPlayer() );
+        return equals( currentPlayer() );
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Player extends MetaObject implements IPlayer {
 
         if (lostObject != null)
             getController().getGameController()
-                           .fireIfPlayer( player -> ObjectUtils.isEqual( this, player ) )
+                           .fireIfPlayer( this::equals )
                            .onPlayerLostObject( this, lostObject );
     }
 
@@ -148,7 +148,7 @@ public class Player extends MetaObject implements IPlayer {
 
         if (previousObject == null)
             getController().getGameController()
-                           .fireIfPlayer( player -> ObjectUtils.isEqual( this, player ) )
+                           .fireIfPlayer( this::equals )
                            .onPlayerGainedObject( this, gameObject );
     }
 

@@ -63,6 +63,6 @@ public class Level extends MetaObject implements ILevel {
             return false;
 
         Level o = (Level) obj;
-        return ObjectUtils.isEqual( size, o.size ) && ObjectUtils.isEqual( type, o.type );
+        return size.equals( o.size ) && type == o.type;
     }
 }

@@ -19,6 +19,7 @@ package com.lyndir.omicron.api;
 
 import com.lyndir.lhunath.opal.system.util.MetaObject;
 import java.util.Objects;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -84,7 +85,13 @@ public abstract class PublicModuleType<M extends IModule> extends MetaObject {
 
     @Override
     public int hashCode() {
-        return Objects.hash( moduleType, standardCost );
+        Class<?> moduleTypeInterface;
+        if (moduleType.isInterface())
+            moduleTypeInterface = moduleType;
+        else
+            moduleTypeInterface = Stream.of(moduleType.getInterfaces()).filter( IModule.class::isAssignableFrom ).findFirst().get();
+
+        return Objects.hash( moduleTypeInterface, standardCost );
     }
 
     @Override
@@ -95,6 +102,6 @@ public abstract class PublicModuleType<M extends IModule> extends MetaObject {
             return false;
 
         PublicModuleType<?> o = (PublicModuleType<?>) obj;
-        return moduleType.equals( o.moduleType ) && standardCost.equals( o.standardCost );
+        return moduleType.isAssignableFrom( o.moduleType ) || o.moduleType.isAssignableFrom( moduleType ) && standardCost.equals( o.standardCost );
     }
 }

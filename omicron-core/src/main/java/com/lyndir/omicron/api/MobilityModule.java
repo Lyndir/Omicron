@@ -79,14 +79,14 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
         if (levelType == currentLevel)
             return 0;
         while (true) {
-            Double currentLevelCost = levelingCost.get( currentLevel );
-            if (currentLevelCost == null)
-                // Cannot level to this level.
-                return Double.MAX_VALUE;
-
             Optional<LevelType> newLevel = currentLevel.up();
             if (!newLevel.isPresent())
                 break;
+
+            Double currentLevelCost = levelingCost.get( EnumUtils.min( currentLevel, newLevel.get() ) );
+            if (currentLevelCost == null)
+                // Cannot level to this level.
+                return Double.MAX_VALUE;
 
             currentLevel = newLevel.get();
             cost += currentLevelCost;
@@ -99,14 +99,14 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
         cost = 0;
         currentLevel = location.getLevel().getType();
         while (true) {
-            Double currentLevelCost = levelingCost.get( currentLevel );
-            if (currentLevelCost == null)
-                // Cannot level to this level.
-                return Double.MAX_VALUE;
-
             Optional<LevelType> newLevel = currentLevel.down();
             if (!newLevel.isPresent())
                 break;
+
+            Double currentLevelCost = levelingCost.get( EnumUtils.min( currentLevel, newLevel.get() ) );
+            if (currentLevelCost == null)
+                // Cannot level to this level.
+                return Double.MAX_VALUE;
 
             currentLevel = newLevel.get();
             cost += currentLevelCost;
@@ -139,8 +139,7 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
             // Cannot move: insufficient speed remaining this turn.
             return Leveling.impossible( this, cost );
 
-        return Leveling.possible( this,
-                                  getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get(),
+        return Leveling.possible( this, getGameObject().getGame().getLevel( levelType ).getTile( currentLocation.getPosition() ).get(),
                                   cost );
     }
 
@@ -164,7 +163,7 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
         final double stepCost = costForMovingInLevel( currentLocation.getLevel().getType() );
 
         // Initialize path finding data functions.
-        PredicateNN<ITile> foundFunction = tile -> isEqual( tile, target );
+        PredicateNN<ITile> foundFunction = tile -> tile.equals( target );
         NNFunctionNN<Step<ITile>, Double> costFunction = tileStep -> {
             if (!tileStep.getTo().isAccessible().isTrue())
                 return Double.MAX_VALUE;
@@ -174,7 +173,8 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
         NNFunctionNN<ITile, Stream<? extends ITile>> neighboursFunction = (input) -> input.neighbours().stream();
 
         // Find the path!
-        Optional<Path<ITile>> path = find( currentLocation, foundFunction, costFunction, remainingSpeed, neighboursFunction );
+        Optional<Path<ITile>> path = find( currentLocation, foundFunction, costFunction, remainingSpeed - leveling.getCost(),
+                                           neighboursFunction );
         return Movement.possible( this, leveling.getCost() + (path.isPresent()? path.get().getCost(): 0), leveling, path );
     }
 
@@ -199,8 +199,8 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
 
     public static class Leveling extends MetaObject implements IMobilityModuleController.ILeveling {
 
-        private final MobilityModule module;
-        private final double cost;
+        private final MobilityModule  module;
+        private final double          cost;
         private final Optional<ITile> target;
 
         private Leveling(final MobilityModule module, final Optional<ITile> target, final double cost) {
@@ -259,7 +259,9 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
             module.getGameObject().getController().setLocation( Tile.cast( target.get() ) );
             module.remainingSpeed -= cost;
 
-            module.getGameObject().getGame().getController()
+            module.getGameObject()
+                  .getGame()
+                  .getController()
                   .fireIfObservable( module.getGameObject() )
                   .onMobilityLeveled( module, locationChange.to( module.getGameObject().getLocation().get() ),
                                       remainingSpeedChange.to( module.remainingSpeed ) );
@@ -269,9 +271,9 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
 
     public static class Movement extends MetaObject implements IMovement {
 
-        private final MobilityModule       module;
-        private final double               cost;
-        private final Leveling             leveling;
+        private final MobilityModule        module;
+        private final double                cost;
+        private final Leveling              leveling;
         private final Optional<Path<ITile>> path;
 
         private Movement(final MobilityModule module, final double cost, @Nullable final Leveling leveling,
@@ -330,11 +332,10 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
 
             // Check that the path can still be walked.
             Path<ITile> tracePath = path.get();
-            do {
+            while (true) {
                 assertState( tracePath.getTarget().isAccessible().isTrue() || //
-                             isEqual( module.getGameObject().getLocation(), tracePath.getTarget() ), //
-                             PathInvalidatedException.class, tracePath
-                );
+                             module.getGameObject().getLocation().get().equals( tracePath.getTarget() ), //
+                             PathInvalidatedException.class, tracePath );
 
                 Optional<Path<ITile>> parent = tracePath.getParent();
                 if (!parent.isPresent())
@@ -342,7 +343,6 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
 
                 tracePath = parent.get();
             }
-            while (true);
 
             // Execute the leveling.
             leveling.execute();
@@ -351,7 +351,9 @@ public class MobilityModule extends Module implements IMobilityModule, IMobility
             module.getGameObject().getController().setLocation( Tile.cast( path.get().getTarget() ) );
             module.remainingSpeed -= path.get().getCost();
 
-            module.getGameObject().getGame().getController()
+            module.getGameObject()
+                  .getGame()
+                  .getController()
                   .fireIfObservable( module.getGameObject() )
                   .onMobilityMoved( module, locationChange.to( module.getGameObject().getLocation().get() ),
                                     remainingSpeedChange.to( module.remainingSpeed ) );

@@ -1,10 +1,10 @@
 package com.lyndir.omicron.api;
 
 import com.google.common.collect.*;
+import com.lyndir.lhunath.opal.system.util.*;
 import com.lyndir.omicron.api.error.NotAuthenticatedException;
 import com.lyndir.omicron.api.error.NotObservableException;
 import java.util.Optional;
-import com.lyndir.lhunath.opal.system.util.ObjectUtils;
 import com.lyndir.omicron.api.util.Maybool;
 import java.util.List;
 import java.util.function.Predicate;
@@ -90,9 +90,10 @@ public interface IGameObject extends GameObserver, GameObservable {
      *
      * @return A proxy object that you can run your method on.
      */
-    default <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final int index, @Nullable final Object elseValue)
+    default <M extends IModule, T> T onModuleElse(final PublicModuleType<M> moduleType, final int index, final T elseValue, final NNFunctionNN<M, T> operation)
             throws NotAuthenticatedException, NotObservableException {
-        return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, index ).orElse( null ), elseValue );
+        Optional<M> module = getModule( moduleType, index );
+        return module.isPresent()? operation.apply( module.get() ): elseValue;
     }
 
     /**
@@ -105,10 +106,11 @@ public interface IGameObject extends GameObserver, GameObservable {
      *
      * @return A proxy object that you can run your method on.
      */
-    default <M extends IModule> M onModuleElse(final PublicModuleType<M> moduleType, final Predicate<M> predicate,
-                                               @Nullable final Object elseValue)
+    default <M extends IModule, T> T onModuleElse(final PublicModuleType<M> moduleType, final Predicate<M> predicate,
+                                                final T elseValue, final NNFunctionNN<M, T> operation)
             throws NotAuthenticatedException, NotObservableException {
-        return ObjectUtils.ifNotNullElse( moduleType.getModuleType(), getModule( moduleType, predicate ).orElse( null ), elseValue );
+        Optional<M> module = getModule( moduleType, predicate );
+        return module.isPresent()? operation.apply( module.get() ): elseValue;
     }
 
     /**
@@ -121,9 +123,11 @@ public interface IGameObject extends GameObserver, GameObservable {
      *
      * @return A proxy object that you can run your method on.
      */
-    default <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final int index)
+    @Nullable
+    default <M extends IModule, T> T onModule(final PublicModuleType<M> moduleType, final int index, final NFunctionNN<M, T> operation)
             throws NotAuthenticatedException, NotObservableException {
-        return onModuleElse( moduleType, index, null );
+        Optional<M> module = getModule( moduleType, index );
+        return module.isPresent()? operation.apply( module.get() ): null;
     }
 
     /**
@@ -136,9 +140,11 @@ public interface IGameObject extends GameObserver, GameObservable {
      *
      * @return A proxy object that you can run your method on.
      */
-    default <M extends IModule> M onModule(final PublicModuleType<M> moduleType, final Predicate<M> predicate)
+    @Nullable
+    default <M extends IModule, T> T onModule(final PublicModuleType<M> moduleType, final Predicate<M> predicate, final NFunctionNN<M, T> operation)
             throws NotAuthenticatedException, NotObservableException {
-        return onModuleElse( moduleType, predicate, null );
+        Optional<M> module = getModule( moduleType, predicate );
+        return module.isPresent()? operation.apply( module.get() ): null;
     }
 
     /**
@@ -153,13 +159,13 @@ public interface IGameObject extends GameObserver, GameObservable {
 
     @Override
     default Maybool canObserve(@Nonnull final GameObservable observable) {
-        return onModuleElse( PublicModuleType.BASE, 0, Maybool.no() ).getController().canObserve( observable );
+        return onModuleElse( PublicModuleType.BASE, 0, Maybool.no(), module -> module.getController().canObserve( observable ) );
     }
 
     @Nonnull
     @Override
     default Stream<? extends ITile> observableTiles() {
-        return onModuleElse( PublicModuleType.BASE, 0, ImmutableList.of() ).getController().observableTiles();
+        return onModuleElse( PublicModuleType.BASE, 0, Stream.empty(), module -> module.getController().observableTiles() );
     }
 
     /**

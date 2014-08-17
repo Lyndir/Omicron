@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
+import javax.annotation.Nullable;
 
 
 public class PlayerKey implements Serializable {
@@ -17,7 +18,7 @@ public class PlayerKey implements Serializable {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(@Nullable final Object obj) {
         if (obj == this)
             return true;
         if (!(obj instanceof PlayerKey))

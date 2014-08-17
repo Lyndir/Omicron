@@ -94,11 +94,11 @@ public class WeaponModule extends Module implements IWeaponModule, IWeaponModule
     @Override
     public boolean fireAt(final ITile target)
             throws NotAuthenticatedException, NotOwnedException, NotObservableException, IWeaponModuleController.OutOfRangeException,
-                   IWeaponModuleController.OutOfRepeatsException,
-                   IWeaponModuleController.OutOfAmmunitionException {
+                   IWeaponModuleController.OutOfRepeatsException, IWeaponModuleController.OutOfAmmunitionException {
         assertOwned();
         Security.assertObservable( target );
-        assertState( getGameObject().getLocation().get().getPosition().distanceTo( target.getPosition() ) <= range, IWeaponModuleController.OutOfRangeException.class );
+        assertState( getGameObject().getLocation().get().getPosition().distanceTo( target.getPosition() ) <= range,
+                     IWeaponModuleController.OutOfRangeException.class );
         assertState( repeated < repeat, IWeaponModuleController.OutOfRepeatsException.class );
         assertState( ammunition > 0, IWeaponModuleController.OutOfAmmunitionException.class );
 
@@ -108,12 +108,17 @@ public class WeaponModule extends Module implements IWeaponModule, IWeaponModule
         ++repeated;
         --ammunition;
 
-        getGameObject().getGame().getController().fireIfObservable( getGameObject() )
-                           .onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
+        getGameObject().getGame()
+                       .getController()
+                       .fireIfObservable( getGameObject() )
+                       .onWeaponFired( this, target, repeatedChange.to( repeated ), ammunitionChange.to( ammunition ) );
 
         Maybe<? extends IGameObject> targetGameObject = target.getContents();
         if (targetGameObject.isPresent())
-            targetGameObject.get().onModule( ModuleType.BASE, 0 ).addDamage( firePower + RANDOM.nextInt( variance ) );
+            targetGameObject.get().onModule( ModuleType.BASE, 0, module -> {
+                module.addDamage( firePower + RANDOM.nextInt( variance ) );
+                return Void.TYPE;
+            } );
 
         return true;
     }

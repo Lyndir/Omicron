@@ -1,7 +1,5 @@
 package com.lyndir.omicron.api;
 
-import static com.lyndir.lhunath.opal.system.util.ObjectUtils.isEqual;
-
 import com.google.common.collect.*;
 import com.lyndir.lhunath.opal.math.Side;
 import com.lyndir.lhunath.opal.math.Vec2;
@@ -99,7 +97,7 @@ public interface ITile extends GameObservable {
             case UNKNOWN:
                 return Maybool.unknown();
             case PRESENT:
-                return Maybool.from( isEqual( contents.get(), target ) );
+                return Maybool.from( contents.get().equals( target ) );
         }
 
         throw new AlreadyCheckedException();
